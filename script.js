@@ -328,15 +328,58 @@
   let currentPage = "dashboard";
   let currentSettingsTab = "general";
   let toastTimeout = null;
+  let remoteAuthenticated = false;
+  let remoteSyncTimer = null;
+  let remoteSyncRunning = false;
+  let remoteSyncQueued = false;
 
   function saveData() {
     try {
       localStorage.setItem(DATA_KEY, JSON.stringify(data));
+      if (remoteAuthenticated) scheduleRemoteSync();
       return true;
     } catch (error) {
       console.error("SmartGoal storage error:", error);
       showToast("Ma’lumotni saqlashda xatolik yuz berdi.", "error");
       return false;
+    }
+  }
+
+  function scheduleRemoteSync() {
+    if (remoteSyncTimer) clearTimeout(remoteSyncTimer);
+    remoteSyncTimer = setTimeout(() => {
+      remoteSyncTimer = null;
+      syncDataToServer();
+    }, 500);
+  }
+
+  async function syncDataToServer() {
+    if (!remoteAuthenticated) return;
+    if (remoteSyncRunning) { remoteSyncQueued = true; return; }
+    remoteSyncRunning = true;
+    try {
+      const response = await fetch("/api/data", {
+        method: "PUT",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data })
+      });
+      if (response.status === 401) {
+        remoteAuthenticated = false;
+        showAuthentication();
+        showToast("Sessiya tugadi. Qayta kiring.", "error");
+      } else if (!response.ok) {
+        throw new Error("Ma’lumot serverga saqlanmadi.");
+      }
+    } catch (error) {
+      console.error("SmartGoal sync error:", error);
+      showToast("Internet yoki server bilan aloqa uzildi. Ma’lumot qurilmada saqlandi.", "error");
+    } finally {
+      remoteSyncRunning = false;
+      if (remoteSyncQueued) {
+        remoteSyncQueued = false;
+        scheduleRemoteSync();
+      }
     }
   }
 
@@ -813,70 +856,123 @@
     $("#app-shell")?.classList.add("hidden");
   }
 
-  function registerLocal(form) {
+  async function registerRemote(form) {
     const formData = new FormData(form);
     const name = String(formData.get("name") || "").trim();
     const email = String(formData.get("email") || "").trim().toLowerCase();
     const birthdate = String(formData.get("birthdate") || "");
     const password = String(formData.get("password") || "");
     const terms = formData.get("terms");
-
     const age = calculateAge(birthdate);
 
-    if (name.length < 2 || !email || !age && age !== 0 || !terms) {
+    if (name.length < 2 || !email || age === null || !terms) {
       showToast("Barcha maydonlarni to‘g‘ri to‘ldiring.", "error");
       return;
     }
-
-    if (password.length < 8) {
-      showToast("Parol kamida 8 ta belgidan iborat bo‘lsin.", "error");
+    if (password.length < 8 || password.length > 128) {
+      showToast("Parol 8–128 belgi bo‘lishi kerak.", "error");
       return;
     }
 
-    data = createInitialData();
-    data.profile.name = name;
-    data.profile.birthdate = birthdate;
-    data.profile.age = age;
-    data.profile.username = normalizedUsername(name.replace(/\s+/g, "."));
-    data.profile.email = email;
+    let username = normalizedUsername(name.replace(/\s+/g, "."));
+    if (!isValidUsername(username)) username = "user_" + Date.now().toString().slice(-8);
 
-    if (!isValidUsername(data.profile.username)) {
-      data.profile.username = `user_${Date.now().toString().slice(-8)}`;
+    const button = form.querySelector("button[type='submit']");
+    const originalText = button?.textContent;
+    if (button) { button.disabled = true; button.textContent = "Hisob yaratilmoqda..."; }
+
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, username, email, birthdate, password })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "Ro‘yxatdan o‘tishda xatolik yuz berdi.");
+
+      remoteAuthenticated = true;
+      localStorage.removeItem(SESSION_KEY);
+      data = createInitialData();
+      data.profile.name = name;
+      data.profile.birthdate = birthdate;
+      data.profile.age = age;
+      data.profile.username = username;
+      data.profile.email = email;
+      settings.difficulty = "auto";
+      saveSettings();
+      saveData();
+      showApplication();
+      showToast("SmartGoal’ga xush kelibsiz!");
+    } catch (error) {
+      showToast(error.message || "Server bilan bog‘lanib bo‘lmadi.", "error");
+    } finally {
+      if (button) { button.disabled = false; button.textContent = originalText || "Hisob yaratish"; }
     }
-
-    settings.difficulty = "auto";
-    saveSettings();
-    saveData();
-
-    localStorage.setItem(SESSION_KEY, "local-demo");
-    showApplication();
-    showToast("SmartGoal’ga xush kelibsiz!");
   }
 
-  function loginLocal(form) {
+  async function loginRemote(form) {
     const formData = new FormData(form);
-    const identifier = String(formData.get("identifier") || "").trim();
+    const identifier = String(formData.get("identifier") || "").trim().toLowerCase();
     const password = String(formData.get("password") || "");
 
     if (!identifier || !password) {
-      showToast("Login va parolni kiriting.", "error");
+      showToast("Username yoki email va parolni kiriting.", "error");
       return;
     }
 
-    // Frontend-only demonstration login.
-    // Real account verification is added when the backend is connected.
-    if (!data.profile.name || data.profile.name === "SmartGoal foydalanuvchisi") {
-      showToast("Demo hisob hali yaratilmagan. Ro‘yxatdan o‘ting.", "error");
-      switchAuthTab("register");
-      return;
-    }
+    const button = form.querySelector("button[type='submit']");
+    const originalText = button?.textContent;
+    if (button) { button.disabled = true; button.textContent = "Tekshirilmoqda..."; }
 
-    localStorage.setItem(SESSION_KEY, "local-demo");
-    showApplication();
-    showToast("Xush kelibsiz!");
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier, password })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "Kirish amalga oshmadi.");
+
+      remoteAuthenticated = true;
+      localStorage.removeItem(SESSION_KEY);
+      await loadRemoteData();
+      if (!data.profile.name || data.profile.name === "SmartGoal foydalanuvchisi") {
+        data.profile.name = result.user?.name || "Foydalanuvchi";
+        data.profile.email = result.user?.email || "";
+        data.profile.username = result.user?.username || "";
+        data.profile.birthdate = result.user?.birthdate || "";
+        data.profile.age = calculateAge(data.profile.birthdate);
+      }
+      showApplication();
+      checkAchievements();
+      showToast("Xush kelibsiz!");
+    } catch (error) {
+      remoteAuthenticated = false;
+      showToast(error.message || "Server bilan bog‘lanib bo‘lmadi.", "error");
+    } finally {
+      if (button) { button.disabled = false; button.textContent = originalText || "Kirish"; }
+    }
   }
 
-  function logout() {
+  async function loadRemoteData() {
+    const response = await fetch("/api/data", { credentials: "same-origin" });
+    if (!response.ok) throw new Error(response.status === 401 ? "Sessiya tugagan. Qayta kiring." : "Ma’lumotlarni yuklab bo‘lmadi.");
+    const result = await response.json();
+    if (!result.success || !result.data) throw new Error("Serverdan kelgan ma’lumot noto‘g‘ri.");
+    localStorage.setItem(DATA_KEY, JSON.stringify(result.data));
+    data = loadData();
+    if (data.profile.birthdate) data.profile.age = calculateAge(data.profile.birthdate);
+  }
+
+  async function logout() {
+    try {
+      await fetch("/api/logout", { method: "POST", credentials: "same-origin" });
+    } catch (error) {
+      console.warn("Serverdan chiqish so‘rovi bajarilmadi:", error);
+    }
+    remoteAuthenticated = false;
     localStorage.removeItem(SESSION_KEY);
     showAuthentication();
     showToast("Hisobdan chiqdingiz.");
@@ -2738,11 +2834,11 @@
     switch (form.id) {
       case "login-form":
         event.preventDefault();
-        loginLocal(form);
+        loginRemote(form);
         break;
       case "register-form":
         event.preventDefault();
-        registerLocal(form);
+        registerRemote(form);
         break;
       case "profile-form":
         event.preventDefault();
@@ -2823,27 +2919,37 @@
 
   /* -------------------- INITIALIZATION -------------------- */
 
-  function initializeSmartGoal() {
+  async function initializeSmartGoal() {
     applySettings();
-
     const maxDate = $("#register-birthdate");
     if (maxDate) maxDate.max = today();
+    localStorage.removeItem(SESSION_KEY);
 
-    const session = localStorage.getItem(SESSION_KEY);
-
-    if (session && data.profile.name && data.profile.name !== "SmartGoal foydalanuvchisi") {
+    try {
+      const response = await fetch("/api/me", { credentials: "same-origin" });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success || !result.user) throw new Error("Not authenticated");
+      remoteAuthenticated = true;
+      await loadRemoteData();
+      if (!data.profile.name || data.profile.name === "SmartGoal foydalanuvchisi") {
+        data.profile.name = result.user.name || "Foydalanuvchi";
+        data.profile.email = result.user.email || "";
+        data.profile.username = result.user.username || "";
+        data.profile.birthdate = result.user.birthdate || "";
+        data.profile.age = calculateAge(data.profile.birthdate);
+      }
       showApplication();
-    } else {
+      checkAchievements();
+    } catch {
+      remoteAuthenticated = false;
       showAuthentication();
       switchAuthTab("login");
     }
-
     updateProfileDisplay();
     refreshIcons();
   }
 
   function syncSmartGoalData() {
-    // Backend synchronization will be implemented in the next integration stage.
     saveData();
     render();
   }
@@ -2900,7 +3006,6 @@
 
   function start() {
     attachEvents();
-    checkAchievements();
     initializeSmartGoal();
   }
 
