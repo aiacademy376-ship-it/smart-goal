@@ -3,7 +3,7 @@ main = "worker/index.js"
 compatibility_date = "2026-11-03"
 
 [vars]
-ALLOWED_ORIGINS = "https://aiacademy376-ship-it.github.io,https://smartgoal.pages.dev"
+ALLOWED_ORIGINS = "https://aiacademy376-ship-it.github.io,https://smart-goal.pages.dev"
 
 [[d1_databases]]
 binding = "DB"
