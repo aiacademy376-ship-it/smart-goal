@@ -1257,6 +1257,9 @@
       return;
     }
 
+    const canAfford = Number(data.xp) >= item.price;
+    const missingXP = Math.max(0, item.price - (Number(data.xp) || 0));
+
     openModal(
       "Xaridni tasdiqlash",
       `
@@ -1265,11 +1268,14 @@
           <h3>${escapeHTML(item.name)}</h3>
           <p>${escapeHTML(item.description)}</p>
           <strong>${formatNumber(item.price)} XP</strong>
+          <p>${canAfford
+            ? `Balansingiz: ${formatNumber(data.xp)} XP`
+            : `Balansingiz: ${formatNumber(data.xp)} XP. Yana ${formatNumber(missingXP)} XP kerak.`}</p>
         </div>
       `,
       `
         <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
-        <button class="primary-button" type="button" data-action="confirm-purchase" data-id="${escapeHTML(id)}">Xarid qilish</button>
+        <button class="primary-button" type="button" data-action="confirm-purchase" data-id="${escapeHTML(id)}" ${canAfford ? "" : "disabled"}>${canAfford ? "Xarid qilish" : "XP yetarli emas"}</button>
       `
     );
   }
@@ -1955,6 +1961,7 @@
       <div class="store-grid">
         ${STORE_ITEMS.map(item => {
           const owned = data.inventory.some(product => product.id === item.id);
+          const canAfford = Number(data.xp) >= item.price;
           return `
             <article class="store-item">
               <div class="store-preview">
@@ -1967,7 +1974,7 @@
                   <strong>${formatNumber(item.price)} XP</strong>
                   ${owned
                     ? `<button class="secondary-button" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button>`
-                    : `<button class="primary-button" type="button" data-action="buy-item" data-id="${escapeHTML(item.id)}">Xarid</button>`}
+                    : `<button class="primary-button" type="button" data-action="buy-item" data-id="${escapeHTML(item.id)}" ${canAfford ? "" : "disabled"}>${canAfford ? "Xarid" : "XP yetarli emas"}</button>`}
                 </div>
               </div>
             </article>
