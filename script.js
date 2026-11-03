@@ -2831,7 +2831,7 @@
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
 
-    switch (form.id) {
+    switch (form.getAttribute("id")) {
       case "login-form":
         event.preventDefault();
         loginRemote(form);
