@@ -332,6 +332,7 @@
   let remoteSyncTimer = null;
   let remoteSyncRunning = false;
   let remoteSyncQueued = false;
+  let aiConversation = [];
 
   function saveData() {
     try {
@@ -505,18 +506,11 @@
     saveData();
   }
 
-  function spendXP(amount) {
-    const points = Math.max(0, Math.floor(Number(amount) || 0));
-
-    if (!points || data.xp < points) {
-      showToast("Bu xarid uchun ochkolaringiz yetarli emas.", "error");
-      return false;
-    }
-
-    data.xp -= points;
-    data.spentXP += points;
-    saveData();
-    return true;
+  async function spendXP(amount) {
+    const points=Math.max(0,Math.floor(Number(amount)||0));
+    if(!points||data.xp<points){showToast("Bu xarid uchun ochkolaringiz yetarli emas.","error");return false;}
+    try{const response=await fetch("/api/xp/spend",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:points})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"XP yechilmadi.");data.xp=Number(result.xpBalance||0);data.spentXP=(Number(data.spentXP)||0)+points;saveData();return true;}
+    catch(error){showToast(error.message||"XP yechishda xatolik yuz berdi.","error");return false;}
   }
 
   /* -------------------- NOTIFICATIONS -------------------- */
@@ -1103,12 +1097,11 @@
           </div>
 
           <div class="form-field">
-            <label class="field-label">Mukofot XP</label>
-            <select class="field-select" name="reward">
-              ${[10, 15, 20, 25, 50, 100].map(value =>
-                `<option value="${value}" ${(task?.reward || 10) === value ? "selected" : ""}>${value} XP</option>`
-              ).join("")}
+            <label class="field-label">Taxminiy bajarish vaqti</label>
+            <select class="field-select" name="estimatedMinutes">
+              ${[15,30,45,60,90,120,180].map(value => `<option value="${value}" ${(task?.estimatedMinutes||30)===value?"selected":""}>${value} daqiqa</option>`).join("")}
             </select>
+            <small>XP miqdorini AI belgilaydi (0–15 XP).</small>
           </div>
 
           <div class="form-field full-width">
@@ -1139,12 +1132,7 @@
       return;
     }
 
-    const values = {
-      title,
-      date: String(fd.get("date") || today()),
-      reward: Math.min(100, Math.max(5, Number(fd.get("reward")) || 10)),
-      goalId: String(fd.get("goalId") || "")
-    };
+    const values = { title, date: String(fd.get("date") || today()), estimatedMinutes: Math.max(5,Math.min(480,Number(fd.get("estimatedMinutes"))||30)), goalId: String(fd.get("goalId") || "") };
 
     if (id) {
       const task = data.tasks.find(item => item.id === id);
@@ -1152,12 +1140,7 @@
       Object.assign(task, values);
     } else {
       data.tasks.unshift({
-        id: uid(),
-        ...values,
-        completed: false,
-        xpAwarded: false,
-        completedAt: null,
-        createdAt: new Date().toISOString()
+        id: uid(), ...values, completed: false, xpAwarded: false, xpEarned: 0, completedAt: null, createdAt: new Date().toISOString()
       });
     }
 
@@ -1167,50 +1150,26 @@
     showToast("Vazifa saqlandi.");
   }
 
-  function toggleTask(id) {
-    const task = data.tasks.find(item => item.id === id);
-    if (!task) return;
-
-    if (!task.completed) {
-      task.completed = true;
-      task.completedAt = new Date().toISOString();
-
-      if (!task.xpAwarded) {
-        task.xpAwarded = true;
-        addXP(task.reward || 10, `Vazifa: ${task.title}`);
-      }
-
-      if (task.goalId) {
-        const goal = data.goals.find(item => item.id === task.goalId);
-
-        if (goal) {
-          const linkedTasks = data.tasks.filter(item => item.goalId === goal.id);
-          const completed = linkedTasks.filter(item => item.completed).length;
-
-          goal.progress = linkedTasks.length
-            ? Math.round((completed / linkedTasks.length) * 100)
-            : goal.progress;
-
-          if (goal.progress >= 100 && !goal.completed) {
-            goal.completed = true;
-            addXP(50, `Maqsad yakunlandi: ${goal.title}`);
-            addNotification("Maqsad yakunlandi!", `“${goal.title}” maqsadini bajardingiz.`);
-          }
-        }
-      }
-
+  async function toggleTask(id) {
+    const task=data.tasks.find(item=>item.id===id);if(!task)return;
+    if(!task.completed){
+      task.completed=true;task.completedAt=new Date().toISOString();render();
+      if(!task.xpAwarded){try{
+        const goal=data.goals.find(item=>item.id===task.goalId);
+        const response=await fetch("/api/tasks/complete",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:{id:task.id,title:task.title,date:task.date||today(),estimatedMinutes:task.estimatedMinutes||30,goalTitle:goal?.title||""}})});
+        const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI vazifani baholay olmadi.");
+        data.xp=Number(result.xpBalance||0);task.xpAwarded=true;task.xpEarned=Number(result.awarded||0);
+        if(task.xpEarned>0){data.activity.push({id:uid(),date:today(),xp:task.xpEarned,reason:"AI baholadi: "+task.title});data.activity=data.activity.slice(-180);}
+        if(result.dailyLimitReached)showToast("Kunlik 45 XP limiti to‘ldi. Vazifa qayd etildi, XP berilmadi.","error");
+        else if(result.alreadyAwarded)showToast("Bu vazifa uchun XP avval berilgan.","error");
+        else showToast("AI bahosi: +"+task.xpEarned+" XP · "+result.difficulty+"/5 · "+(result.onTime?"muddatida":"kechikib"));
+      }catch(error){task.completed=false;task.completedAt=null;saveData();render();showToast(error.message||"XP hisoblashda xatolik.","error");return;}}
+      if(task.goalId){const goal=data.goals.find(item=>item.id===task.goalId);if(goal){const linked=data.tasks.filter(item=>item.goalId===goal.id),completed=linked.filter(item=>item.completed).length;goal.progress=linked.length?Math.round(completed/linked.length*100):goal.progress;if(goal.progress>=100&&!goal.completed){goal.completed=true;addNotification("Maqsad yakunlandi!","“"+goal.title+"” maqsadini bajardingiz.");}}}
       checkAchievements();
-      showToast(`Vazifa bajarildi! +${task.reward || 10} XP`);
-    } else {
-      // Completed tasks can be reopened, but awarded XP is not deducted.
-      task.completed = false;
-      task.completedAt = null;
-      showToast("Vazifa qayta ochildi.");
-    }
-
-    saveData();
-    render();
+    }else{task.completed=false;task.completedAt=null;showToast("Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.");}
+    saveData();render();
   }
+
 
   function deleteTask(id) {
     const task = data.tasks.find(item => item.id === id);
@@ -1280,7 +1239,7 @@
     );
   }
 
-  function confirmPurchase(id) {
+  async function confirmPurchase(id) {
     const item = STORE_ITEMS.find(product => product.id === id);
     if (!item) return;
 
@@ -1290,7 +1249,7 @@
       return;
     }
 
-    if (!spendXP(item.price)) return;
+    if (!await spendXP(item.price)) return;
 
     data.inventory.push({
       id: item.id,
@@ -1461,7 +1420,7 @@
               <small>${escapeHTML(formatDate(task.date))}</small>
             </div>
 
-            <span class="task-reward">${icon("zap", 12)} ${task.reward || 10} XP</span>
+            <span class="task-reward">${icon("zap", 12)} AI: 0–15 XP</span>
           </div>
         `).join("")
       : emptyState("Buguncha vazifalar yo‘q", textForUser("emptyTasks"), "calendar-check");
@@ -1693,7 +1652,7 @@
                 <small>${escapeHTML(formatDate(task.date))}</small>
               </div>
 
-              <span class="task-reward">${icon("zap", 12)} ${task.reward || 10} XP</span>
+              <span class="task-reward">${icon("zap", 12)} AI: 0–15 XP</span>
 
               <button class="icon-button" type="button"
                 data-action="edit-task" data-id="${escapeHTML(task.id)}"
@@ -1735,7 +1694,7 @@
           ? `<div class="task-list">${pendingTasks.filter(task => task.date === today()).map(task => `
               <div class="task-item">
                 <input class="task-checkbox" type="checkbox" data-action="toggle-task" data-id="${escapeHTML(task.id)}">
-                <div class="task-info"><strong>${escapeHTML(task.title)}</strong><small>${task.reward} XP</small></div>
+                <div class="task-info"><strong>${escapeHTML(task.title)}</strong><small>AI: 0–15 XP</small></div>
               </div>
             `).join("") || emptyState("Bugungi vazifalar yo‘q", "Yangi vazifa qo‘shishingiz mumkin.", "calendar-check")}</div>`
           : emptyState("Reja hali bo‘sh", "Vazifalar qo‘shish orqali rejalashtirishni boshlang.", "calendar")}
@@ -1745,11 +1704,12 @@
         <div class="card-header">
           <div>
             <h3 class="card-title">Maqsadlar asosida tavsiyalar</h3>
-            <p class="card-description">Hozircha SmartGoal ichidagi oddiy rejalashtirish yordamchisi</p>
+            <p class="card-description">AI maqsad va vazifalaringizdan kelib chiqib reja tuzadi.</p>
           </div>
-          <span class="nav-badge">AI keyin ulanadi</span>
+          <button class="card-action" type="button" data-action="generate-ai-plan">AI reja tuzsin</button>
         </div>
 
+        <div id="ai-plan-output" class="card-description" style="white-space:pre-wrap;margin:12px 0"></div>
         ${activeGoals.length ? activeGoals.map(goal => `
           <div class="goal-item">
             <div class="goal-item-header">
@@ -2051,58 +2011,28 @@
   /* -------------------- AI PAGE -------------------- */
 
   function renderAI() {
+    const messages=aiConversation.length?aiConversation:[{role:"assistant",content:"Salom! Men SmartGoal AI murabbiyiman. Maqsadlaringiz, kun tartibingiz va vazifalaringizni birga yaxshilaymiz."}];
     return `
-      ${pageHeader(
-        "SHAXSIY YORDAMCHI",
-        "Smart AI",
-        "Maqsadlaringiz va rejalaringiz bo‘yicha aqlli yordamchi."
-      )}
-
-      <section class="ai-panel">
-        <span class="eyebrow">SMARTGOAL INTELLIGENCE</span>
-        <h2>Rivojlanishingiz uchun aqlli yordam.</h2>
-        <p>
-          Kelajakda AI yoshingiz, maqsadlaringiz va tanlagan interfeys
-          murakkabligingizga mos tavsiyalar beradi.
-        </p>
-      </section>
-
-      <section class="card" style="margin-top:20px">
-        <h3 class="card-title">AI bilan suhbat</h3>
-        <p class="card-description">Hozircha demo rejim. AI xizmati keyingi backend bosqichida ulanadi.</p>
-
-        <div class="ai-chat" id="ai-chat">
-          <div class="ai-message">
-            Salom! Men SmartGoal yordamchisiman. Hozircha maqsadlaringiz asosida oddiy tavsiyalar bera olaman.
-          </div>
-        </div>
-
-        <form id="ai-form" class="ai-input-row" style="margin-top:18px">
-          <input name="message" placeholder="Savolingizni yozing..." maxlength="500" required>
-          <button class="primary-button" type="submit">${icon("send", 16)}</button>
-        </form>
-      </section>
-    `;
+      ${pageHeader("SHAXSIY YORDAMCHI","Smart AI","Maqsadlar, kun tartibi va vazifalar bo‘yicha jonli AI yordami.")}
+      <section class="ai-panel"><span class="eyebrow">SMARTGOAL INTELLIGENCE</span><h2>Rejangizni birga yaxshilaymiz.</h2><p>AI maqsadlaringiz va vazifalaringizni tahlil qilib, aniq tavsiyalar beradi.</p></section>
+      <section class="card" style="margin-top:20px"><h3 class="card-title">AI bilan suhbat</h3><p class="card-description">Savolingizni yozing — AI maqsadlaringiz kontekstida javob beradi.</p>
+        <div class="ai-chat" id="ai-chat">${messages.map(item=>'<div class="ai-message '+(item.role==="user"?"user":"")+'">'+escapeHTML(item.content)+'</div>').join("")}</div>
+        <form id="ai-form" class="ai-input-row" style="margin-top:18px"><input name="message" placeholder="Masalan: Imtihonga qanday tayyorlansam bo‘ladi?" maxlength="500" required><button class="primary-button" type="submit">${icon("send",16)}</button></form>
+      </section>`;
   }
-
-  function sendAIMessage(form) {
-    const input = form.elements.message;
-    const message = String(input.value || "").trim();
-    if (!message) return;
-
-    const chat = $("#ai-chat");
-    if (!chat) return;
-
-    chat.insertAdjacentHTML("beforeend", `
-      <div class="ai-message user">${escapeHTML(message)}</div>
-      <div class="ai-message">
-        Hozircha AI xizmati ulanmagan. Maqsadlaringizni “Maqsadlarim” bo‘limida belgilang.
-        Keyingi bosqichda sizga mos AI tavsiyalarini ulaymiz.
-      </div>
-    `);
-
-    input.value = "";
-    chat.scrollTop = chat.scrollHeight;
+  async function sendAIMessage(form) {
+    const input=form.elements.message,message=String(input.value||"").trim();if(!message)return;const chat=$("#ai-chat");if(!chat)return;
+    aiConversation.push({role:"user",content:message});aiConversation=aiConversation.slice(-12);chat.insertAdjacentHTML("beforeend",'<div class="ai-message user">'+escapeHTML(message)+'</div><div class="ai-message" id="ai-typing">AI javob yozmoqda...</div>');
+    input.value="";const submit=form.querySelector("button[type='submit']");if(submit)submit.disabled=true;chat.scrollTop=chat.scrollHeight;
+    try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message,history:aiConversation.slice(0,-1),language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI bilan bog‘lanib bo‘lmadi.");aiConversation.push({role:"assistant",content:result.answer});aiConversation=aiConversation.slice(-12);$("#ai-typing")?.remove();chat.insertAdjacentHTML("beforeend",'<div class="ai-message">'+escapeHTML(result.answer)+'</div>');}
+    catch(error){$("#ai-typing")?.remove();const msg=error.message||"AI hozircha javob bera olmadi.";aiConversation.push({role:"assistant",content:msg});chat.insertAdjacentHTML("beforeend",'<div class="ai-message">'+escapeHTML(msg)+'</div>');}
+    finally{if(submit)submit.disabled=false;chat.scrollTop=chat.scrollHeight;}
+  }
+  async function generateAIPlan() {
+    const output=$("#ai-plan-output"),button=document.querySelector("[data-action='generate-ai-plan']");if(!output)return;if(button)button.disabled=true;output.textContent="AI maqsadlaringiz va vazifalaringizni tahlil qilmoqda...";
+    try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"plan",language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI reja tuza olmadi.");output.textContent=result.answer;}
+    catch(error){output.textContent=error.message||"AI reja tuzishda xatolik yuz berdi.";}
+    finally{if(button)button.disabled=false;}
   }
 
   /* -------------------- NOTIFICATIONS PAGE -------------------- */
@@ -2670,6 +2600,9 @@
         break;
       case "refresh-friends":
         loadCommunityRelations();
+        break;
+      case "generate-ai-plan":
+        generateAIPlan();
         break;
       case "add-goal":
         openGoalForm();

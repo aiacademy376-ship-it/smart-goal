@@ -10,3 +10,6 @@ binding = "DB"
 database_name = "smartgoal-db"
 database_id = "08d5a6c1-0cd9-4cd8-8544-953a2a32b85b"
 migrations_dir = "worker/migrations"
+
+[ai]
+binding = "AI"
