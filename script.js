@@ -2011,7 +2011,7 @@
             ${icon("search")}
             <input id="community-search" type="search" placeholder="@username">
           </div>
-          <small>Hozircha demo rejim. Haqiqiy foydalanuvchilar qidiruvi backend ulanganda ishlaydi.</small>
+          <small>Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.</small>
         </div>
 
         <div id="community-results" style="margin-top:20px">
@@ -2881,6 +2881,60 @@
     }
   }
 
+  let communitySearchSequence = 0;
+
+  async function searchCommunityUsers(value) {
+    const query = normalizedUsername(value);
+    const results = $("#community-results");
+    const sequence = ++communitySearchSequence;
+    if (!results) return;
+
+    if (!query) {
+      results.innerHTML = emptyState("Qidiruvga tayyor", "Username kiriting.", "users");
+      return;
+    }
+    if (query.length < 3) {
+      results.innerHTML = emptyState("Yana belgi kiriting", "Qidiruv uchun kamida 3 ta belgi kerak.", "search");
+      return;
+    }
+
+    results.innerHTML = emptyState("Qidirilmoqda...", "Foydalanuvchilar tekshirilmoqda.", "loader-circle");
+
+    try {
+      const response = await fetch("/api/users/search?username=" + encodeURIComponent(query), {
+        method: "GET",
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      const result = await response.json().catch(() => ({}));
+      if (sequence !== communitySearchSequence) return;
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Qidiruv vaqtida xatolik yuz berdi.");
+      }
+
+      const users = Array.isArray(result.users) ? result.users : [];
+      if (!users.length) {
+        results.innerHTML = emptyState("Foydalanuvchi topilmadi", "Bu username bilan boshlanadigan foydalanuvchi yo‘q.", "user-search");
+        return;
+      }
+
+      results.innerHTML = users.map(user => `
+        <div class="user-item">
+          <span class="avatar avatar-medium">${icon("user-round")}</span>
+          <div class="user-item-info">
+            <strong>${escapeHTML(user.name || "Foydalanuvchi")}</strong>
+            <small>@${escapeHTML(user.username || "")}${user.username === data.profile.username ? " · Sizning profilingiz" : ""}</small>
+          </div>
+          ${user.username === data.profile.username ? `<span class="user-rank">Siz</span>` : ""}
+        </div>
+      `).join("");
+      refreshIcons();
+    } catch (error) {
+      if (sequence !== communitySearchSequence) return;
+      results.innerHTML = emptyState("Qidiruv ishlamadi", escapeHTML(error.message || "Server bilan bog‘lanib bo‘lmadi."), "alert-circle");
+    }
+  }
+
   function handleInput(event) {
     const target = event.target;
 
@@ -2889,31 +2943,7 @@
     }
 
     if (target.id === "community-search") {
-      const query = normalizedUsername(target.value);
-      const results = $("#community-results");
-      if (!results) return;
-
-      if (!query) {
-        results.innerHTML = emptyState("Qidiruvga tayyor", "Username kiriting.", "users");
-      } else if (query === data.profile.username) {
-        results.innerHTML = `
-          <div class="user-item">
-            <span class="avatar avatar-medium">${data.profile.avatar ? `<img src="${escapeHTML(data.profile.avatar)}" alt="">` : icon("user-round")}</span>
-            <div class="user-item-info">
-              <strong>${escapeHTML(data.profile.name)}</strong>
-              <small>@${escapeHTML(data.profile.username)} · Sizning profilingiz</small>
-            </div>
-            <span class="user-rank">Level ${getRank().level}</span>
-          </div>
-        `;
-        refreshIcons();
-      } else {
-        results.innerHTML = emptyState(
-          "Foydalanuvchi topilmadi",
-          "Haqiqiy foydalanuvchilarni qidirish uchun backend va hamjamiyat tizimi ulanishi kerak.",
-          "user-search"
-        );
-      }
+      searchCommunityUsers(target.value);
     }
   }
 
