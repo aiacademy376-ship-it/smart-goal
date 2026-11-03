@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT NOT NULL,
   username TEXT NOT NULL UNIQUE COLLATE NOCASE,
   email TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  age_band TEXT NOT NULL CHECK(age_band IN ('13_15','16_17','adult')),
+  terms_accepted_at TEXT NOT NULL,
   password_hash TEXT NOT NULL,
   password_salt TEXT NOT NULL,
   password_iterations INTEGER NOT NULL,
