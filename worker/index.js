@@ -299,6 +299,36 @@ export default {
         return json({ success: true, user: publicUser(user) });
       }
 
+      if (request.method === "GET" && path === "/api/users/search") {
+        const user = await authenticatedUser(request, env);
+        if (!user) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
+
+        const username = String(url.searchParams.get("username") || "")
+          .trim().toLowerCase().replace(/^@/, "");
+        if (!/^[a-z0-9_][a-z0-9_.]{2,19}$/.test(username)) {
+          return json({ success: false, message: "Qidirish uchun kamida 3 ta belgi kiriting." }, 400);
+        }
+
+        const rateKey = await clientKey(request, "community-search");
+        if (!await enforceRateLimit(env, rateKey, 30, 60)) {
+          return json({ success: false, message: "Qidiruv juda tez takrorlandi. Biroz kuting." }, 429);
+        }
+
+        const result = await env.DB.prepare(
+          "SELECT name, username FROM users " +
+          "WHERE username LIKE ? COLLATE NOCASE " +
+          "ORDER BY username COLLATE NOCASE LIMIT 10"
+        ).bind(username + "%").all();
+
+        return json({
+          success: true,
+          users: (result.results || []).map(item => ({
+            name: item.name,
+            username: item.username
+          }))
+        });
+      }
+
       if (path === "/api/data") {
         const user = await authenticatedUser(request, env);
         if (!user) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
