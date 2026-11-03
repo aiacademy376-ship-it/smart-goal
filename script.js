@@ -2004,6 +2004,7 @@
   /* -------------------- COMMUNITY PAGE -------------------- */
 
   function renderCommunity() {
+    setTimeout(loadCommunityRelations, 0);
     return `
       ${pageHeader(
         "HAMJAMIYAT",
@@ -2023,6 +2024,16 @@
 
         <div id="community-results" style="margin-top:20px">
           ${emptyState("Qidiruvga tayyor", "Username kiriting. Haqiqiy foydalanuvchilar ro‘yxati backend bilan ulanadi.", "users")}
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:20px">
+        <div class="card-header">
+          <h3 class="card-title">Do‘stlik so‘rovlari</h3>
+          <button class="card-action" type="button" data-action="refresh-friends">Yangilash</button>
+        </div>
+        <div id="community-relations">
+          ${emptyState("Yuklanmoqda...", "Do‘stlik ma’lumotlari olinmoqda.", "users")}
         </div>
       </section>
 
@@ -2651,6 +2662,15 @@
     const id = actionElement.dataset.id;
 
     switch (action) {
+      case "send-friend-request":
+        sendFriendRequest(actionElement.dataset.userId);
+        break;
+      case "respond-friend":
+        respondFriendRequest(actionElement.dataset.requestId, actionElement.dataset.decision);
+        break;
+      case "refresh-friends":
+        loadCommunityRelations();
+        break;
       case "add-goal":
         openGoalForm();
         break;
@@ -2932,13 +2952,82 @@
             <strong>${escapeHTML(user.name || "Foydalanuvchi")}</strong>
             <small>@${escapeHTML(user.username || "")}${user.username === data.profile.username ? " · Sizning profilingiz" : ""}</small>
           </div>
-          ${user.username === data.profile.username ? `<span class="user-rank">Siz</span>` : ""}
+          ${user.username === data.profile.username
+            ? `<span class="user-rank">Siz</span>`
+            : `<button class="card-action" type="button" data-action="send-friend-request" data-user-id="${escapeHTML(user.id)}">Do‘st bo‘lish</button>`}
         </div>
       `).join("");
       refreshIcons();
+      loadCommunityRelations();
     } catch (error) {
       if (sequence !== communitySearchSequence) return;
       results.innerHTML = emptyState("Qidiruv ishlamadi", escapeHTML(error.message || "Server bilan bog‘lanib bo‘lmadi."), "alert-circle");
+    }
+  }
+
+  async function loadCommunityRelations() {
+    const container = $("#community-relations");
+    if (!container) return;
+    try {
+      const response = await fetch("/api/friends", { credentials: "same-origin" });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "Do‘stlar ro‘yxatini yuklab bo‘lmadi.");
+      const incoming = Array.isArray(result.incoming) ? result.incoming : [];
+      const outgoing = Array.isArray(result.outgoing) ? result.outgoing : [];
+      const friends = Array.isArray(result.friends) ? result.friends : [];
+      const section = (title, rows, renderRow, empty) => `
+        <div style="margin-top:14px">
+          <h4>${escapeHTML(title)}</h4>
+          ${rows.length ? rows.map(renderRow).join("") : `<p class="card-description">${escapeHTML(empty)}</p>`}
+        </div>`;
+      container.innerHTML =
+        section("Kelgan so‘rovlar", incoming, item => `
+          <div class="user-item">
+            <div class="user-item-info"><strong>${escapeHTML(item.name)}</strong><small>@${escapeHTML(item.username)}</small></div>
+            <button class="card-action" data-action="respond-friend" data-request-id="${escapeHTML(item.id)}" data-decision="accept">Qabul qilish</button>
+            <button class="card-action" data-action="respond-friend" data-request-id="${escapeHTML(item.id)}" data-decision="decline">Rad etish</button>
+          </div>`, "Hozircha kelgan so‘rov yo‘q.") +
+        section("Yuborilgan so‘rovlar", outgoing, item => `
+          <div class="user-item"><div class="user-item-info"><strong>${escapeHTML(item.name)}</strong><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Kutilmoqda</span></div>`, "Yuborilgan so‘rov yo‘q.") +
+        section("Do‘stlaringiz", friends, item => `
+          <div class="user-item"><div class="user-item-info"><strong>${escapeHTML(item.name)}</strong><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Do‘st</span></div>`, "Hali do‘stlar yo‘q.");
+    } catch (error) {
+      container.innerHTML = emptyState("Do‘stlar yuklanmadi", error.message || "Server bilan aloqa uzildi.", "alert-circle");
+    }
+    refreshIcons();
+  }
+
+  async function sendFriendRequest(userId) {
+    try {
+      const response = await fetch("/api/friends/request", {
+        method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "So‘rov yuborilmadi.");
+      showToast(result.message || "Do‘stlik so‘rovi yuborildi.");
+      await loadCommunityRelations();
+      const input = $("#community-search");
+      if (input?.value) searchCommunityUsers(input.value);
+    } catch (error) {
+      showToast(error.message || "So‘rov yuborilmadi.", "error");
+    }
+  }
+
+  async function respondFriendRequest(requestId, decision) {
+    try {
+      const response = await fetch("/api/friends/respond", {
+        method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, decision })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "Amal bajarilmadi.");
+      showToast(result.message || "So‘rov yangilandi.");
+      await loadCommunityRelations();
+    } catch (error) {
+      showToast(error.message || "Amal bajarilmadi.", "error");
     }
   }
 
