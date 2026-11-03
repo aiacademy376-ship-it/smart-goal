@@ -13,3 +13,11 @@ migrations_dir = "worker/migrations"
 
 [ai]
 binding = "AI"
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
