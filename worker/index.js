@@ -308,7 +308,7 @@ async function handleAI(request,env,user){
     messages.push({role:"user",content:message});
   }
   try{return json({success:true,answer:await runSmartAI(env,messages,{max_tokens:action==="plan"?900:650})});}
-  catch(error){console.error("SmartGoal AI error:",error);return json({success:false,message:error.message||"AI bilan bog‘lanib bo‘lmadi."},503);}
+  catch(error){console.error("SmartGoal AI error:",{name:error?.name||"Error",message:String(error?.message||error||"Unknown AI error").slice(0,500),cause:error?.cause?String(error.cause).slice(0,300):undefined});return json({success:false,message:error?.message||"AI bilan bog‘lanib bo‘lmadi."},503);}
 }
 async function handleTaskCompletion(request,env,user){
   if(!env.AI)return json({success:false,message:"AI baholash xizmati ulanmagan."},503);
