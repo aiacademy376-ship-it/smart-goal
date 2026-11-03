@@ -152,6 +152,7 @@ function publicUser(user) {
     id: user.id,
     name: user.name,
     email: user.email,
+    username: user.username,
     birthdate: user.birthdate || null,
     createdAt: user.created_at
   };
@@ -161,6 +162,7 @@ async function handleRegister(request, env) {
   const body = await readJson(request);
   const name = String(body.name || "").trim();
   const email = String(body.email || "").trim().toLowerCase();
+  const username = String(body.username || "").trim().toLowerCase();
   const password = String(body.password || "");
   const birthdate = body.birthdate ? String(body.birthdate) : null;
 
@@ -174,43 +176,43 @@ async function handleRegister(request, env) {
     return json({ success: false, message: "Juda ko‘p urinish. Keyinroq qayta urinib ko‘ring." }, 429);
   }
 
-  const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email).first();
-  if (existing) return json({ success: false, message: "Bu email bilan hisob mavjud." }, 409);
+  const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ? OR username = ?").bind(email, username).first();
+  if (existing) return json({ success: false, message: "Bu email yoki username band." }, 409);
 
   const credentials = await hashPassword(password);
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
 
   await env.DB.prepare(
-    "INSERT INTO users (id, name, email, password_hash, password_salt, password_iterations, birthdate, created_at, updated_at) " +
-    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-  ).bind(id, name, email, credentials.hash, credentials.salt, credentials.iterations, birthdate, now, now).run();
+    "INSERT INTO users (id, name, username, email, password_hash, password_salt, password_iterations, birthdate, created_at, updated_at) " +
+    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  ).bind(id, name, username, email, credentials.hash, credentials.salt, credentials.iterations, birthdate, now, now).run();
 
   await env.DB.prepare(
     "INSERT INTO user_data (user_id, data_json, updated_at) VALUES (?, ?, ?)"
-  ).bind(id, JSON.stringify({ profile: { name, email, birthdate }, goals: [], tasks: [], habits: [], activity: [], achievements: [], inventory: [], notifications: [], memories: [] }), now).run();
+  ).bind(id, JSON.stringify({ profile: { name, username, email, birthdate }, goals: [], tasks: [], habits: [], activity: [], achievements: [], inventory: [], notifications: [], memories: [] }), now).run();
 
   const token = await createSession(env, id);
-  return json({ success: true, user: { id, name, email, birthdate, createdAt: now } }, 201, {
+  return json({ success: true, user: { id, name, username, email, birthdate, createdAt: now } }, 201, {
     "set-cookie": cookieHeader(token, SESSION_TTL_SECONDS)
   });
 }
 
 async function handleLogin(request, env) {
   const body = await readJson(request);
-  const email = String(body.email || "").trim().toLowerCase();
+  const identifier = String(body.identifier || body.email || "").trim().toLowerCase();
   const password = String(body.password || "");
-  if (!email || !password) return json({ success: false, message: "Email va parolni kiriting." }, 400);
+  if (!identifier || !password) return json({ success: false, message: "Username yoki email va parolni kiriting." }, 400);
 
-  const rateKey = await clientKey(request, "login:" + email);
+  const rateKey = await clientKey(request, "login:" + identifier);
   if (!await enforceRateLimit(env, rateKey, 10, 900)) {
     return json({ success: false, message: "Juda ko‘p urinish. 15 daqiqadan keyin qayta urinib ko‘ring." }, 429);
   }
 
   const user = await env.DB.prepare(
-    "SELECT id, name, email, birthdate, password_hash, password_salt, password_iterations, created_at " +
-    "FROM users WHERE email = ? LIMIT 1"
-  ).bind(email).first();
+    "SELECT id, name, username, email, birthdate, password_hash, password_salt, password_iterations, created_at " +
+    "FROM users WHERE email = ? OR username = ? LIMIT 1"
+  ).bind(identifier, identifier).first();
 
   if (!user) return json({ success: false, message: "Email yoki parol noto‘g‘ri." }, 401);
 
