@@ -886,7 +886,7 @@
         method: "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, username, email, birthdate, password })
+        body: JSON.stringify({ name, username, email, birthdate, password, termsAccepted: true })
       });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success) throw new Error(result.message || "Ro‘yxatdan o‘tishda xatolik yuz berdi.");
