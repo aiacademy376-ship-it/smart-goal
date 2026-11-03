@@ -1,30 +1,42 @@
-# SmartGoal Cloudflare backend foundation
+# SmartGoal — Cloudflare deployment notes
 
-This directory is the first backend foundation for the SmartGoal upgrade.
+## Canonical files in this branch
 
-Files:
-- worker.js: Cloudflare Worker API for register, login, current user and logout.
-- schema.sql: D1 schema for users, sessions, goals, tasks, habits, settings, notifications and rewards.
-- wrangler.jsonc: Worker and D1 configuration template.
+Use the root-level deployment files below. The files formerly stored in this directory are an earlier draft and must not be deployed alongside the current implementation.
 
-Dashboard deployment:
-1. Create a D1 database named smartgoal-db in Cloudflare.
-2. Run schema.sql in the D1 Console.
-3. Copy the D1 database ID into wrangler.jsonc, replacing the placeholder.
-4. Create a Worker named smartgoal-api and paste worker.js into its dashboard editor.
-5. Bind the D1 database to the Worker using binding name DB.
-6. Set ALLOWED_ORIGINS to the exact frontend origin; never use wildcard *.
-7. Deploy and test GET /api/health.
+- `worker/index.js` — current Cloudflare Worker API.
+- `worker/migrations/0001_initial.sql` — current D1 migration.
+- `wrangler.toml` — Worker deployment configuration.
+- `functions/api/[[path]].js` — same-origin Cloudflare Pages API proxy.
+- `script.js` — frontend authentication and data-sync integration.
 
-Security:
-- Passwords use PBKDF2-HMAC-SHA-256 with random per-user salts.
-- Session tokens are random; only SHA-256 token hashes are stored in D1.
-- Session cookies are HttpOnly, Secure and SameSite=None.
-- Register and login have a basic per-IP rate limit and strict Origin checks.
-- Under-13 self-registration is blocked until a reviewed guardian-consent flow exists.
+## Existing Cloudflare resources (audited 2026-11-03)
 
-Production limitations:
-- Email verification, password reset, guardian consent, account deletion workflow, full audit logging and authenticated CRUD endpoints are not implemented yet.
-- The existing frontend still comments out auth.js and uses local-demo authentication. Do not enable production sign-in until frontend integration and deployment are completed.
-- GitHub Pages and workers.dev are cross-site. Third-party cookie restrictions can prevent cookie sessions from working consistently. Production should route /api through the same custom site origin (for example, a Pages Function proxy) before public sign-in is enabled.
-- Review privacy, child-safety and local legal requirements with qualified counsel before launch.
+- Existing Worker: `smart-goal` (keep unchanged until the replacement is tested).
+- D1 database: `smartgoal-db`, ID `08d5a6c1-0cd9-4cd8-8544-953a2a32b85b`.
+- The D1 database had zero tables at audit time.
+- No Pages project or R2 bucket existed at audit time.
+
+The root `wrangler.toml` targets a separate Worker named `smartgoal-api` and binds the audited D1 database using binding `DB`. Do not replace the existing `smart-goal` Worker during initial testing.
+
+## Pages configuration
+
+Connect the repository to Cloudflare Pages. Use the repository root as the output directory and no build command for the current static frontend. Keep `main` as the production branch; use `smartgoal/cloudflare-upgrade` as a preview branch until the changes pass validation.
+
+Set the Pages environment variable:
+
+- `API_ORIGIN` = `https://smartgoal-api.<your-workers-subdomain>.workers.dev`
+
+Set the Worker variable `ALLOWED_ORIGINS` to the exact Pages hostname(s), not a wildcard. Update the placeholder Pages hostname in `wrangler.toml` after Cloudflare assigns the actual project URL.
+
+## Current implementation limits
+
+- Account registration, login, logout, session lookup, and per-user JSON data persistence are implemented in the new API foundation.
+- Passwords are hashed with PBKDF2-HMAC-SHA-256 and random salts. Only session token hashes are stored in D1. Session cookies are HttpOnly, Secure and SameSite=Lax; the Pages proxy keeps the browser-facing API same-origin.
+- Login and registration have basic rate limiting and strict Origin allowlisting.
+- Self-registration under age 13 is blocked until a guardian-consent workflow exists. Age bands are stored for 13–15, 16–17 and adult accounts.
+- Email verification, password reset, guardian consent, account deletion, full audit logging, granular relational CRUD, community moderation and AI provider integration are not complete.
+- R2 is not required for the initial auth/data test; add it only when file/avatar uploads are implemented.
+- Review privacy, child-safety and Uzbekistan legal requirements with qualified counsel before public launch.
+
+Do not describe the platform as production-ready until deployment, migration, end-to-end auth, data persistence, security and UI tests have all passed.
