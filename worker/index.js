@@ -315,7 +315,7 @@ export default {
         }
 
         const result = await env.DB.prepare(
-          "SELECT name, username FROM users " +
+          "SELECT id, name, username FROM users " +
           "WHERE username LIKE ? COLLATE NOCASE " +
           "ORDER BY username COLLATE NOCASE LIMIT 10"
         ).bind(username + "%").all();
@@ -323,10 +323,89 @@ export default {
         return json({
           success: true,
           users: (result.results || []).map(item => ({
+            id: item.id,
             name: item.name,
             username: item.username
           }))
         });
+      }
+
+      if (request.method === "GET" && path === "/api/friends") {
+        const user = await authenticatedUser(request, env);
+        if (!user) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
+        const incoming = await env.DB.prepare(
+          "SELECT fr.id, u.name, u.username, fr.created_at AS createdAt " +
+          "FROM friend_requests fr JOIN users u ON u.id = fr.sender_id " +
+          "WHERE fr.receiver_id = ? AND fr.status = 'pending' ORDER BY fr.created_at DESC LIMIT 100"
+        ).bind(user.id).all();
+        const outgoing = await env.DB.prepare(
+          "SELECT fr.id, u.name, u.username, fr.created_at AS createdAt " +
+          "FROM friend_requests fr JOIN users u ON u.id = fr.receiver_id " +
+          "WHERE fr.sender_id = ? AND fr.status = 'pending' ORDER BY fr.created_at DESC LIMIT 100"
+        ).bind(user.id).all();
+        const friends = await env.DB.prepare(
+          "SELECT u.name, u.username, fr.updated_at AS since " +
+          "FROM friend_requests fr JOIN users u ON u.id = CASE WHEN fr.sender_id = ? THEN fr.receiver_id ELSE fr.sender_id END " +
+          "WHERE (fr.sender_id = ? OR fr.receiver_id = ?) AND fr.status = 'accepted' " +
+          "ORDER BY fr.updated_at DESC LIMIT 200"
+        ).bind(user.id, user.id, user.id).all();
+        return json({
+          success: true,
+          incoming: incoming.results || [],
+          outgoing: outgoing.results || [],
+          friends: friends.results || []
+        });
+      }
+
+      if (request.method === "POST" && path === "/api/friends/request") {
+        const user = await authenticatedUser(request, env);
+        if (!user) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
+        const body = await readJson(request);
+        const targetId = String(body.userId || "");
+        if (!targetId || targetId === user.id) return json({ success: false, message: "O‘zingizga so‘rov yubora olmaysiz." }, 400);
+        const target = await env.DB.prepare("SELECT id FROM users WHERE id = ?").bind(targetId).first();
+        if (!target) return json({ success: false, message: "Foydalanuvchi topilmadi." }, 404);
+        const existing = await env.DB.prepare(
+          "SELECT id, status, sender_id, receiver_id FROM friend_requests " +
+          "WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) LIMIT 1"
+        ).bind(user.id, targetId, targetId, user.id).first();
+        if (existing) {
+          if (existing.status === "accepted") return json({ success: false, message: "Siz allaqachon do‘stsiz." }, 409);
+          if (existing.status === "pending" && existing.sender_id === user.id) return json({ success: false, message: "So‘rov allaqachon yuborilgan." }, 409);
+          if (existing.status === "pending" && existing.receiver_id === user.id) {
+            await env.DB.prepare("UPDATE friend_requests SET status = 'accepted', updated_at = ? WHERE id = ?")
+              .bind(new Date().toISOString(), existing.id).run();
+            return json({ success: true, message: "Do‘stlik so‘rovi o‘zaro tasdiqlandi." });
+          }
+          await env.DB.prepare("DELETE FROM friend_requests WHERE id = ?").bind(existing.id).run();
+        }
+        const now = new Date().toISOString();
+        await env.DB.prepare(
+          "INSERT INTO friend_requests (id, sender_id, receiver_id, status, created_at, updated_at) VALUES (?, ?, ?, 'pending', ?, ?)"
+        ).bind(crypto.randomUUID(), user.id, targetId, now, now).run();
+        return json({ success: true, message: "Do‘stlik so‘rovi yuborildi." }, 201);
+      }
+
+      if (request.method === "POST" && path === "/api/friends/respond") {
+        const user = await authenticatedUser(request, env);
+        if (!user) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
+        const body = await readJson(request);
+        const requestId = String(body.requestId || "");
+        const decision = String(body.decision || "");
+        if (!requestId || !["accept", "decline"].includes(decision)) {
+          return json({ success: false, message: "So‘rov yoki amal noto‘g‘ri." }, 400);
+        }
+        const pending = await env.DB.prepare(
+          "SELECT id FROM friend_requests WHERE id = ? AND receiver_id = ? AND status = 'pending'"
+        ).bind(requestId, user.id).first();
+        if (!pending) return json({ success: false, message: "Kutilayotgan so‘rov topilmadi." }, 404);
+        if (decision === "accept") {
+          await env.DB.prepare("UPDATE friend_requests SET status = 'accepted', updated_at = ? WHERE id = ?")
+            .bind(new Date().toISOString(), requestId).run();
+          return json({ success: true, message: "Do‘stlik so‘rovi qabul qilindi." });
+        }
+        await env.DB.prepare("DELETE FROM friend_requests WHERE id = ?").bind(requestId).run();
+        return json({ success: true, message: "Do‘stlik so‘rovi rad etildi." });
       }
 
       if (path === "/api/data") {
