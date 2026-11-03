@@ -1,0 +1,61 @@
+name: SmartGoal validation
+
+on:
+  push:
+    branches:
+      - smartgoal/cloudflare-upgrade
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check script.js
+          node --check worker/index.js
+          node --check "functions/api/[[path]].js"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate D1 migration
+        run: |
+          python - <<'PY'
+          import sqlite3
+          from pathlib import Path
+
+          db = sqlite3.connect(":memory:")
+          db.executescript(Path("worker/migrations/0001_initial.sql").read_text())
+          expected = {"users", "sessions", "user_data", "rate_limits"}
+          actual = {
+              row[0] for row in db.execute(
+                  "SELECT name FROM sqlite_master WHERE type='table'"
+              )
+          }
+          missing = expected - actual
+          assert not missing, f"Missing tables: {sorted(missing)}"
+
+          columns = {
+              row[1] for row in db.execute("PRAGMA table_info(users)")
+          }
+          required = {
+              "id", "name", "username", "email", "password_hash",
+              "password_salt", "password_iterations", "birthdate",
+              "age_band", "terms_accepted_at"
+          }
+          assert required <= columns, f"Missing user columns: {sorted(required - columns)}"
+          print("D1 schema validation passed.")
+          PY
