@@ -171,7 +171,15 @@ async function handleRegister(request, env) {
   if (name.length < 2 || name.length > 60) return json({ success: false, message: "Ism 2–60 belgi bo‘lishi kerak." }, 400);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return json({ success: false, message: "Email manzil noto‘g‘ri." }, 400);
   if (password.length < 8 || password.length > 128) return json({ success: false, message: "Parol 8–128 belgi bo‘lishi kerak." }, 400);
-  if (birthdate && !/^\d{4}-\d{2}-\d{2}$/.test(birthdate)) return json({ success: false, message: "Tug‘ilgan sana noto‘g‘ri." }, 400);
+  if (!birthdate || !/^\\d{4}-\\d{2}-\\d{2}$/.test(birthdate) || Number.isNaN(Date.parse(birthdate + "T00:00:00Z")) || new Date(birthdate + "T00:00:00Z").toISOString().slice(0, 10) !== birthdate) return json({ success: false, message: "Tug‘ilgan sana noto‘g‘ri." }, 400);
+  if (!termsAccepted) return json({ success: false, message: "Foydalanish shartlariga rozilik kerak." }, 400);
+  const birth = new Date(birthdate + "T00:00:00Z");
+  const nowDate = new Date();
+  let age = nowDate.getUTCFullYear() - birth.getUTCFullYear();
+  if (nowDate.getUTCMonth() < birth.getUTCMonth() || (nowDate.getUTCMonth() === birth.getUTCMonth() && nowDate.getUTCDate() < birth.getUTCDate())) age--;
+  if (age < 0 || age > 120) return json({ success: false, message: "Tug‘ilgan sana yaroqsiz." }, 400);
+  if (age < 13) return json({ success: false, message: "13 yoshgacha bo‘lgan foydalanuvchilar uchun ota-ona yoki qonuniy vakil roziligi jarayoni tayyorlanmoqda." }, 403);
+  const ageBand = age < 16 ? "13_15" : age < 18 ? "16_17" : "adult";
 
   const rateKey = await clientKey(request, "register:" + email);
   if (!await enforceRateLimit(env, rateKey, 5, 3600)) {
