@@ -153,6 +153,7 @@ function publicUser(user) {
     name: user.name,
     email: user.email,
     username: user.username,
+    ageBand: user.age_band,
     birthdate: user.birthdate || null,
     createdAt: user.created_at
   };
@@ -165,6 +166,7 @@ async function handleRegister(request, env) {
   const username = String(body.username || "").trim().toLowerCase();
   const password = String(body.password || "");
   const birthdate = body.birthdate ? String(body.birthdate) : null;
+  const termsAccepted = body.termsAccepted === true;
 
   if (name.length < 2 || name.length > 60) return json({ success: false, message: "Ism 2–60 belgi bo‘lishi kerak." }, 400);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return json({ success: false, message: "Email manzil noto‘g‘ri." }, 400);
@@ -184,16 +186,16 @@ async function handleRegister(request, env) {
   const now = new Date().toISOString();
 
   await env.DB.prepare(
-    "INSERT INTO users (id, name, username, email, password_hash, password_salt, password_iterations, birthdate, created_at, updated_at) " +
-    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-  ).bind(id, name, username, email, credentials.hash, credentials.salt, credentials.iterations, birthdate, now, now).run();
+    "INSERT INTO users (id, name, username, email, password_hash, password_salt, password_iterations, birthdate, age_band, terms_accepted_at, created_at, updated_at) " +
+    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+  ).bind(id, name, username, email, credentials.hash, credentials.salt, credentials.iterations, birthdate, ageBand, now, now, now).run();
 
   await env.DB.prepare(
     "INSERT INTO user_data (user_id, data_json, updated_at) VALUES (?, ?, ?)"
-  ).bind(id, JSON.stringify({ profile: { name, username, email, birthdate }, goals: [], tasks: [], habits: [], activity: [], achievements: [], inventory: [], notifications: [], memories: [] }), now).run();
+  ).bind(id, JSON.stringify({ profile: { name, username, email, birthdate, age, ageBand }, goals: [], tasks: [], habits: [], activity: [], achievements: [], inventory: [], notifications: [], memories: [] }), now).run();
 
   const token = await createSession(env, id);
-  return json({ success: true, user: { id, name, username, email, birthdate, createdAt: now } }, 201, {
+  return json({ success: true, user: { id, name, username, email, birthdate, ageBand, createdAt: now } }, 201, {
     "set-cookie": cookieHeader(token, SESSION_TTL_SECONDS)
   });
 }
@@ -210,7 +212,7 @@ async function handleLogin(request, env) {
   }
 
   const user = await env.DB.prepare(
-    "SELECT id, name, username, email, birthdate, password_hash, password_salt, password_iterations, created_at " +
+    "SELECT id, name, username, email, birthdate, age_band, password_hash, password_salt, password_iterations, created_at " +
     "FROM users WHERE email = ? OR username = ? LIMIT 1"
   ).bind(identifier, identifier).first();
 
