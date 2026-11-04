@@ -1937,7 +1937,7 @@
     const routine = [...(data.dailyRoutine || [])].sort((a,b) => String(a.time).localeCompare(String(b.time)));
 
     return `
-      ${pageHeader("VAQTNI BOSHQARISH","Rejalashtiruvchi","Kunlik rejangiz, odatlaringiz va maqsadlaringizni bir joyda boshqaring.")}
+      ${pageHeader("VAQTNI BOSHQARISH","Kun tartibim","Kunlik rejangiz, odatlaringiz va maqsadlaringizni bir joyda boshqaring.")}
 
       <section class="card routine-card">
         <div class="card-header">
