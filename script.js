@@ -821,6 +821,7 @@
     }
     if (remoteAuthenticated) {
       try {
+        if (!await flushRemoteSync()) throw new Error("Ma’lumotlar serverga saqlanmadi. Qayta urinib ko‘ring.");
         const response = await fetch("/api/profile", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,username})});
         const result = await response.json().catch(()=>({}));
         if (!response.ok || !result.success) throw new Error(result.message || "Profil serverda saqlanmadi.");
@@ -1402,6 +1403,7 @@
       }
       let purchasedItem;
       if (remoteAuthenticated) {
+        if (!await flushRemoteSync()) throw new Error("Ma’lumotlar serverga saqlanmadi. Qayta urinib ko‘ring.");
         const response = await fetch("/api/store/purchase", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({itemId:id})});
         const result = await response.json().catch(()=>({}));
         if (!response.ok || !result.success) throw new Error(result.message || "Xaridni amalga oshirib bo‘lmadi.");
