@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "smartgoal-api",
+  "main": "worker.js",
+  "compatibility_date": "2026-11-03",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "smartgoal-db",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ],
+  "vars": {
+    "ALLOWED_ORIGINS": "https://aiacademy376-ship-it.github.io"
+  }
+}

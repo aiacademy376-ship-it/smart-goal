@@ -16,16 +16,17 @@
     language: "uz",
     theme: "light",
     colorTheme: "violet",
-    difficulty: "auto",
     sound: false,
-    reducedMotion: false
+    reducedMotion: false,
+    routineReminders: false,
+    fontSize: "medium"
   };
 
   const PAGE_TITLES = {
     dashboard: "Bosh sahifa",
     goals: "Maqsadlarim",
     schedule: "Vazifalar",
-    planner: "Rejalashtiruvchi",
+    planner: "Kun tartibim",
     analytics: "Statistika",
     achievements: "Yutuqlarim",
     rewards: "Mukofotlar do‘koni",
@@ -56,7 +57,7 @@
       description: "Profilingiz va interfeysingiz uchun sokin ko‘k rang.",
       type: "theme",
       value: "ocean",
-      price: 250,
+      price: 80,
       icon: "waves"
     },
     {
@@ -65,7 +66,7 @@
       description: "Yashil va nafis ko‘rinish.",
       type: "theme",
       value: "emerald",
-      price: 400,
+      price: 120,
       icon: "leaf"
     },
     {
@@ -74,7 +75,7 @@
       description: "Iliq ranglardagi maxsus interfeys.",
       type: "theme",
       value: "sunset",
-      price: 550,
+      price: 160,
       icon: "sunset"
     },
     {
@@ -83,7 +84,7 @@
       description: "Nafis pushti ranglar uyg‘unligi.",
       type: "theme",
       value: "rose",
-      price: 750,
+      price: 200,
       icon: "flower-2"
     },
     {
@@ -92,7 +93,7 @@
       description: "Profil uchun qoramtir, maxsus fon.",
       type: "background",
       value: "midnight",
-      price: 1200,
+      price: 250,
       icon: "moon-star"
     },
     {
@@ -101,7 +102,7 @@
       description: "Maxsus kosmik profil foni.",
       type: "background",
       value: "galaxy",
-      price: 2500,
+      price: 400,
       icon: "orbit"
     },
     {
@@ -110,7 +111,7 @@
       description: "Noyob premium profil dizayni.",
       type: "background",
       value: "royal",
-      price: 5000,
+      price: 650,
       icon: "crown"
     },
     {
@@ -119,7 +120,7 @@
       description: "Diqqat va intizom ramzi.",
       type: "badge",
       value: "focus",
-      price: 900,
+      price: 120,
       icon: "crosshair"
     },
     {
@@ -128,8 +129,53 @@
       description: "Maxsus premium belgi.",
       type: "badge",
       value: "diamond",
-      price: 3000,
+      price: 300,
       icon: "gem"
+    },
+    {
+      id: "theme-sky",
+      name: "Sky mavzusi",
+      description: "Yengil moviy ranglar va sokin ko‘rinish.",
+      type: "theme",
+      value: "sky",
+      price: 90,
+      icon: "cloud-sun"
+    },
+    {
+      id: "background-sakura",
+      name: "Sakura profil foni",
+      description: "Profilingizga nozik va yorqin uslub.",
+      type: "background",
+      value: "sakura",
+      price: 220,
+      icon: "flower-2"
+    },
+    {
+      id: "background-nebula",
+      name: "Nebula profil foni",
+      description: "Yulduzli kosmik bezak.",
+      type: "background",
+      value: "nebula",
+      price: 360,
+      icon: "orbit"
+    },
+    {
+      id: "badge-builder",
+      name: "Builder belgisi",
+      description: "Har kuni o‘z ustida ishlaydiganlar uchun.",
+      type: "badge",
+      value: "builder",
+      price: 100,
+      icon: "hammer"
+    },
+    {
+      id: "avatar-frame-gold",
+      name: "Oltin avatar ramkasi",
+      description: "Profil rasmingiz uchun oltin bezak.",
+      type: "avatar",
+      value: "gold",
+      price: 260,
+      icon: "crown"
     },
     {
       id: "avatar-premium",
@@ -137,9 +183,71 @@
       description: "Profil rasmingiz uchun maxsus ramka.",
       type: "avatar",
       value: "premium",
-      price: 1800,
+      price: 360,
       icon: "frame"
-    }
+    },
+    {
+      id: "background-aurora",
+      name: "Aurora profil foni",
+      description: "Yashil va binafsha shimol yog‘dusi uslubidagi fon.",
+      type: "background",
+      value: "aurora",
+      price: 520,
+      icon: "sparkles"
+    },
+    {
+      id: "background-forest",
+      name: "Forest profil foni",
+      description: "Tabiat ranglaridagi sokin profil foni.",
+      type: "background",
+      value: "forest",
+      price: 480,
+      icon: "trees"
+    },
+    {
+      id: "background-sunrise",
+      name: "Sunrise profil foni",
+      description: "Yangi kun va yangi maqsadlar uchun iliq fon.",
+      type: "background",
+      value: "sunrise",
+      price: 450,
+      icon: "sunrise"
+    },
+    {
+      id: "badge-scholar",
+      name: "Scholar belgisi",
+      description: "Bilim va muntazam o‘rganish ramzi.",
+      type: "badge",
+      value: "Scholar",
+      price: 240,
+      icon: "graduation-cap"
+    },
+    {
+      id: "badge-explorer",
+      name: "Explorer belgisi",
+      description: "Yangi ko‘nikmalarni sinab ko‘rish ramzi.",
+      type: "badge",
+      value: "Explorer",
+      price: 280,
+      icon: "compass"
+    },
+    {
+      id: "avatar-frame-neon",
+      name: "Neon avatar ramkasi",
+      description: "Profil rasmingiz uchun yorqin neon ramka.",
+      type: "avatar",
+      value: "neon",
+      price: 420,
+      icon: "zap"
+    },
+    { id: "theme-lavender", name: "Lavender mavzusi", description: "Yumshoq lavanda ranglaridagi interfeys.", type: "theme", value: "lavender", price: 150, icon: "flower" },
+    { id: "theme-mint", name: "Mint mavzusi", description: "Yengil va tetiklantiruvchi yashil ranglar.", type: "theme", value: "mint", price: 180, icon: "sprout" },
+    { id: "background-coral", name: "Coral profil foni", description: "Iliq marjon ranglari bilan o‘ziga xos profil.", type: "background", value: "coral", price: 520, icon: "sun" },
+    { id: "background-ember", name: "Ember profil foni", description: "Chuqur ranglar va olovli aksentlar.", type: "background", value: "ember", price: 720, icon: "flame" },
+    { id: "badge-streak", name: "Streak belgisi", description: "Muntazamlik va davomiy harakat ramzi.", type: "badge", value: "Streak", price: 360, icon: "calendar-check" },
+    { id: "badge-creator", name: "Creator belgisi", description: "Yangi g‘oyalarni amaliy natijaga aylantiruvchilar uchun.", type: "badge", value: "Creator", price: 480, icon: "lightbulb" },
+    { id: "avatar-frame-crystal", name: "Crystal avatar ramkasi", description: "Profil rasmingiz uchun billurdek yorqin ramka.", type: "avatar", value: "crystal", price: 620, icon: "diamond" },
+    { id: "avatar-frame-flame", name: "Flame avatar ramkasi", description: "Profilingizga jo‘shqin va yorqin uslub.", type: "avatar", value: "flame", price: 760, icon: "flame" }
   ];
 
   const ACHIEVEMENTS = [
@@ -183,14 +291,14 @@
       name: "500 XP",
       description: "500 ochko to‘plang.",
       icon: "coins",
-      condition: data => data.xp >= 500
+      condition: data => Number(data.xp || 0) + Number(data.spentXP || 0) >= 500
     },
     {
       id: "xp-1000",
       name: "Minglik marrasi",
       description: "1000 ochko to‘plang.",
       icon: "gem",
-      condition: data => data.xp >= 1000
+      condition: data => Number(data.xp || 0) + Number(data.spentXP || 0) >= 1000
     }
   ];
 
@@ -221,7 +329,7 @@
     }
   };
 
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => { const d=new Date(); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-"); };
 
   const formatDate = value => {
     if (!value) return "Sana belgilanmagan";
@@ -249,9 +357,9 @@
     return `<i data-lucide="${escapeHTML(name)}" width="${size}" height="${size}"></i>`;
   }
 
-  function refreshIcons() {
+  function refreshIcons(root = document) {
     if (window.lucide && typeof window.lucide.createIcons === "function") {
-      window.lucide.createIcons();
+      window.lucide.createIcons({ root: root || document });
     }
   }
 
@@ -264,6 +372,7 @@
         name: "SmartGoal foydalanuvchisi",
         username: "",
         birthdate: "",
+        birthdatePublic: false,
         age: null,
         bio: "",
         avatar: "",
@@ -275,6 +384,8 @@
       spentXP: 0,
       goals: [],
       tasks: [],
+      dailyRoutine: [],
+      routineLogs: {},
       activity: [],
       achievements: [],
       inventory: [],
@@ -288,50 +399,69 @@
         }
       ],
       memories: [],
-      preferences: {
-        difficulty: "auto"
-      }
+      preferences: {}
     };
   }
 
   function loadData() {
     const saved = safeJSON(localStorage.getItem(DATA_KEY), null);
-
-    if (!saved || typeof saved !== "object") {
-      return createInitialData();
-    }
-
+    if (!saved || typeof saved !== "object") return createInitialData();
     const initial = createInitialData();
-
-    return {
+    const loaded = {
       ...initial,
       ...saved,
       profile: { ...initial.profile, ...(saved.profile || {}) },
       preferences: { ...initial.preferences, ...(saved.preferences || {}) },
       goals: Array.isArray(saved.goals) ? saved.goals : [],
       tasks: Array.isArray(saved.tasks) ? saved.tasks : [],
+      dailyRoutine: Array.isArray(saved.dailyRoutine) ? saved.dailyRoutine : [],
+      routineLogs: saved.routineLogs && typeof saved.routineLogs === "object" ? saved.routineLogs : {},
       activity: Array.isArray(saved.activity) ? saved.activity : [],
       achievements: Array.isArray(saved.achievements) ? saved.achievements : [],
       inventory: Array.isArray(saved.inventory) ? saved.inventory : [],
       notifications: Array.isArray(saved.notifications) ? saved.notifications : [],
       memories: Array.isArray(saved.memories) ? saved.memories : []
     };
+    if (!Number(saved.spentXP) && loaded.inventory.length) {
+      const legacyPrices = {"theme-ocean":250,"theme-emerald":400,"theme-sunset":550,"theme-rose":750,"background-midnight":1200,"background-galaxy":2500,"background-royal":5000,"badge-focus":900,"badge-diamond":3000,"avatar-premium":1800};
+      loaded.spentXP = loaded.inventory.reduce((sum,item)=>sum+(legacyPrices[item?.id]||0),0);
+    }
+    return loaded;
   }
 
   function loadSettings() {
     const saved = safeJSON(localStorage.getItem(SETTINGS_KEY), {});
-    return { ...DEFAULT_SETTINGS, ...(saved || {}) };
+    const loaded = { ...DEFAULT_SETTINGS, ...(saved || {}) };
+    delete loaded.difficulty;
+    return loaded;
   }
 
   let data = loadData();
   let settings = loadSettings();
   let currentPage = "dashboard";
   let currentSettingsTab = "general";
+  let storeFilter = "all";
+  let taskListLimit = 50;
+  let goalListLimit = 40;
+  let memoryListLimit = 30;
   let toastTimeout = null;
+  let remoteAuthenticated = false;
+  let remoteSyncTimer = null;
+  let remoteSyncRunning = false;
+  let remoteSyncQueued = false;
+  let aiConversation = [];
+  let aiRequestInFlight = false;
+  let registerRetryTimer = null;
+  let lastTranslatedLanguage = null;
+  let communityRelations = { incoming: [], outgoing: [], friends: [] };
+  let communityLeaderboard = [];
+  const taskActionsInFlight = new Set();
+  const purchaseActionsInFlight = new Set();
 
   function saveData() {
     try {
       localStorage.setItem(DATA_KEY, JSON.stringify(data));
+      if (remoteAuthenticated) scheduleRemoteSync();
       return true;
     } catch (error) {
       console.error("SmartGoal storage error:", error);
@@ -340,13 +470,77 @@
     }
   }
 
+  function scheduleRemoteSync() {
+    if (remoteSyncTimer) clearTimeout(remoteSyncTimer);
+    remoteSyncTimer = setTimeout(() => {
+      remoteSyncTimer = null;
+      syncDataToServer();
+    }, 500);
+  }
+
+  async function syncDataToServer() {
+    if (!remoteAuthenticated) return false;
+    if (remoteSyncRunning) { remoteSyncQueued = true; return false; }
+    remoteSyncRunning = true;
+    let synced = false;
+    try {
+      const response = await fetch("/api/data", {
+        method: "PUT",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data })
+      });
+      if (response.status === 401) {
+        remoteAuthenticated = false;
+        showAuthentication();
+        showToast("Sessiya tugadi. Qayta kiring.", "error");
+      } else if (!response.ok) {
+        throw new Error("Ma’lumot serverga saqlanmadi.");
+      } else {
+        synced = true;
+      }
+    } catch (error) {
+      console.error("SmartGoal sync error:", error);
+      showToast("Internet yoki server bilan aloqa uzildi. Ma’lumot qurilmada saqlandi.", "error");
+    } finally {
+      remoteSyncRunning = false;
+      if (remoteSyncQueued) {
+        remoteSyncQueued = false;
+        scheduleRemoteSync();
+      }
+    }
+    return synced;
+  }
+
+  async function flushRemoteSync() {
+    if (!remoteAuthenticated) return false;
+    while (true) {
+      if (remoteSyncTimer) {
+        clearTimeout(remoteSyncTimer);
+        remoteSyncTimer = null;
+      }
+      while (remoteSyncRunning) {
+        await new Promise(resolve => setTimeout(resolve, 25));
+      }
+      if (remoteSyncTimer) {
+        clearTimeout(remoteSyncTimer);
+        remoteSyncTimer = null;
+      }
+      remoteSyncQueued = false;
+      if (!await syncDataToServer()) return false;
+      if (!remoteSyncRunning && !remoteSyncQueued && !remoteSyncTimer) return true;
+    }
+  }
+
   function saveSettings() {
+    data.preferences = { ...(data.preferences || {}), ...settings };
     try {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     } catch (error) {
       console.error("Settings storage error:", error);
     }
     applySettings();
+    saveData();
   }
 
   /* -------------------- AGE AND DIFFICULTY -------------------- */
@@ -370,52 +564,22 @@
     return age >= 0 && age <= 120 ? age : null;
   }
 
-  function getDifficulty() {
-    if (settings.difficulty !== "auto") return settings.difficulty;
-
-    const age = data.profile.age;
-
-    if (age === null || age === undefined) return "adult";
-    if (age <= 11) return "junior";
-    if (age <= 17) return "senior";
-    return "adult";
-  }
-
   const UI_TEXT = {
-    junior: {
-      welcome: "Bugun nimaga erishamiz?",
-      description: "Kichik qadamlar katta natijalarga olib boradi.",
-      addTask: "Vazifa qo‘shish",
-      addGoal: "Maqsad qo‘shish",
-      emptyTasks: "Hali vazifalar yo‘q. Birinchi vazifangizni qo‘shing!",
-      emptyGoals: "Hali maqsad yo‘q. O‘z maqsadingizni belgilang!"
-    },
-    senior: {
-      welcome: "Bugungi rejalaringizga xush kelibsiz",
-      description: "Vaqtingizni samarali boshqaring va natijalarni kuzating.",
-      addTask: "Yangi vazifa",
-      addGoal: "Yangi maqsad",
-      emptyTasks: "Hozircha vazifalar mavjud emas.",
-      emptyGoals: "Hozircha maqsadlar mavjud emas."
-    },
-    adult: {
-      welcome: "Rivojlanishingizni boshqarishni davom ettiring",
-      description: "Ustuvor vazifalarni belgilang, jarayonni kuzating va natijaga erishing.",
-      addTask: "Vazifa yaratish",
-      addGoal: "Maqsad yaratish",
-      emptyTasks: "Rejalashtirilgan vazifalar mavjud emas.",
-      emptyGoals: "Hozircha faol maqsadlar mavjud emas."
-    }
+    welcome: "Bugungi rejalaringizga xush kelibsiz",
+    description: "Vaqtingizni samarali boshqaring va natijalarni kuzating.",
+    addTask: "Yangi vazifa",
+    addGoal: "Yangi maqsad",
+    emptyTasks: "Hozircha vazifalar mavjud emas.",
+    emptyGoals: "Hozircha maqsadlar mavjud emas."
   };
 
   function textForUser(key) {
-    const level = getDifficulty();
-    return UI_TEXT[level]?.[key] || UI_TEXT.adult[key] || "";
+    return UI_TEXT[key] || "";
   }
 
   /* -------------------- XP AND RANKS -------------------- */
 
-  function getRank(xp = data.xp) {
+  function getRank(xp = Number(data.xp || 0) + Number(data.spentXP || 0)) {
     let rank = RANKS[0];
 
     for (const item of RANKS) {
@@ -462,18 +626,11 @@
     saveData();
   }
 
-  function spendXP(amount) {
-    const points = Math.max(0, Math.floor(Number(amount) || 0));
-
-    if (!points || data.xp < points) {
-      showToast("Bu xarid uchun ochkolaringiz yetarli emas.", "error");
-      return false;
-    }
-
-    data.xp -= points;
-    data.spentXP += points;
-    saveData();
-    return true;
+  async function spendXP(amount) {
+    const points=Math.max(0,Math.floor(Number(amount)||0));
+    if(!points||data.xp<points){showToast("Bu xarid uchun ochkolaringiz yetarli emas.","error");return false;}
+    try{const response=await fetch("/api/xp/spend",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:points})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"XP yechilmadi.");data.xp=Number(result.xpBalance||0);data.spentXP=(Number(data.spentXP)||0)+points;saveData();return true;}
+    catch(error){showToast(error.message||"XP yechishda xatolik yuz berdi.","error");return false;}
   }
 
   /* -------------------- NOTIFICATIONS -------------------- */
@@ -489,6 +646,8 @@
 
     data.notifications = data.notifications.slice(0, 60);
     saveData();
+    updateNotificationIndicators();
+    if (currentPage === "notifications") render();
   }
 
   function unreadCount() {
@@ -507,6 +666,7 @@
     }
 
     messageElement.textContent = message;
+    translateVisibleUI(toast);
     toast.classList.remove("hidden", "toast-error");
 
     const toastIcon = $(".toast-icon", toast);
@@ -543,6 +703,7 @@
     overlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
     refreshIcons();
+    translateVisibleUI($("#modal-overlay"));
   }
 
   function closeModal() {
@@ -590,6 +751,7 @@
 
     root.dataset.theme = theme;
     root.dataset.colorTheme = settings.colorTheme || "violet";
+    root.dataset.fontSize = ["small","medium","large"].includes(settings.fontSize) ? settings.fontSize : "medium";
 
     const language = settings.language || "uz";
     root.lang = language;
@@ -634,7 +796,7 @@
       if (!element) return;
 
       element.innerHTML = avatar
-        ? `<img src="${escapeHTML(avatar)}" alt="Profil rasmi">`
+        ? `<img src="${escapeHTML(avatar)}" alt="Profil rasmi" loading="lazy" decoding="async">`
         : icon("user-round");
     });
   }
@@ -665,12 +827,16 @@
             <textarea class="field-textarea" id="profile-bio" name="bio"
               maxlength="240" placeholder="O‘zingiz haqingizda qisqacha...">${escapeHTML(profile.bio)}</textarea>
           </div>
+          <div class="form-field full-width">
+            <label class="checkbox-label"><input type="checkbox" name="birthdatePublic" ${profile.birthdatePublic ? "checked" : ""}><span>Tug‘ilgan kunim va yoshim profilimda hammaga ko‘rinsin</span></label>
+          </div>
 
           <div class="form-field full-width">
             <label class="field-label" for="profile-avatar">Profil rasmi</label>
             <input class="field-input" id="profile-avatar" name="avatar"
               type="file" accept="image/png,image/jpeg,image/webp">
             <small>PNG, JPG yoki WEBP. Rasm 2 MB dan kichik bo‘lsin.</small>
+            <label class="checkbox-label"><input type="checkbox" name="removeAvatar"><span>Profil rasmini olib tashlash</span></label>
           </div>
         </form>
       `,
@@ -687,50 +853,32 @@
     const username = normalizedUsername(formData.get("username"));
     const bio = String(formData.get("bio") || "").trim();
     const file = formData.get("avatar");
-
-    if (name.length < 2) {
-      showToast("Ism va familiyani to‘g‘ri kiriting.", "error");
-      return;
+    if (name.length < 2) { showToast("Ism va familiyani to‘g‘ri kiriting.", "error"); return; }
+    if (!isValidUsername(username)) { showToast("Username formati noto‘g‘ri.", "error"); return; }
+    const removeAvatar = formData.get("removeAvatar") === "on";
+    let avatar = removeAvatar ? "" : (data.profile.avatar || "");
+    if (!removeAvatar && file instanceof File && file.size > 0) {
+      if (!file.type.startsWith("image/") || file.size > 2 * 1024 * 1024) { showToast("Rasm 2 MB dan kichik bo‘lishi kerak.", "error"); return; }
+      try { avatar = await resizeImage(file); } catch { showToast("Rasmni yuklashda xatolik yuz berdi.", "error"); return; }
     }
-
-    if (!isValidUsername(username)) {
-      showToast("Username formati noto‘g‘ri.", "error");
-      return;
+    if (remoteAuthenticated) {
+      try {
+        if (!await flushRemoteSync()) throw new Error("Ma’lumotlar serverga saqlanmadi. Qayta urinib ko‘ring.");
+        const response = await fetch("/api/profile", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,username})});
+        const result = await response.json().catch(()=>({}));
+        if (!response.ok || !result.success) throw new Error(result.message || "Profil serverda saqlanmadi.");
+      } catch (error) { showToast(error.message || "Profilni saqlashda xatolik.", "error"); return; }
     }
-
-    // Real uniqueness checking will be connected to the backend.
-    // Local demo can only check the current account.
-    if (username !== data.profile.username && username === "admin") {
-      showToast("Bu username band.", "error");
-      return;
-    }
-
     data.profile.name = name;
     data.profile.username = username;
     data.profile.bio = bio;
-
-    if (file instanceof File && file.size > 0) {
-      if (!file.type.startsWith("image/") || file.size > 2 * 1024 * 1024) {
-        showToast("Rasm 2 MB dan kichik bo‘lishi kerak.", "error");
-        return;
-      }
-
-      try {
-        data.profile.avatar = await resizeImage(file);
-      } catch {
-        showToast("Rasmni yuklashda xatolik yuz berdi.", "error");
-        return;
-      }
-    }
-
-    saveData();
-    updateProfileDisplay();
-    closeModal();
-    render();
+    data.profile.avatar = avatar;
+    data.profile.birthdatePublic = formData.get("birthdatePublic") === "on";
+    saveData(); updateProfileDisplay(); closeModal(); render();
     showToast("Profil muvaffaqiyatli yangilandi.");
   }
 
-  function resizeImage(file) {
+  function resizeImage(file, maxDimension = 420, quality = 0.72) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
@@ -743,7 +891,7 @@
 
         image.onload = () => {
           const canvas = document.createElement("canvas");
-          const max = 500;
+          const max = Math.max(160, Math.min(1200, Number(maxDimension) || 420));
           const ratio = Math.min(1, max / Math.max(image.width, image.height));
 
           canvas.width = Math.round(image.width * ratio);
@@ -752,7 +900,7 @@
           const context = canvas.getContext("2d");
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-          resolve(canvas.toDataURL("image/jpeg", 0.82));
+          resolve(canvas.toDataURL("image/jpeg", Math.max(0.45, Math.min(0.9, Number(quality) || 0.72))));
         };
 
         image.src = reader.result;
@@ -813,70 +961,170 @@
     $("#app-shell")?.classList.add("hidden");
   }
 
-  function registerLocal(form) {
+  function showRegistrationRetry(seconds) {
+    const form = $("#register-form");
+    if (!form) return;
+    if (registerRetryTimer) clearInterval(registerRetryTimer);
+    let status = $("#register-retry-status");
+    if (!status) {
+      status = document.createElement("p");
+      status.id = "register-retry-status";
+      status.className = "auth-retry-status";
+      const submit = form.querySelector(".auth-submit");
+      if (submit) submit.insertAdjacentElement("afterend", status);
+      else form.append(status);
+    }
+    let remaining = Math.max(1, Math.ceil(Number(seconds) || 300));
+    const renderTimer = () => {
+      const minutes = Math.floor(remaining / 60);
+      const secs = String(remaining % 60).padStart(2, "0");
+      status.textContent = remaining > 0
+        ? "Xavfsizlik uchun kutish: " + minutes + ":" + secs + ". Vaqt tugagach qayta urinishingiz mumkin."
+        : "Qayta urinib ko‘rishingiz mumkin.";
+    };
+    renderTimer();
+    registerRetryTimer = setInterval(() => {
+      remaining = Math.max(0, remaining - 1);
+      renderTimer();
+      if (!remaining) {
+        clearInterval(registerRetryTimer);
+        registerRetryTimer = null;
+      }
+    }, 1000);
+  }
+
+  async function registerRemote(form) {
     const formData = new FormData(form);
     const name = String(formData.get("name") || "").trim();
     const email = String(formData.get("email") || "").trim().toLowerCase();
     const birthdate = String(formData.get("birthdate") || "");
     const password = String(formData.get("password") || "");
     const terms = formData.get("terms");
-
     const age = calculateAge(birthdate);
 
-    if (name.length < 2 || !email || !age && age !== 0 || !terms) {
+    if (name.length < 2 || !email || age === null || !terms) {
       showToast("Barcha maydonlarni to‘g‘ri to‘ldiring.", "error");
       return;
     }
-
-    if (password.length < 8) {
-      showToast("Parol kamida 8 ta belgidan iborat bo‘lsin.", "error");
+    if (password.length < 8 || password.length > 128) {
+      showToast("Parol 8–128 belgi bo‘lishi kerak.", "error");
       return;
     }
 
-    data = createInitialData();
-    data.profile.name = name;
-    data.profile.birthdate = birthdate;
-    data.profile.age = age;
-    data.profile.username = normalizedUsername(name.replace(/\s+/g, "."));
-    data.profile.email = email;
+    let username = normalizedUsername(name.replace(/\s+/g, "."));
+    if (!isValidUsername(username)) username = "user_" + Date.now().toString().slice(-8);
 
-    if (!isValidUsername(data.profile.username)) {
-      data.profile.username = `user_${Date.now().toString().slice(-8)}`;
+    const button = form.querySelector("button[type='submit']");
+    const originalText = button?.textContent;
+    if (button) { button.disabled = true; button.textContent = "Hisob yaratilmoqda..."; }
+
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, username, email, birthdate, password, termsAccepted: true })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) {
+        const error = new Error(result.message || "Ro‘yxatdan o‘tishda xatolik yuz berdi.");
+        error.retryAfter = Number(result.retryAfter || response.headers.get("Retry-After") || 0);
+        throw error;
+      }
+
+      remoteAuthenticated = true;
+      localStorage.removeItem(SESSION_KEY);
+      data = createInitialData();
+      data.profile.name = name;
+      data.profile.birthdate = birthdate;
+      data.profile.age = age;
+      data.profile.username = username;
+      data.profile.email = email;
+      saveSettings();
+      saveData();
+      showApplication();
+      showToast("SmartGoal’ga xush kelibsiz!");
+    } catch (error) {
+      showToast(error.message || "Server bilan bog‘lanib bo‘lmadi.", "error");
+      if (error.retryAfter > 0) showRegistrationRetry(error.retryAfter);
+    } finally {
+      if (button) { button.disabled = false; button.textContent = originalText || "Hisob yaratish"; }
     }
-
-    settings.difficulty = "auto";
-    saveSettings();
-    saveData();
-
-    localStorage.setItem(SESSION_KEY, "local-demo");
-    showApplication();
-    showToast("SmartGoal’ga xush kelibsiz!");
   }
 
-  function loginLocal(form) {
+  async function loginRemote(form) {
     const formData = new FormData(form);
-    const identifier = String(formData.get("identifier") || "").trim();
+    const identifier = String(formData.get("identifier") || "").trim().toLowerCase();
     const password = String(formData.get("password") || "");
 
     if (!identifier || !password) {
-      showToast("Login va parolni kiriting.", "error");
+      showToast("Username yoki email va parolni kiriting.", "error");
       return;
     }
 
-    // Frontend-only demonstration login.
-    // Real account verification is added when the backend is connected.
-    if (!data.profile.name || data.profile.name === "SmartGoal foydalanuvchisi") {
-      showToast("Demo hisob hali yaratilmagan. Ro‘yxatdan o‘ting.", "error");
-      switchAuthTab("register");
-      return;
-    }
+    const button = form.querySelector("button[type='submit']");
+    const originalText = button?.textContent;
+    if (button) { button.disabled = true; button.textContent = "Tekshirilmoqda..."; }
 
-    localStorage.setItem(SESSION_KEY, "local-demo");
-    showApplication();
-    showToast("Xush kelibsiz!");
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier, password })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "Kirish amalga oshmadi.");
+
+      remoteAuthenticated = true;
+      localStorage.removeItem(SESSION_KEY);
+      await loadRemoteData();
+      if (!data.profile.name || data.profile.name === "SmartGoal foydalanuvchisi") {
+        data.profile.name = result.user?.name || "Foydalanuvchi";
+        data.profile.email = result.user?.email || "";
+        data.profile.username = result.user?.username || "";
+        data.profile.birthdate = result.user?.birthdate || "";
+        data.profile.age = calculateAge(data.profile.birthdate);
+      }
+      showApplication();
+      checkAchievements();
+      checkRoutineReminders();
+      openRequestedProfile();
+      showToast("Xush kelibsiz!");
+    } catch (error) {
+      remoteAuthenticated = false;
+      showToast(error.message || "Server bilan bog‘lanib bo‘lmadi.", "error");
+    } finally {
+      if (button) { button.disabled = false; button.textContent = originalText || "Kirish"; }
+    }
   }
 
-  function logout() {
+  async function loadRemoteData() {
+    const response = await fetch("/api/data", { credentials: "same-origin" });
+    if (!response.ok) throw new Error(response.status === 401 ? "Sessiya tugagan. Qayta kiring." : "Ma’lumotlarni yuklab bo‘lmadi.");
+    const result = await response.json();
+    if (!result.success || !result.data) throw new Error("Serverdan kelgan ma’lumot noto‘g‘ri.");
+    localStorage.setItem(DATA_KEY, JSON.stringify(result.data));
+    data = loadData();
+    const remotePreferences = data.preferences || {};
+    ["language","theme","colorTheme","fontSize","sound","reducedMotion","routineReminders"].forEach(key => {
+      if (Object.prototype.hasOwnProperty.call(remotePreferences,key) && remotePreferences[key] !== undefined) settings[key] = remotePreferences[key];
+    });
+    delete remotePreferences.difficulty;
+    data.preferences = { ...remotePreferences, ...settings };
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    applySettings();
+    saveData();
+    if (data.profile.birthdate) data.profile.age = calculateAge(data.profile.birthdate);
+  }
+
+  async function logout() {
+    try {
+      await fetch("/api/logout", { method: "POST", credentials: "same-origin" });
+    } catch (error) {
+      console.warn("Serverdan chiqish so‘rovi bajarilmadi:", error);
+    }
+    remoteAuthenticated = false;
     localStorage.removeItem(SESSION_KEY);
     showAuthentication();
     showToast("Hisobdan chiqdingiz.");
@@ -986,134 +1234,165 @@
 
   function openTaskForm(taskId = null) {
     const task = data.tasks.find(item => item.id === taskId);
-
-    openModal(
-      task ? "Vazifani tahrirlash" : "Yangi vazifa",
-      `
-        <form id="task-form" class="form-grid">
-          <input type="hidden" name="id" value="${escapeHTML(task?.id || "")}">
-
-          <div class="form-field full-width">
-            <label class="field-label">Vazifa nomi</label>
-            <input class="field-input" name="title" maxlength="100" required
-              placeholder="Masalan: 20 bet kitob o‘qish"
-              value="${escapeHTML(task?.title || "")}">
-          </div>
-
-          <div class="form-field">
-            <label class="field-label">Bajarish sanasi</label>
-            <input class="field-input" type="date" name="date"
-              value="${escapeHTML(task?.date || today())}">
-          </div>
-
-          <div class="form-field">
-            <label class="field-label">Mukofot XP</label>
-            <select class="field-select" name="reward">
-              ${[10, 15, 20, 25, 50, 100].map(value =>
-                `<option value="${value}" ${(task?.reward || 10) === value ? "selected" : ""}>${value} XP</option>`
-              ).join("")}
-            </select>
-          </div>
-
-          <div class="form-field full-width">
-            <label class="field-label">Bog‘langan maqsad</label>
-            <select class="field-select" name="goalId">
-              <option value="">Maqsadsiz vazifa</option>
-              ${data.goals.map(goal =>
-                `<option value="${escapeHTML(goal.id)}" ${task?.goalId === goal.id ? "selected" : ""}>${escapeHTML(goal.title)}</option>`
-              ).join("")}
-            </select>
-          </div>
-        </form>
-      `,
-      `
-        <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
-        <button class="primary-button" type="submit" form="task-form">Saqlash</button>
-      `
-    );
+    openModal(task ? "Vazifani tahrirlash" : "Yangi vazifa", `
+      <form id="task-form" class="form-grid">
+        <input type="hidden" name="id" value="${escapeHTML(task?.id || "")}">
+        <div class="form-field full-width">
+          <label class="field-label">Vazifa nomi</label>
+          <input class="field-input" name="title" maxlength="100" required placeholder="Masalan: 20 bet kitob o‘qish" value="${escapeHTML(task?.title || "")}">
+        </div>
+        <div class="form-field full-width">
+          <label class="field-label">Qisqa mazmuni</label>
+          <textarea class="field-textarea" name="description" rows="3" maxlength="500" required placeholder="Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.">${escapeHTML(task?.description || "")}</textarea>
+          <small>Qisqa va aniq izoh AI’ga ishning qiyinligi va mehnatini adolatli baholashga yordam beradi.</small>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Qaysi kuni bajariladi?</label>
+          <input class="field-input" type="date" name="date" required value="${escapeHTML(task?.date || today())}">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Taxminiy bajarish vaqti</label>
+          <select class="field-select" name="estimatedMinutes">
+            ${[[15,"15 daqiqa"],[30,"30 daqiqa"],[45,"45 daqiqa"],[60,"1 soat"],[90,"1,5 soat"],[120,"2 soat"],[180,"3 soat"],[240,"4 soat"],[360,"6 soat"]].map(([value,label])=>`<option value="${value}" ${Number(task?.estimatedMinutes||30)===value?"selected":""}>${label}</option>`).join("")}
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Ustuvorlik</label>
+          <select class="field-select" name="priority">
+            <option value="low" ${task?.priority==="low"?"selected":""}>Past</option>
+            <option value="medium" ${!task||task.priority==="medium"?"selected":""}>O‘rta</option>
+            <option value="high" ${task?.priority==="high"?"selected":""}>Yuqori</option>
+          </select>
+        </div>
+        <details class="form-field full-width task-extra-settings">
+          <summary>Qo‘shimcha sozlama (ixtiyoriy)</summary>
+          <label class="field-label" for="task-goal">Qaysi maqsadga tegishli?</label>
+          <select class="field-select" id="task-goal" name="goalId"><option value="">Maqsadsiz vazifa</option>${data.goals.map(goal=>`<option value="${escapeHTML(goal.id)}" ${task?.goalId===goal.id?"selected":""}>${escapeHTML(goal.title)}</option>`).join("")}</select>
+        </details>
+      </form>`, `
+      <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
+      <button class="primary-button" type="submit" form="task-form">Saqlash</button>`);
   }
 
   function saveTask(form) {
     const fd = new FormData(form);
     const id = String(fd.get("id") || "");
     const title = String(fd.get("title") || "").trim();
+    const description = String(fd.get("description") || "").trim().slice(0, 500);
 
     if (title.length < 2) {
       showToast("Vazifa nomini kiriting.", "error");
       return;
     }
+    if (description.length < 5) {
+      showToast("Vazifa nima haqida ekanini kamida bir jumla bilan yozing.", "error");
+      return;
+    }
 
     const values = {
       title,
+      description,
       date: String(fd.get("date") || today()),
-      reward: Math.min(100, Math.max(5, Number(fd.get("reward")) || 10)),
+      priority: ["low","medium","high"].includes(String(fd.get("priority")||"medium")) ? String(fd.get("priority")||"medium") : "medium",
+      estimatedMinutes: Math.max(5,Math.min(480,Number(fd.get("estimatedMinutes")||30)||30)),
       goalId: String(fd.get("goalId") || "")
     };
 
     if (id) {
       const task = data.tasks.find(item => item.id === id);
       if (!task) return;
+      const scoreChanged = task.title !== values.title || task.description !== values.description || task.date !== values.date || task.priority !== values.priority || Number(task.estimatedMinutes||30) !== values.estimatedMinutes;
       Object.assign(task, values);
+      if (scoreChanged && Number(task.xpEarned || 0) === 0) {
+        task.completed = false;
+        task.completedAt = null;
+        task.xpAwarded = false;
+      }
     } else {
       data.tasks.unshift({
-        id: uid(),
-        ...values,
-        completed: false,
-        xpAwarded: false,
-        completedAt: null,
-        createdAt: new Date().toISOString()
+        id: uid(), ...values, completed: false, xpAwarded: false, xpEarned: 0, completedAt: null, createdAt: new Date().toISOString()
       });
     }
 
+    refreshGoalProgress();
     saveData();
     closeModal();
     render();
     showToast("Vazifa saqlandi.");
   }
 
-  function toggleTask(id) {
+  async function toggleTask(id) {
+    if (taskActionsInFlight.has(id)) return;
     const task = data.tasks.find(item => item.id === id);
     if (!task) return;
-
-    if (!task.completed) {
-      task.completed = true;
-      task.completedAt = new Date().toISOString();
-
-      if (!task.xpAwarded) {
-        task.xpAwarded = true;
-        addXP(task.reward || 10, `Vazifa: ${task.title}`);
-      }
-
-      if (task.goalId) {
-        const goal = data.goals.find(item => item.id === task.goalId);
-
-        if (goal) {
-          const linkedTasks = data.tasks.filter(item => item.goalId === goal.id);
-          const completed = linkedTasks.filter(item => item.completed).length;
-
-          goal.progress = linkedTasks.length
-            ? Math.round((completed / linkedTasks.length) * 100)
-            : goal.progress;
-
-          if (goal.progress >= 100 && !goal.completed) {
-            goal.completed = true;
-            addXP(50, `Maqsad yakunlandi: ${goal.title}`);
-            addNotification("Maqsad yakunlandi!", `“${goal.title}” maqsadini bajardingiz.`);
+    taskActionsInFlight.add(id);
+    try {
+      if (!task.completed) {
+        task.completed = true;
+        task.completedAt = new Date().toISOString();
+        render();
+        if (!task.xpAwarded || Number(task.xpEarned || 0) === 0) {
+          if (!remoteAuthenticated) {
+            task.xpAwarded = false;
+            task.xpEarned = 0;
+            showToast(settings.language==="ru"?"Задача сохранена на устройстве. Войдите в аккаунт, чтобы получать XP от AI.":settings.language==="en"?"Task saved on this device. Sign in to earn AI-awarded XP.":"Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.", "error");
+          } else {
+            try {
+              if (!await flushRemoteSync()) throw new Error("Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.");
+              const response = await fetch("/api/tasks/complete", {
+                method: "POST", credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ task: { id: task.id }, language: settings.language })
+              });
+              const result = await response.json().catch(() => ({}));
+              if (!response.ok || !result.success) throw new Error(result.message || "AI vazifani baholay olmadi.");
+              data.xp = Number(result.xpBalance ?? data.xp ?? 0);
+              task.xpAwarded = true;
+              task.xpEarned = Number(result.awarded || 0);
+              if (task.xpEarned > 0) {
+                data.activity.push({ id: uid(), date: today(), xp: task.xpEarned, reason: "AI baholadi: " + task.title });
+                data.activity = data.activity.slice(-180);
+              }
+              if (result.notMeaningful) showToast(settings.language==="ru"?"AI не смог определить конкретную задачу. Уточните название или описание.":settings.language==="en"?"AI could not identify a clear task. Please clarify its title or description.":"AI bu vazifani aniq ish deb baholamadi. Nomini yoki qisqa mazmunini aniqroq yozing.", "error");
+              else if (result.duplicateTask) showToast(result.reason || "Bugun shu mazmundagi vazifa uchun XP avval berilgan.", "error");
+              else if (result.alreadyAwarded) showToast(settings.language==="ru"?"За эту задачу XP уже начислялись.":settings.language==="en"?"XP has already been awarded for this task.":"Bu vazifa uchun XP avval berilgan.", "error");
+              else if (task.xpEarned > 0) showToast(settings.language==="ru"?"Оценка AI: +"+task.xpEarned+" XP · сложность "+(result.difficulty||"—")+"/5 · усилия "+(result.effort||"—")+"/5 · "+(result.onTime?"в срок":"с опозданием"):settings.language==="en"?"AI score: +"+task.xpEarned+" XP · difficulty "+(result.difficulty||"—")+"/5 · effort "+(result.effort||"—")+"/5 · "+(result.onTime?"on time":"late"):"AI bahosi: +" + task.xpEarned + " XP · qiyinlik " + (result.difficulty || "—") + "/5 · mehnat " + (result.effort || "—") + "/5 · " + (result.onTime ? "muddatida" : "kechikkan"));
+              else showToast(result.reason || "AI vazifani tekshirdi, lekin bu safar XP ajratilmadi.", "error");
+            } catch (error) {
+              task.completed = false;
+              task.completedAt = null;
+              saveData();
+              render();
+              showToast(error.message || "XP hisoblashda xatolik.", "error");
+              return;
+            }
           }
         }
+        if (task.goalId) {
+          const goal = data.goals.find(item => item.id === task.goalId);
+          if (goal) {
+            const linked = data.tasks.filter(item => item.goalId === goal.id);
+            const completed = linked.filter(item => item.completed).length;
+            goal.progress = linked.length ? Math.round(completed / linked.length * 100) : goal.progress;
+            if (goal.progress >= 100 && !goal.completed) {
+              goal.completed = true;
+              addNotification("Maqsad yakunlandi!", "“" + goal.title + "” maqsadini bajardingiz.");
+            }
+          }
+        }
+        refreshGoalProgress();
+        checkAchievements();
+      } else {
+        task.completed = false;
+        task.completedAt = null;
+        refreshGoalProgress();
+        showToast("Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.");
       }
-
-      checkAchievements();
-      showToast(`Vazifa bajarildi! +${task.reward || 10} XP`);
-    } else {
-      // Completed tasks can be reopened, but awarded XP is not deducted.
-      task.completed = false;
-      task.completedAt = null;
-      showToast("Vazifa qayta ochildi.");
+      saveData();
+      render();
+    } finally {
+      taskActionsInFlight.delete(id);
     }
-
-    saveData();
-    render();
   }
 
   function deleteTask(id) {
@@ -1161,6 +1440,9 @@
       return;
     }
 
+    const canAfford = Number(data.xp) >= item.price;
+    const missingXP = Math.max(0, item.price - (Number(data.xp) || 0));
+
     openModal(
       "Xaridni tasdiqlash",
       `
@@ -1169,38 +1451,54 @@
           <h3>${escapeHTML(item.name)}</h3>
           <p>${escapeHTML(item.description)}</p>
           <strong>${formatNumber(item.price)} XP</strong>
+          <p>${canAfford
+            ? `Balansingiz: ${formatNumber(data.xp)} XP`
+            : `Balansingiz: ${formatNumber(data.xp)} XP. Yana ${formatNumber(missingXP)} XP kerak.`}</p>
         </div>
       `,
       `
         <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
-        <button class="primary-button" type="button" data-action="confirm-purchase" data-id="${escapeHTML(id)}">Xarid qilish</button>
+        <button class="primary-button" type="button" data-action="confirm-purchase" data-id="${escapeHTML(id)}" ${canAfford ? "" : "disabled"}>${canAfford ? "Xarid qilish" : "XP yetarli emas"}</button>
       `
     );
   }
 
-  function confirmPurchase(id) {
+  async function confirmPurchase(id) {
+    if (purchaseActionsInFlight.has(id)) return;
     const item = STORE_ITEMS.find(product => product.id === id);
     if (!item) return;
-
-    if (data.inventory.some(product => product.id === id)) {
-      showToast("Bu mahsulot sizda mavjud.", "error");
-      closeModal();
-      return;
+    purchaseActionsInFlight.add(id);
+    const button = document.querySelector("[data-action='confirm-purchase']");
+    if (button) button.disabled = true;
+    try {
+      if (data.inventory.some(product => product.id === id)) {
+        showToast("Bu mahsulot sizda allaqachon mavjud.", "error"); closeModal(); return;
+      }
+      let purchasedItem;
+      if (remoteAuthenticated) {
+        if (!await flushRemoteSync()) throw new Error("Ma’lumotlar serverga saqlanmadi. Qayta urinib ko‘ring.");
+        const response = await fetch("/api/store/purchase", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({itemId:id})});
+        const result = await response.json().catch(()=>({}));
+        if (!response.ok || !result.success) throw new Error(result.message || "Xaridni amalga oshirib bo‘lmadi.");
+        data.xp = Number(result.xpBalance || 0);
+        data.spentXP = (Number(data.spentXP)||0) + item.price;
+        purchasedItem = result.item;
+      } else {
+        if (Number(data.xp) < item.price) throw new Error("Bu xarid uchun XP yetarli emas.");
+        data.xp = Number(data.xp) - item.price;
+        data.spentXP = (Number(data.spentXP)||0) + item.price;
+        purchasedItem = {id:item.id,type:item.type,value:item.value,purchasedAt:new Date().toISOString()};
+      }
+      data.inventory.push(purchasedItem || {id:item.id,type:item.type,value:item.value,purchasedAt:new Date().toISOString()});
+      saveData(); closeModal(); render();
+      showToast(`${item.name} muvaffaqiyatli xarid qilindi!`);
+    } catch (error) {
+      showToast(error.message || "Xarid vaqtida xatolik yuz berdi.", "error");
+    } finally {
+      purchaseActionsInFlight.delete(id);
+      const currentButton = document.querySelector("[data-action='confirm-purchase']");
+      if (currentButton) currentButton.disabled = false;
     }
-
-    if (!spendXP(item.price)) return;
-
-    data.inventory.push({
-      id: item.id,
-      type: item.type,
-      value: item.value,
-      purchasedAt: new Date().toISOString()
-    });
-
-    saveData();
-    closeModal();
-    render();
-    showToast(`${item.name} muvaffaqiyatli xarid qilindi!`);
   }
 
   function useItem(id) {
@@ -1235,7 +1533,7 @@
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const key = date.toISOString().slice(0, 10);
+      const key = [date.getFullYear(),String(date.getMonth()+1).padStart(2,"0"),String(date.getDate()).padStart(2,"0")].join("-");
 
       const xp = data.activity
         .filter(item => item.date === key)
@@ -1249,6 +1547,25 @@
     }
 
     return result;
+  }
+
+  function getActivityStreak() {
+    const activeDays=new Set();
+    for(const item of (data.activity||[]))if(/^\d{4}-\d{2}-\d{2}$/.test(String(item.date||"")))activeDays.add(String(item.date));
+    for(const task of (data.tasks||[])){
+      if(!task.completed||!task.completedAt)continue;
+      const date=new Date(task.completedAt);
+      if(Number.isNaN(date.getTime()))continue;
+      const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
+      activeDays.add(parts.filter(part=>part.type!=="literal").map(part=>part.value).join("-"));
+    }
+    const todayParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+    let cursor=todayParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-");
+    const shiftDay=key=>{const date=new Date(key+"T12:00:00Z");date.setUTCDate(date.getUTCDate()-1);return date.toISOString().slice(0,10);};
+    if(!activeDays.has(cursor))cursor=shiftDay(cursor);
+    let streak=0;
+    while(streak<366&&activeDays.has(cursor)){streak++;cursor=shiftDay(cursor);}
+    return streak;
   }
 
   function chartMarkup() {
@@ -1340,29 +1657,72 @@
 
   /* -------------------- DASHBOARD PAGE -------------------- */
 
+  function getDailyCoachTip() {
+    const overdue=data.tasks.filter(task=>!task.completed&&task.date&&task.date<today()).length;
+    const todayPending=data.tasks.filter(task=>!task.completed&&task.date===today()).length;
+    const active=data.goals.filter(goal=>!goal.completed);
+    const lang=settings.language||"uz";
+    const copy={
+      uz:{
+        overdueTitle:"Avval kechikkan ishlarni yengillashtiring",
+        overdueText:n=>n+" ta vazifa muddati o‘tgan. Hammasini birdan bajarishga urinmang: eng muhim bittasini tanlab, 20–25 daqiqa ishlang.",
+        todayTitle:"Bugun ustuvorlikni tanlang",
+        todayText:n=>"Bugun "+n+" ta vazifa bor. Eng muhim 3 tasini tanlang, ular orasida qisqa tanaffus qiling.",
+        goalTitle:"Yangi maqsad sari qadam qo‘ying",
+        goalText:"Keyingi 30 kun ichida erishmoqchi bo‘lgan bitta aniq natijani belgilang.",
+        routineTitle:"Kun tartibini shakllantiring",
+        routineText:"Uyg‘onish, o‘qish yoki ish va dam olish vaqtlarini belgilang. Barqaror tartib maqsadlarga erishishni osonlashtiradi.",
+        defaultTitle:"Kichik, muntazam qadamlar katta natija beradi",
+        defaultText:"Bugun faol maqsadlaringizdan bittasiga tegishli vazifani bajaring. Kechqurun natijani ko‘rib, ertangi kunni rejalashtiring."
+      },
+      ru:{
+        overdueTitle:"Сначала разберите просроченные задачи",
+        overdueText:n=>n+" задач просрочено. Не пытайтесь сделать всё сразу: выберите одну самую важную и поработайте над ней 20–25 минут.",
+        todayTitle:"Выберите главный приоритет на сегодня",
+        todayText:n=>"На сегодня запланировано "+n+" задач. Выберите три самые важные и делайте короткие перерывы.",
+        goalTitle:"Сделайте шаг к новой цели",
+        goalText:"Определите один конкретный результат, которого хотите достичь в ближайшие 30 дней.",
+        routineTitle:"Сформируйте распорядок дня",
+        routineText:"Укажите время пробуждения, учёбы или работы и отдыха. Регулярный распорядок помогает достигать целей.",
+        defaultTitle:"Небольшие регулярные шаги приводят к большим результатам",
+        defaultText:"Сегодня выполните одну задачу, связанную с активной целью. Вечером оцените результат и спланируйте завтра."
+      },
+      en:{
+        overdueTitle:"Start by simplifying overdue tasks",
+        overdueText:n=>n+" tasks are overdue. Do not try to do everything at once: choose the most important one and work on it for 20–25 minutes.",
+        todayTitle:"Choose today's top priority",
+        todayText:n=>"You have "+n+" tasks planned for today. Pick the three most important and take short breaks between them.",
+        goalTitle:"Take a step toward a new goal",
+        goalText:"Choose one specific result you want to achieve in the next 30 days.",
+        routineTitle:"Build a daily routine",
+        routineText:"Set your wake-up, study or work, and rest times. A steady routine makes goals easier to reach.",
+        defaultTitle:"Small, consistent steps lead to big results",
+        defaultText:"Complete one task linked to an active goal today. Review your progress tonight and plan tomorrow."
+      }
+    };
+    const t=copy[lang]||copy.uz;
+    if(overdue)return {title:t.overdueTitle,text:t.overdueText(overdue)};
+    if(todayPending>4)return {title:t.todayTitle,text:t.todayText(todayPending)};
+    if(!active.length)return {title:t.goalTitle,text:t.goalText};
+    if(!(data.dailyRoutine||[]).length)return {title:t.routineTitle,text:t.routineText};
+    return {title:t.defaultTitle,text:t.defaultText};
+  }
+
   function renderDashboard() {
-    const completed = data.tasks.filter(task => task.completed).length;
+    const completed = data.tasks.filter(task => task.isRoutineEntry && task.completed).length;
     const activeGoals = data.goals.filter(goal => !goal.completed).length;
-    const todayTasks = data.tasks.filter(task => task.date === today());
+    const todayTasks = data.tasks.filter(task => task.isRoutineEntry && task.date === today());
     const completedToday = todayTasks.filter(task => task.completed).length;
+    const routineToday = getRoutineProgress(data.dailyRoutine || []);
     const rank = getRank();
+    const coachTip = getDailyCoachTip();
 
-    const tasksHTML = todayTasks.length
-      ? todayTasks.slice(0, 5).map(task => `
-          <div class="task-item ${task.completed ? "task-completed" : ""}">
-            <input class="task-checkbox" type="checkbox"
-              data-action="toggle-task" data-id="${escapeHTML(task.id)}"
-              ${task.completed ? "checked" : ""} aria-label="Vazifani bajarildi deb belgilash">
-
-            <div class="task-info">
-              <strong>${escapeHTML(task.title)}</strong>
-              <small>${escapeHTML(formatDate(task.date))}</small>
-            </div>
-
-            <span class="task-reward">${icon("zap", 12)} ${task.reward || 10} XP</span>
-          </div>
-        `).join("")
-      : emptyState("Buguncha vazifalar yo‘q", textForUser("emptyTasks"), "calendar-check");
+    const routineHTML = routineToday.items.length
+      ? routineToday.items.slice(0, 5).map(item => {
+          const label = item.status === "done" ? "Bajarildi" : item.status === "missed" ? "O‘tkazib yuborildi" : item.status === "no-time" ? "Vaqt yetmadi" : "Kutilmoqda";
+          return '<div class="dashboard-routine-row"><time>'+escapeHTML(item.time)+'</time><strong>'+escapeHTML(item.title)+'</strong><span class="routine-status-pill '+(item.status==="done"?"done":["missed","no-time"].includes(item.status)?"missed":"upcoming")+'">'+label+'</span></div>';
+        }).join("")
+      : emptyState("Kun tartibi hali tuzilmagan", "Birinchi kun tartibi bandingizni qo‘shing.", "calendar-check");
 
     const goalsHTML = data.goals.length
       ? data.goals.filter(goal => !goal.completed).slice(0, 4).map(goal => `
@@ -1372,10 +1732,10 @@
                 <strong>${escapeHTML(goal.title)}</strong>
                 <small>${goal.deadline ? `Muddat: ${escapeHTML(formatDate(goal.deadline))}` : "Muddat belgilanmagan"}</small>
               </div>
-              <span class="goal-percentage">${goal.progress || 0}%</span>
+              <span class="goal-percentage">${getGoalProgress(goal).progress}%</span>
             </div>
             <div class="progress-track">
-              <div class="progress-fill" style="width:${Math.min(100, goal.progress || 0)}%"></div>
+              <div class="progress-fill" style="width:${getGoalProgress(goal).progress}%"></div>
             </div>
           </div>
         `).join("")
@@ -1388,7 +1748,7 @@
           <h2>${escapeHTML(textForUser("welcome"))}</h2>
           <p>${escapeHTML(textForUser("description"))}</p>
           <div class="welcome-actions">
-            ${actionButton("add-task", textForUser("addTask"), "plus")}
+            ${actionButton("add-routine", "Kun tartibiga band qo‘shish", "plus")}
             <button class="secondary-button" type="button" data-page="goals">
               ${icon("target", 15)} Maqsadlarim
             </button>
@@ -1411,7 +1771,7 @@
           <div class="stat-top">
             <span class="stat-icon green">${icon("check-circle-2")}</span>
           </div>
-          <p class="stat-label">Bajarilgan vazifalar</p>
+          <p class="stat-label">Bajarilgan kun tartibi bandlari</p>
           <div class="stat-value">${formatNumber(completed)}</div>
           <span class="stat-change">${completedToday} ta bugun</span>
         </div>
@@ -1433,7 +1793,20 @@
           <div class="stat-value">${formatNumber(data.achievements.length)}</div>
           <span class="stat-change">Qo‘lga kiritilgan</span>
         </div>
+        <div class="stat-card">
+          <div class="stat-top"><span class="stat-icon purple">${icon("flame")}</span></div>
+          <p class="stat-label">Faollik zanjiri</p>
+          <div class="stat-value">${formatNumber(getActivityStreak())}</div>
+          <span class="stat-change">Ketma-ket faol kun</span>
+        </div>
       </div>
+
+      <section class="card daily-coach-card">
+        <div class="daily-coach-icon">${icon("sparkles",22)}</div>
+        <div><span class="eyebrow">SMARTGOAL MASLAHATI</span><h3>${escapeHTML(coachTip.title)}</h3><p>${escapeHTML(coachTip.text)}</p></div>
+        <div class="daily-coach-actions"><button class="secondary-button" type="button" data-action="generate-daily-advice">${icon("sparkles",14)} AI’dan shaxsiy maslahat</button><button class="card-action" type="button" data-page="ai">AI bilan suhbat ${icon("arrow-right",14)}</button></div>
+      </section>
+      <section class="card daily-ai-advice-output hidden" id="daily-ai-advice-card" aria-live="polite"><div class="card-header"><h3 class="card-title">AI tavsiyasi</h3><button class="card-action" type="button" data-action="close-daily-advice">Yopish</button></div><div id="daily-ai-advice-output" class="card-description"></div></section>
 
       <div class="dashboard-grid">
         <div class="dashboard-column">
@@ -1451,12 +1824,12 @@
           <section class="card">
             <div class="card-header">
               <div>
-                <h3 class="card-title">Bugungi vazifalar</h3>
-                <p class="card-description">${completedToday}/${todayTasks.length} ta bajarildi</p>
+                <h3 class="card-title">Bugungi kun tartibim</h3>
+                <p class="card-description">${routineToday.completedPercent}% bajarildi · ${routineToday.missedPercent}% bajarilmadi · ${completedToday}/${todayTasks.length} ta band</p>
               </div>
-              <button class="card-action" type="button" data-action="add-task">+ Qo‘shish</button>
+              <button class="card-action" type="button" data-page="planner">Batafsil</button>
             </div>
-            ${tasksHTML}
+            <div class="dashboard-routine-list">${routineHTML}</div>
           </section>
         </div>
 
@@ -1485,7 +1858,7 @@
               <div class="progress-fill" style="width:${rank.progress}%"></div>
             </div>
             <div class="goal-footer">
-              <span>${formatNumber(data.xp)} XP</span>
+              <span>${formatNumber(Number(data.xp||0)+Number(data.spentXP||0))} XP</span>
               <span>${rank.next ? `${formatNumber(rank.next.xp)} XP` : "MAX"}</span>
             </div>
             <button class="card-action" type="button" data-page="profile" style="margin-top:16px">
@@ -1499,8 +1872,32 @@
 
   /* -------------------- GOALS PAGE -------------------- */
 
+  function refreshGoalProgress() {
+    for (const goal of data.goals) {
+      const linked=data.tasks.filter(task=>task.goalId===goal.id);
+      if (!linked.length) {
+        if (goal.completed) { goal.completed=false; goal.progress=0; }
+        continue;
+      }
+      const completed=linked.filter(task=>task.completed).length;
+      goal.progress=Math.round(completed/linked.length*100);
+      goal.completed=completed===linked.length;
+    }
+  }
+
+  function getGoalProgress(goal) {
+    const linked = data.tasks.filter(task => task.goalId === goal.id);
+    const completed = linked.filter(task => task.completed).length;
+    const progress = linked.length ? Math.round(completed / linked.length * 100) : Math.max(0,Math.min(100,Number(goal.progress)||0));
+    const daysLeft = goal.deadline ? Math.ceil((new Date(goal.deadline+"T12:00:00").getTime()-new Date(today()+"T12:00:00").getTime())/86400000) : null;
+    return { total:linked.length, completed, remaining:Math.max(0,linked.length-completed), progress, daysLeft };
+  }
+
   function renderGoals() {
     const goals = data.goals;
+    const visibleGoals = goals.slice(0,goalListLimit);
+    const goalStats = new Map(goals.map(goal => [goal.id,getGoalProgress(goal)]));
+    const progressFor = goal => goalStats.get(goal.id) || getGoalProgress(goal);
 
     return `
       ${pageHeader(
@@ -1525,12 +1922,12 @@
         </div>
         <div class="stat-card">
           <p class="stat-label">O‘rtacha progress</p>
-          <div class="stat-value">${goals.length ? Math.round(goals.reduce((s, g) => s + (g.progress || 0), 0) / goals.length) : 0}%</div>
+          <div class="stat-value">${goals.length ? Math.round(goals.reduce((sum, goal) => sum + progressFor(goal).progress, 0) / goals.length) : 0}%</div>
         </div>
       </div>
 
       <div class="goal-list">
-        ${goals.length ? goals.map(goal => `
+        ${goals.length ? visibleGoals.map(goal => { const progress=progressFor(goal); return `
           <article class="goal-item">
             <div class="goal-item-header">
               <div>
@@ -1538,13 +1935,14 @@
                 <small>${escapeHTML(goal.description || "Maqsad tavsifi kiritilmagan")}</small>
                 <small>${goal.deadline ? `Muddat: ${escapeHTML(formatDate(goal.deadline))}` : "Muddat belgilanmagan"}</small>
               </div>
-              <span class="goal-percentage">${goal.progress || 0}%</span>
+              <span class="goal-percentage">${progress.progress}%</span>
             </div>
 
             <div class="progress-track">
-              <div class="progress-fill" style="width:${Math.min(100, goal.progress || 0)}%"></div>
+              <div class="progress-fill" style="width:${progress.progress}%"></div>
             </div>
 
+            <div class="goal-progress-detail"><span>${progress.total ? `${progress.completed}/${progress.total} vazifa bajarildi · yana ${progress.remaining} ta qoldi` : "Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating."}</span><span>${progress.daysLeft===null ? "Muddat yo‘q" : progress.daysLeft<0 ? "Muddat o‘tgan" : progress.daysLeft===0 ? "Bugun oxirgi kun" : `Yana ${progress.daysLeft} kun`}</span></div>
             <div class="goal-footer">
               <span>${goal.completed ? "Yakunlangan" : `Ustuvorlik: ${escapeHTML(goal.priority || "medium")}`}</span>
               <span>
@@ -1553,7 +1951,8 @@
               </span>
             </div>
           </article>
-        `).join("") : emptyState("Maqsadlar mavjud emas", "Birinchi maqsadingizni yarating va unga qadam-baqadam yaqinlashing.", "target")}
+        `; }).join("") : emptyState("Maqsadlar mavjud emas", "Birinchi maqsadingizni yarating va unga qadam-baqadam yaqinlashing.", "target")}
+        ${goals.length > goalListLimit ? `<button class="secondary-button task-load-more" type="button" data-action="load-more-goals">Yana ${Math.min(40,goals.length-goalListLimit)} ta maqsadni ko‘rsatish</button>` : ""}
       </div>
     `;
   }
@@ -1561,7 +1960,8 @@
   /* -------------------- SCHEDULE PAGE -------------------- */
 
   function renderSchedule() {
-    const tasks = [...data.tasks].sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    const tasks = [...data.tasks].filter(task => !task.isRoutineEntry).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    const visibleTasks = tasks.slice(0, taskListLimit);
 
     return `
       ${pageHeader(
@@ -1580,7 +1980,7 @@
         </div>
 
         <div class="task-list">
-          ${tasks.length ? tasks.map(task => `
+          ${tasks.length ? visibleTasks.map(task => `
             <div class="task-item ${task.completed ? "task-completed" : ""}">
               <input class="task-checkbox" type="checkbox"
                 data-action="toggle-task" data-id="${escapeHTML(task.id)}"
@@ -1588,10 +1988,10 @@
 
               <div class="task-info">
                 <strong>${escapeHTML(task.title)}</strong>
-                <small>${escapeHTML(formatDate(task.date))}</small>
+                <small>${escapeHTML(formatDate(task.date))} · ${Number(task.estimatedMinutes||30)} daqiqa</small>
               </div>
 
-              <span class="task-reward">${icon("zap", 12)} ${task.reward || 10} XP</span>
+              <span class="task-reward">${icon("zap", 12)} AI: 0–15 XP</span>
 
               <button class="icon-button" type="button"
                 data-action="edit-task" data-id="${escapeHTML(task.id)}"
@@ -1603,69 +2003,288 @@
             </div>
           `).join("") : emptyState("Vazifalar mavjud emas", "Yangi vazifa qo‘shib rejangizni boshlang.", "calendar-check")}
         </div>
+        ${tasks.length > taskListLimit ? `<button class="secondary-button task-load-more" type="button" data-action="load-more-tasks">Yana ${Math.min(50,tasks.length-taskListLimit)} ta vazifani ko‘rsatish</button>` : ""}
       </section>
     `;
   }
 
   /* -------------------- PLANNER PAGE -------------------- */
 
+  function getRoutineProgress(routine, date = today()) {
+    const now = new Date();
+    const currentTime = String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
+    const savedLogs = data.routineLogs?.[date] || {};
+    let autoMarked = false;
+    const items = routine.map(item => {
+      let saved = savedLogs[item.id];
+      if (!saved && String(item.time || "99:99") <= currentTime) {
+        if (!data.routineLogs[date]) data.routineLogs[date] = {};
+        saved = data.routineLogs[date][item.id] = { status: "missed", updatedAt: new Date().toISOString(), xpEarned: 0, automatic: true };
+        autoMarked = true;
+      }
+      const status = saved?.status || "upcoming";
+      return { ...item, status, xpEarned: Number(saved?.xpEarned || 0) };
+    });
+    if (autoMarked) saveData();
+    const total = items.length;
+    const completed = items.filter(item => item.status === "done").length;
+    const skipped = items.filter(item => item.status === "missed").length;
+    const noTime = items.filter(item => item.status === "no-time").length;
+    const missed = skipped + noTime;
+    return {
+      items, total, completed, skipped, noTime, missed,
+      completedPercent: total ? Math.round(completed / total * 100) : 0,
+      skippedPercent: total ? Math.round(skipped / total * 100) : 0,
+      noTimePercent: total ? Math.round(noTime / total * 100) : 0,
+      missedPercent: total ? Math.round(missed / total * 100) : 0
+    };
+  }
+
+  async function setRoutineStatus(id, status) {
+    if (!["done","missed","no-time"].includes(status)) return;
+    const item = (data.dailyRoutine || []).find(row => row.id === id);
+    if (!item) return;
+    const day = today();
+    if (!data.routineLogs || typeof data.routineLogs !== "object") data.routineLogs = {};
+    if (!data.routineLogs[day] || typeof data.routineLogs[day] !== "object") data.routineLogs[day] = {};
+    if (data.routineLogs[day][id]?.status === "done") {
+      showToast("Bajarilgan band va uning XP bahosi o‘zgartirilmaydi.", "error");
+      return;
+    }
+    if (status !== "done") {
+      data.routineLogs[day][id] = { status, updatedAt: new Date().toISOString(), xpEarned: 0 };
+      saveData(); render();
+      return;
+    }
+    const existingTask = data.tasks.find(task => task.isRoutineEntry && task.routineId === id && task.date === day);
+    const task = existingTask || {
+      id: uid(), title: String(item.title || "Kun tartibi bandi").slice(0,100),
+      description: ("Kun tartibi: " + String(item.description || item.title || "")).slice(0,500),
+      date: day, priority: "medium", estimatedMinutes: Math.max(5,Math.min(480,Number(item.estimatedMinutes||30))),
+      goalId: "", completed: false, xpAwarded: false, xpEarned: 0, completedAt: null,
+      createdAt: day + "T" + String(item.time || "00:00") + ":00+05:00", isRoutineEntry: true, routineId: id
+    };
+    if (!existingTask) data.tasks.push(task);
+    saveData();
+    if (!remoteAuthenticated || !await flushRemoteSync()) {
+      if (!existingTask) data.tasks = data.tasks.filter(row => row.id !== task.id);
+      saveData(); render();
+      showToast("Kun tartibi bandi serverga saqlanmadi. Internetni tekshirib qayta urinib ko‘ring.", "error");
+      return;
+    }
+    await toggleTask(task.id);
+    if (!task.completed) {
+      if (!existingTask) data.tasks = data.tasks.filter(row => row.id !== task.id);
+      saveData(); render();
+      return;
+    }
+    data.routineLogs[day][id] = { status: "done", updatedAt: new Date().toISOString(), taskId: task.id, xpEarned: Number(task.xpEarned || 0) };
+    saveData(); render();
+  }
+
   function renderPlanner() {
     const activeGoals = data.goals.filter(goal => !goal.completed);
-    const pendingTasks = data.tasks.filter(task => !task.completed);
+    const routine = [...(data.dailyRoutine || [])].sort((a,b) => String(a.time).localeCompare(String(b.time)));
+    const routineProgress = getRoutineProgress(routine);
 
     return `
-      ${pageHeader(
-        "VAQTNI BOSHQARISH",
-        "Rejalashtiruvchi",
-        "Kunlik va haftalik rejalaringizni tartibga soling."
-      )}
+      ${pageHeader("VAQTNI BOSHQARISH","Kun tartibim","Kunlik rejangiz, odatlaringiz va maqsadlaringizni bir joyda boshqaring.")}
 
-      <section class="card">
+      <section class="card routine-card">
         <div class="card-header">
-          <div>
-            <h3 class="card-title">Bugungi reja</h3>
-            <p class="card-description">${escapeHTML(formatDate(today()))}</p>
-          </div>
-          ${actionButton("add-task", "Vazifa qo‘shish")}
+          <div><span class="eyebrow">SIZNING SHAXSIY REJANGIZ</span><h3 class="card-title">Kun tartibim</h3><p class="card-description">Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.</p></div>
+          ${actionButton("add-routine","Band qo‘shish","plus")}
         </div>
-
-        ${pendingTasks.length
-          ? `<div class="task-list">${pendingTasks.filter(task => task.date === today()).map(task => `
-              <div class="task-item">
-                <input class="task-checkbox" type="checkbox" data-action="toggle-task" data-id="${escapeHTML(task.id)}">
-                <div class="task-info"><strong>${escapeHTML(task.title)}</strong><small>${task.reward} XP</small></div>
-              </div>
-            `).join("") || emptyState("Bugungi vazifalar yo‘q", "Yangi vazifa qo‘shishingiz mumkin.", "calendar-check")}</div>`
-          : emptyState("Reja hali bo‘sh", "Vazifalar qo‘shish orqali rejalashtirishni boshlang.", "calendar")}
+        <div class="routine-progress-summary">
+          <div class="routine-progress-head"><strong>Bugungi bajarilish</strong><span>${routineProgress.completedPercent}% bajarildi</span></div>
+          <div class="routine-progress-track"><span class="routine-progress-done" style="width:${routineProgress.completedPercent}%"></span><span class="routine-progress-missed" style="width:${routineProgress.skippedPercent}%"></span><span class="routine-progress-no-time" style="width:${routineProgress.noTimePercent}%"></span></div>
+          <div class="routine-progress-legend"><span class="routine-legend-done">${routineProgress.completed} ta · ${routineProgress.completedPercent}% bajarildi</span><span class="routine-legend-missed">${routineProgress.skipped} ta · ${routineProgress.skippedPercent}% o‘tkazildi</span><span class="routine-legend-time">${routineProgress.noTime} ta · ${routineProgress.noTimePercent}% vaqt yetmadi</span><span>${Math.max(0,routineProgress.total-routineProgress.completed-routineProgress.missed)} kutilmoqda</span></div>
+        </div>
+        <div class="routine-list">
+          ${routineProgress.items.length ? routineProgress.items.map(item => {
+            const labels = {done:"Bajarildi",missed:"O‘tkazib yuborildi","no-time":"Vaqt yetmadi",upcoming:"Kutilmoqda"};
+            const statusClass = item.status === "done" ? "done" : ["missed","no-time"].includes(item.status) ? "missed" : "upcoming";
+            return `
+              <article class="routine-item routine-item-${statusClass}">
+                <time>${escapeHTML(item.time || "--:--")}</time>
+                <div class="routine-item-content"><strong>${escapeHTML(item.title)}</strong><small>${escapeHTML(item.description || "")}</small><span class="routine-status-pill ${statusClass}">${labels[item.status]}${item.status==="done"?" · +"+item.xpEarned+" XP":""}</span></div>
+                <div class="routine-item-actions">
+                  ${item.status !== "done" ? `
+                    <button class="routine-mark-button routine-mark-done" type="button" data-action="routine-status" data-status="done" data-id="${escapeHTML(item.id)}" title="Bajarildi">✓</button>
+                    <button class="routine-mark-button routine-mark-missed" type="button" data-action="routine-status" data-status="missed" data-id="${escapeHTML(item.id)}" title="Bajarilmadi">×</button>
+                    <button class="routine-mark-button routine-mark-time" type="button" data-action="routine-status" data-status="no-time" data-id="${escapeHTML(item.id)}" title="Vaqt yetmadi">◷</button>
+                  ` : ""}
+                  <button class="icon-button" type="button" data-action="edit-routine" data-id="${escapeHTML(item.id)}" aria-label="Tahrirlash">${icon("pencil",15)}</button>
+                  <button class="icon-button" type="button" data-action="delete-routine" data-id="${escapeHTML(item.id)}" aria-label="O‘chirish">${icon("trash-2",15)}</button>
+                </div>
+              </article>`;
+          }).join("") : emptyState("Kun tartibi hali tuzilmagan","Masalan, 07:00 — uyg‘onish, 07:15 — badantarbiya kabi bandlar qo‘shing.","sunrise")}
+        </div>
+        <div class="routine-ai">
+          <div><strong>${icon("sparkles",16)} AI bilan kun tartibini tuzish</strong><small>Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing. Eslatmalar sahifa ochiq turganda ishlaydi.</small></div>
+          <textarea id="routine-ai-prompt" class="field-textarea" rows="2" maxlength="700" placeholder="Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman."></textarea>
+          <button class="primary-button" type="button" data-action="generate-routine">${icon("sparkles",15)} Menga kun tartibi tuz</button>
+          <button class="secondary-button" type="button" data-action="generate-routine-advice">${icon("message-circle-heart",15)} AI maslahat olish</button>
+          <div id="routine-ai-advice-output" class="daily-ai-advice-output" aria-live="polite"></div>
+          <button class="secondary-button" type="button" data-action="enable-routine-reminders">${icon("bell",15)} ${settings.routineReminders ? "Eslatmalar yoqilgan" : "Vaqtida eslatib tur"}</button>
+        </div>
       </section>
 
-      <section class="card" style="margin-top:20px">
-        <div class="card-header">
-          <div>
-            <h3 class="card-title">Maqsadlar asosida tavsiyalar</h3>
-            <p class="card-description">Hozircha SmartGoal ichidagi oddiy rejalashtirish yordamchisi</p>
-          </div>
-          <span class="nav-badge">AI keyin ulanadi</span>
-        </div>
-
-        ${activeGoals.length ? activeGoals.map(goal => `
-          <div class="goal-item">
-            <div class="goal-item-header">
-              <div><strong>${escapeHTML(goal.title)}</strong><small>${escapeHTML(goal.description || "Maqsadga erishish uchun muntazam ishlang.")}</small></div>
-              <span class="goal-percentage">${goal.progress || 0}%</span>
-            </div>
-            <p class="card-description">Tavsiya: ushbu maqsad uchun bugun kamida bitta kichik vazifa belgilang.</p>
-          </div>
-        `).join("") : emptyState("Faol maqsad yo‘q", "Avval maqsad yarating.", "target")}
+remove planner task block      <section class="card" style="margin-top:20px">
+        <div class="card-header"><div><h3 class="card-title">Maqsadlar asosida tavsiyalar</h3><p class="card-description">AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.</p></div><button class="card-action" type="button" data-action="generate-ai-plan">AI reja tuzsin</button></div>
+        <div id="ai-plan-output" class="card-description" style="white-space:pre-wrap;margin:12px 0"></div>
+        ${activeGoals.length ? activeGoals.map(goal => `<div class="goal-item"><div class="goal-item-header"><div><strong>${escapeHTML(goal.title)}</strong><small>${escapeHTML(goal.description || "Maqsadga erishish uchun muntazam ishlang.")}</small></div><span class="goal-percentage">${getGoalProgress(goal).progress}%</span></div><p class="card-description">Tavsiya: ushbu maqsad uchun bugun kamida bitta kichik vazifa belgilang.</p></div>`).join("") : emptyState("Faol maqsad yo‘q","Avval maqsad yarating.","target")}
       </section>
     `;
+  }
+
+  function openRoutineForm(id = null) {
+    const item = (data.dailyRoutine || []).find(row => row.id === id);
+    openModal(item ? "Kun tartibini tahrirlash" : "Kun tartibiga yangi band", `
+      <form id="routine-form" class="form-grid">
+        <input type="hidden" name="id" value="${escapeHTML(item?.id || "")}">
+        <div class="form-field"><label class="field-label">Vaqt</label><input class="field-input" type="time" name="time" required value="${escapeHTML(item?.time || "07:00")}"></div>
+        <div class="form-field full-width"><label class="field-label">Nima qilasiz?</label><input class="field-input" name="title" maxlength="90" required placeholder="Masalan: Uyg‘onish" value="${escapeHTML(item?.title || "")}"></div>
+        <div class="form-field"><label class="field-label">Davomiyligi (daqiqa)</label><input class="field-input" type="number" name="estimatedMinutes" min="5" max="480" step="5" value="${Math.max(5,Math.min(480,Number(item?.estimatedMinutes||30)))}"></div>
+        <div class="form-field full-width"><label class="field-label">Qisqa izoh (ixtiyoriy)</label><textarea class="field-textarea" name="description" maxlength="180" rows="2" placeholder="Masalan: Suv ichish va xonani shamollatish">${escapeHTML(item?.description || "")}</textarea></div>
+      </form>`, `
+      <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
+      <button class="primary-button" type="submit" form="routine-form">Saqlash</button>`);
+  }
+
+  function saveRoutine(form) {
+    const fd = new FormData(form), id = String(fd.get("id") || "");
+    const time = String(fd.get("time") || ""), title = String(fd.get("title") || "").trim();
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time) || title.length < 2) { showToast("Vaqt va mashg‘ulot nomini to‘g‘ri kiriting.", "error"); return; }
+    if ((data.dailyRoutine || []).some(item => item.time === time && item.id !== id)) { showToast("Bu vaqtga boshqa mashg‘ulot belgilangan. Boshqa vaqt tanlang.", "error"); return; }
+    const values = { time, title, description: String(fd.get("description") || "").trim().slice(0,180), estimatedMinutes: Math.max(5,Math.min(480,Number(fd.get("estimatedMinutes")||30)||30)) };
+    if (id) { const item = data.dailyRoutine.find(row => row.id === id); if (item) Object.assign(item, values); }
+    else data.dailyRoutine.push({ id: uid(), ...values });
+    data.dailyRoutine.sort((a,b) => a.time.localeCompare(b.time));
+    saveData(); closeModal(); render(); showToast("Kun tartibi saqlandi.");
+  }
+
+  async function enableRoutineReminders() {
+    if (!("Notification" in window)) {
+      settings.routineReminders=true; saveSettings(); render();
+      showToast("Ilova ichidagi kun tartibi eslatmalari yoqildi.");
+      return;
+    }
+    if (Notification.permission === "denied") {
+      settings.routineReminders=true; saveSettings(); render();
+      showToast("Ilova ichidagi eslatmalar yoqildi. Brauzer xabarlari bloklangan.");
+      return;
+    }
+    const permission = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
+    settings.routineReminders=true; saveSettings(); render();
+    showToast(permission==="granted" ? "Kun tartibi eslatmalari yoqildi." : "Ilova ichidagi eslatmalar yoqildi. Brauzer xabarlariga ruxsat berilmadi.");
+  }
+
+  function checkDueTaskNotifications() {
+    const day=today();
+    let added=0;
+    for (const task of (data.tasks||[]).filter(item=>!item.completed && item.date===day).slice(0,80)) {
+      const key="smartgoal_task_due_"+day+"_"+task.id;
+      if (localStorage.getItem(key)) continue;
+      localStorage.setItem(key,"1");
+      data.notifications.unshift({id:uid(),title:"Bugungi vazifa",message:task.title+" — bugun bajarish rejalashtirilgan.",date:new Date().toISOString(),read:false});
+      added++;
+    }
+    if (added) {
+      data.notifications=data.notifications.slice(0,60);
+      saveData(); updateNotificationIndicators();
+      if (currentPage==="notifications") render();
+    }
+  }
+
+  function checkRoutineReminders() {
+    checkDueTaskNotifications();
+    if (!settings.routineReminders || !Array.isArray(data.dailyRoutine) || !data.dailyRoutine.length) return;
+    const now = new Date(), time = String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+    const day = now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+    for (const item of data.dailyRoutine) {
+      if (item.time !== time) continue;
+      const key = "smartgoal_routine_reminder_"+day+"_"+item.id;
+      if (localStorage.getItem(key)) continue;
+      localStorage.setItem(key,"1");
+      addNotification("Kun tartibi vaqti!", item.title + (item.description ? " — "+item.description : ""));
+      if ("Notification" in window && Notification.permission === "granted") {
+        try { new Notification("SmartGoal · "+item.title,{body:item.description || "Rejangizdagi navbatdagi ish vaqti keldi."}); } catch {}
+      }
+    }
+  }
+
+  async function generateRoutineAdvice() {
+    const output = $("#routine-ai-advice-output");
+    const button = document.querySelector("[data-action='generate-routine-advice']");
+    if (!output) return;
+    const language = settings.language;
+    const prompts = {
+      uz: "Bugungi kun tartibimni va bajarilish holatini tahlil qil. Bajarilgan, o‘tkazib yuborilgan va vaqt yetmagan bandlarni hisobga olib, ertangi kun tartibimni qanday yaxshilashimni ayt. 3 ta aniq, muloyim va amaliy maslahat ber. Muvaffaqiyatsizlik uchun ayblama, ortiqcha bandlarni kamaytir va real vaqt oralig‘ini taklif qil.",
+      ru: "Проанализируй мой распорядок и сегодняшнее выполнение. Учти выполненные, пропущенные пункты и пункты, на которые не хватило времени. Дай 3 конкретных и доброжелательных совета, как улучшить расписание на завтра. Не обвиняй, предложи реалистичные интервалы и разумную нагрузку.",
+      en: "Review my daily routine and today's completion. Consider completed, missed and time-constrained items. Give 3 practical, supportive recommendations to improve tomorrow's schedule. Do not blame me; suggest realistic time blocks and a sustainable workload."
+    };
+    output.innerHTML = "<p>AI kun tartibingizni tahlil qilmoqda…</p>";
+    if (button) button.disabled = true;
+    try {
+      const response = await fetch("/api/ai", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message:prompts[language]||prompts.uz,language,history:[]})});
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "AI maslahat bera olmadi.");
+      output.innerHTML = formatAIMessage(result.answer || "");
+    } catch (error) {
+      output.textContent = error.message || "AI bilan aloqa uzildi.";
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
+
+  async function generateRoutine() {
+    const input = $("#routine-ai-prompt"), prompt = String(input?.value || "").trim();
+    if (!prompt) { showToast("Avval kuningiz haqida qisqacha yozing.", "error"); return; }
+    const button = document.querySelector("[data-action='generate-routine']");
+    if (button) { button.disabled = true; button.textContent = settings.language==="ru"?"AI составляет распорядок...":settings.language==="en"?"AI is building your routine...":"AI reja tuzmoqda..."; }
+    try {
+      const response = await fetch("/api/ai", { method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"routine",prompt,language:settings.language}) });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "AI kun tartibini tuza olmadi.");
+      const match = String(result.answer || "").match(/\[[\s\S]*\]/);
+      if (!match) throw new Error("AI reja formatini tushunib bo‘lmadi. Qayta urinib ko‘ring.");
+      const items = JSON.parse(match[0]);
+      if (!Array.isArray(items) || !items.length) throw new Error("AI bo‘sh kun tartibi qaytardi.");
+      const usedTimes = new Set();
+      const cleaned = items.slice(0,14).filter(item => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(item.time || "")) && String(item.title || "").trim().length >= 2 && !usedTimes.has(item.time) && usedTimes.add(item.time)).map(item => ({id:uid(),time:item.time,title:String(item.title).slice(0,90),description:String(item.description || "").slice(0,180),estimatedMinutes:Math.max(5,Math.min(480,Number(item.estimatedMinutes||30)||30))}));
+      if (!cleaned.length) throw new Error("AI yaratgan vaqtlar noto‘g‘ri formatda.");
+      const existing = Array.isArray(data.dailyRoutine) ? data.dailyRoutine : [];
+      const minuteOf = value => {
+        const parts = String(value || "").split(":").map(Number);
+        return parts.length === 2 && parts.every(Number.isFinite) ? parts[0] * 60 + parts[1] : -1;
+      };
+      const durationOf = item => Math.max(5, Math.min(480, Number(item.estimatedMinutes || 30) || 30));
+      const overlaps = (first, second) => {
+        const firstStart = minuteOf(first.time), secondStart = minuteOf(second.time);
+        if (firstStart < 0 || secondStart < 0) return true;
+        const firstEnd = firstStart + durationOf(first), secondEnd = secondStart + durationOf(second);
+        return firstStart < secondEnd && secondStart < firstEnd;
+      };
+      const additions = [];
+      for (const candidate of cleaned) {
+        if (candidate.time && minuteOf(candidate.time) + durationOf(candidate) > 1440) continue;
+        if (existing.some(item => overlaps(candidate, item)) || additions.some(item => overlaps(candidate, item))) continue;
+        additions.push(candidate);
+      }
+      if (!additions.length) throw new Error("AI takliflari mavjud mashg‘ulotlar bilan vaqt jihatidan to‘qnashdi. Boshqa vaqt oralig‘ini kiriting.");
+      data.dailyRoutine = [...existing, ...additions].sort((a,b) => a.time.localeCompare(b.time));
+      saveData(); render(); showToast("Mavjud bandlaringiz saqlandi, AI yangi mashg‘ulotlarni qo‘shdi.");
+    } catch (error) { showToast(error.message || "AI xatolik berdi.", "error"); }
+    finally { if (button) { button.disabled = false; button.innerHTML = icon("sparkles",15) + " Menga kun tartibi tuz"; translateVisibleUI(button); refreshIcons(); } }
   }
 
   /* -------------------- ANALYTICS PAGE -------------------- */
 
   function renderAnalytics() {
-    const completed = data.tasks.filter(task => task.completed).length;
-    const total = data.tasks.length;
+    const routineTasks = data.tasks.filter(task => task.isRoutineEntry);
+    const completed = routineTasks.filter(task => task.completed).length;
+    const total = routineTasks.length;
     const completion = total ? Math.round(completed / total * 100) : 0;
     const weeklyXP = getLastSevenDays().reduce((sum, day) => sum + day.xp, 0);
 
@@ -1693,6 +2312,26 @@
           <p class="stat-label">Bajarilish foizi</p>
           <div class="stat-value">${completion}%</div>
         </div>
+        <div class="stat-card">
+          <p class="stat-label">Faollik zanjiri</p>
+          <div class="stat-value">${formatNumber(getActivityStreak())} kun</div>
+          <span class="stat-change">Ketma-ket faol kun</span>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Bajarilgan ishlar vaqti</p>
+          <div class="stat-value">${Math.floor(data.tasks.filter(task=>task.completed).reduce((sum,task)=>sum+Math.max(0,Math.min(480,Number(task.estimatedMinutes)||0)),0)/60)} soat</div>
+          <span class="stat-change">Vazifalarga rejalashtirilgan vaqt</span>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Qolgan vazifalar</p>
+          <div class="stat-value">${data.tasks.filter(task=>!task.completed).length}</div>
+          <span class="stat-change">Bajarilishi kutilayotgan ishlar</span>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Maqsadlar o‘rtacha progressi</p>
+          <div class="stat-value">${data.goals.length?Math.round(data.goals.reduce((sum,goal)=>sum+getGoalProgress(goal).progress,0)/data.goals.length):0}%</div>
+          <span class="stat-change">Barcha maqsadlar bo‘yicha</span>
+        </div>
       </div>
 
       <section class="card">
@@ -1703,6 +2342,12 @@
           </div>
         </div>
         ${chartMarkup()}
+      </section>
+
+      <section class="card" style="margin-top:20px">
+        <h3 class="card-title">Maqsadlar sari bosib o‘tilgan yo‘l</h3>
+        <p class="card-description">Har bir maqsad uchun bajarilgan ishlar va qolgan qadamlar.</p>
+        ${data.goals.length ? data.goals.map(goal => { const progress=getGoalProgress(goal); return `<div class="goal-progress-analytics"><div class="goal-item-header"><strong>${escapeHTML(goal.title)}</strong><span class="goal-percentage">${progress.progress}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${progress.progress}%"></div></div><div class="goal-progress-detail"><span>${progress.completed} / ${progress.total} vazifa bajarildi · ${progress.remaining} ta qoldi</span><span>${progress.daysLeft===null?"Muddat yo‘q":progress.daysLeft<0?Math.abs(progress.daysLeft)+" kun kechikkan":progress.daysLeft===0?"Bugun oxirgi kun":progress.daysLeft+" kun qoldi"}</span></div></div>`; }).join("") : emptyState("Hali maqsad yo‘q","Maqsad yarating va unga tegishli vazifalarni belgilang.","target")}
       </section>
 
       <section class="card" style="margin-top:20px">
@@ -1726,6 +2371,8 @@
   /* -------------------- ACHIEVEMENTS PAGE -------------------- */
 
   function renderAchievements() {
+    const memories=Array.isArray(data.memories)?data.memories:[];
+    const visibleMemories=memories.slice(0,memoryListLimit);
     return `
       ${pageHeader(
         "SIZNING NATIJALARINGIZ",
@@ -1760,22 +2407,24 @@
       <section class="card" style="margin-top:20px">
         <div class="card-header">
           <div>
-            <h3 class="card-title">Shaxsiy xotiralar</h3>
-            <p class="card-description">Sertifikatlar, muhim kunlar va esdaliklar.</p>
+            <h3 class="card-title">Mening yutuqlarim va esdaliklarim</h3>
+            <p class="card-description">Rasm, sarlavha va izoh bilan o‘zingiz uchun muhim natijalarni saqlang.</p>
           </div>
         </div>
 
-        ${data.memories.length ? data.memories.map(memory => `
+        ${memories.length ? visibleMemories.map(memory => `
           <article class="notification-item">
             <div class="achievement-icon">${icon(memory.type === "certificate" ? "file-badge" : "bookmark", 20)}</div>
             <div>
               <strong>${escapeHTML(memory.title)}</strong>
+              ${memory.image ? `<img class="memory-image" src="${escapeHTML(memory.image)}" alt="${escapeHTML(memory.title)}" loading="lazy" decoding="async">` : ""}
               <p>${escapeHTML(memory.description || "")}</p>
               <small>${escapeHTML(formatDate(memory.date))}</small>
             </div>
             <button class="icon-button" type="button" data-action="delete-memory" data-id="${escapeHTML(memory.id)}">${icon("trash-2", 14)}</button>
           </article>
         `).join("") : emptyState("Xotiralar hali yo‘q", "Birinchi yutug‘ingiz yoki esdalik kuningizni saqlang.", "bookmark")}
+        ${memories.length > memoryListLimit ? `<button class="secondary-button task-load-more" type="button" data-action="load-more-memories">Yana ${Math.min(30,memories.length-memoryListLimit)} ta xotirani ko‘rsatish</button>` : ""}
       </section>
     `;
   }
@@ -1805,6 +2454,11 @@
             <label class="field-label">Sana</label>
             <input class="field-input" type="date" name="date" value="${today()}">
           </div>
+          <div class="form-field full-width">
+            <label class="field-label">Yutuq rasmi (ixtiyoriy)</label>
+            <input class="field-input" type="file" name="image" accept="image/png,image/jpeg,image/webp">
+            <small>Sertifikat yoki esdalik rasmini qo‘shing. Rasm avtomatik kichraytiriladi.</small>
+          </div>
         </form>
       `,
       `
@@ -1814,7 +2468,7 @@
     );
   }
 
-  function saveMemory(form) {
+  async function saveMemory(form) {
     const fd = new FormData(form);
     const title = String(fd.get("title") || "").trim();
 
@@ -1823,13 +2477,22 @@
       return;
     }
 
+    const file = fd.get("image");
+    let image = "";
+    if (file instanceof File && file.size > 0) {
+      if (!file.type.startsWith("image/") || file.size > 4 * 1024 * 1024) { showToast("Rasm 4 MB dan kichik bo‘lishi kerak.", "error"); return; }
+      try { image = await resizeImage(file, 320, 0.6); } catch { showToast("Rasmni yuklab bo‘lmadi.", "error"); return; }
+    }
+    if (image && data.memories.filter(item => item.image).length >= 8) { showToast("Profil va yutuqlar uchun jami 8 tagacha rasm saqlash mumkin.", "error"); return; }
     data.memories.unshift({
       id: uid(),
       title,
       description: String(fd.get("description") || "").trim(),
       type: String(fd.get("type") || "memory"),
-      date: String(fd.get("date") || today())
+      date: String(fd.get("date") || today()),
+      image
     });
+    data.memories = data.memories.slice(0,100);
 
     saveData();
     closeModal();
@@ -1840,67 +2503,32 @@
   /* -------------------- STORE PAGE -------------------- */
 
   function renderRewards() {
+    const visibleItems = STORE_ITEMS.filter(item => storeFilter === "all" || item.type === storeFilter);
+    const categories = [{id:"all",label:"Barchasi"},{id:"theme",label:"Mavzular"},{id:"background",label:"Profil fonlari"},{id:"badge",label:"Belgilar"},{id:"avatar",label:"Avatar ramkalari"}];
     return `
-      ${pageHeader(
-        "MAXSUS IMKONIYATLAR",
-        "Mukofotlar do‘koni",
-        "Yig‘ilgan XP bilan profilingiz uchun maxsus mahsulotlarni oching."
-      )}
-
-      <section class="welcome-banner" style="min-height:120px">
-        <div class="welcome-content">
-          <span class="eyebrow">SIZNING BALANSINGIZ</span>
-          <h2>${formatNumber(data.xp)} XP</h2>
-          <p>Har bir vazifa sizni yangi imkoniyatlarga yaqinlashtiradi.</p>
-        </div>
-        <div class="welcome-visual">${icon("shopping-bag", 65)}</div>
-      </section>
-
-      <div class="store-grid">
-        ${STORE_ITEMS.map(item => {
-          const owned = data.inventory.some(product => product.id === item.id);
-          return `
-            <article class="store-item">
-              <div class="store-preview">
-                ${icon(item.icon, 45)}
-              </div>
-              <div class="store-content">
-                <h3>${escapeHTML(item.name)}</h3>
-                <p>${escapeHTML(item.description)}</p>
-                <div class="store-price">
-                  <strong>${formatNumber(item.price)} XP</strong>
-                  ${owned
-                    ? `<button class="secondary-button" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button>`
-                    : `<button class="primary-button" type="button" data-action="buy-item" data-id="${escapeHTML(item.id)}">Xarid</button>`}
-                </div>
-              </div>
-            </article>
-          `;
-        }).join("")}
+      ${pageHeader("MAXSUS IMKONIYATLAR","Mukofotlar do‘koni","XP bilan profilingiz va SmartGoal ko‘rinishini o‘zingizga moslang.")}
+      <section class="welcome-banner" style="min-height:120px"><div class="welcome-content"><span class="eyebrow">SIZNING BALANSINGIZ</span><h2>${formatNumber(data.xp)} XP</h2><p>Har bir haqiqiy yutuq sizga yangi imkoniyatlarni ochadi.</p></div><div class="welcome-visual">${icon("shopping-bag",65)}</div></section>
+      <div class="store-categories" role="group" aria-label="Do‘kon kategoriyalari">
+        ${categories.map(item => `<button type="button" class="store-category ${storeFilter===item.id?"active":""}" data-store-filter="${item.id}">${item.label}</button>`).join("")}
       </div>
-
-      <section class="card" style="margin-top:22px">
-        <h3 class="card-title">Sizning kolleksiyangiz</h3>
-        <p class="card-description">Sotib olgan mahsulotlaringiz shu yerda saqlanadi.</p>
-        <div class="badge-grid" style="margin-top:16px">
-          ${data.inventory.length ? data.inventory.map(owned => {
-            const item = STORE_ITEMS.find(product => product.id === owned.id);
-            return item ? `
-              <div class="achievement-card">
-                <div class="achievement-icon">${icon(item.icon, 22)}</div>
-                <strong>${escapeHTML(item.name)}</strong>
-                <button class="card-action" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button>
-              </div>
-            ` : "";
-          }).join("") : emptyState("Kolleksiyangiz hozircha bo‘sh", "Do‘kondan birinchi mahsulotingizni xarid qiling.", "package")}
-        </div>
-      </section>
+      <div class="store-grid">
+        ${visibleItems.map(item => {
+          const owned = data.inventory.some(product => product.id === item.id);
+          const canAfford = Number(data.xp) >= item.price;
+          return `<article class="store-item"><div class="store-preview">${icon(item.icon,45)}</div><div class="store-content"><h3>${escapeHTML(item.name)}</h3><p>${escapeHTML(item.description)}</p><div class="store-price"><strong>${formatNumber(item.price)} XP</strong>${owned ? `<button class="secondary-button" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button>` : `<button class="primary-button" type="button" data-action="buy-item" data-id="${escapeHTML(item.id)}" ${canAfford?"":"disabled"}>${canAfford?"Xarid":"XP yetarli emas"}</button>`}</div></div></article>`;
+        }).join("") || emptyState("Bu kategoriyada mahsulot yo‘q","Boshqa kategoriyani tanlang.","package")}
+      </div>
+      <section class="card" style="margin-top:22px"><h3 class="card-title">Sizning kolleksiyangiz</h3><p class="card-description">Sotib olgan mahsulotlaringiz shu yerda saqlanadi.</p><div class="badge-grid" style="margin-top:16px">
+        ${data.inventory.length ? data.inventory.map(owned => { const item=STORE_ITEMS.find(product=>product.id===owned.id); return item ? `<div class="achievement-card"><div class="achievement-icon">${icon(item.icon,22)}</div><strong>${escapeHTML(item.name)}</strong><button class="card-action" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button></div>` : ""; }).join("") : emptyState("Kolleksiyangiz hozircha bo‘sh","Do‘kondan birinchi mahsulotingizni xarid qiling.","package")}
+      </div></section>
     `;
   }
 
   /* -------------------- COMMUNITY PAGE -------------------- */
 
   function renderCommunity() {
+    setTimeout(loadCommunityRelations, 0);
+    setTimeout(loadCommunityLeaderboard, 0);
     return `
       ${pageHeader(
         "HAMJAMIYAT",
@@ -1915,11 +2543,26 @@
             ${icon("search")}
             <input id="community-search" type="search" placeholder="@username">
           </div>
-          <small>Hozircha demo rejim. Haqiqiy foydalanuvchilar qidiruvi backend ulanganda ishlaydi.</small>
+          <small>Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.</small>
         </div>
 
         <div id="community-results" style="margin-top:20px">
           ${emptyState("Qidiruvga tayyor", "Username kiriting. Haqiqiy foydalanuvchilar ro‘yxati backend bilan ulanadi.", "users")}
+        </div>
+      </section>
+
+      <section class="card community-leaderboard-card" style="margin-top:20px">
+        <div class="card-header"><div><h3 class="card-title">Eng faol foydalanuvchilar</h3><p class="card-description">Jami ishlab topilgan XP bo‘yicha reyting.</p></div><button class="card-action" type="button" data-action="refresh-leaderboard">Yangilash</button></div>
+        <div id="community-leaderboard">${communityLeaderboard.length ? communityLeaderboard.map(user=>`<div class="leaderboard-row"><span class="leaderboard-rank">#${user.rank}</span><div class="leaderboard-user"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username)}"><strong>${escapeHTML(user.name)}</strong></button><small>@${escapeHTML(user.username)} · Level ${getRank(Number(user.totalEarnedXP||0)).level}</small></div><strong class="leaderboard-xp">${formatNumber(user.totalEarnedXP)} XP</strong></div>`).join("") : emptyState("Reyting yuklanmoqda","Eng faol foydalanuvchilar ro‘yxati olinmoqda.","trophy")}</div>
+      </section>
+
+      <section class="card" style="margin-top:20px">
+        <div class="card-header">
+          <h3 class="card-title">Do‘stlik so‘rovlari</h3>
+          <button class="card-action" type="button" data-action="refresh-friends">Yangilash</button>
+        </div>
+        <div id="community-relations">
+          ${emptyState("Yuklanmoqda...", "Do‘stlik ma’lumotlari olinmoqda.", "users")}
         </div>
       </section>
 
@@ -1936,59 +2579,144 @@
 
   /* -------------------- AI PAGE -------------------- */
 
-  function renderAI() {
-    return `
-      ${pageHeader(
-        "SHAXSIY YORDAMCHI",
-        "Smart AI",
-        "Maqsadlaringiz va rejalaringiz bo‘yicha aqlli yordamchi."
-      )}
-
-      <section class="ai-panel">
-        <span class="eyebrow">SMARTGOAL INTELLIGENCE</span>
-        <h2>Rivojlanishingiz uchun aqlli yordam.</h2>
-        <p>
-          Kelajakda AI yoshingiz, maqsadlaringiz va tanlagan interfeys
-          murakkabligingizga mos tavsiyalar beradi.
-        </p>
-      </section>
-
-      <section class="card" style="margin-top:20px">
-        <h3 class="card-title">AI bilan suhbat</h3>
-        <p class="card-description">Hozircha demo rejim. AI xizmati keyingi backend bosqichida ulanadi.</p>
-
-        <div class="ai-chat" id="ai-chat">
-          <div class="ai-message">
-            Salom! Men SmartGoal yordamchisiman. Hozircha maqsadlaringiz asosida oddiy tavsiyalar bera olaman.
-          </div>
-        </div>
-
-        <form id="ai-form" class="ai-input-row" style="margin-top:18px">
-          <input name="message" placeholder="Savolingizni yozing..." maxlength="500" required>
-          <button class="primary-button" type="submit">${icon("send", 16)}</button>
-        </form>
-      </section>
-    `;
+  function formatAIMessage(value) {
+    const source = escapeHTML(String(value || "").replace(/\\([*_#])/g, "$1")).replace(/\r\n?/g, "\n");
+    const inline = line => line
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
+    const output = [];
+    let paragraph = [], listType = "";
+    const closeList = () => { if (listType) { output.push("</" + listType + ">"); listType = ""; } };
+    const flushParagraph = () => { if (paragraph.length) { output.push("<p>" + inline(paragraph.join(" ")) + "</p>"); paragraph = []; } };
+    for (const rawLine of source.split("\n")) {
+      const line = rawLine.trim();
+      if (!line) { flushParagraph(); closeList(); continue; }
+      const heading = line.match(/^#{1,3}\s+(.+)$/);
+      const ordered = line.match(/^\d+[.)]\s+(.+)$/);
+      const bullet = line.match(/^[-•]\s+(.+)$/);
+      if (heading) { flushParagraph(); closeList(); output.push("<h3>" + inline(heading[1]) + "</h3>"); continue; }
+      if (ordered || bullet) {
+        flushParagraph();
+        const nextType = ordered ? "ol" : "ul";
+        if (listType !== nextType) { closeList(); output.push("<" + nextType + ">"); listType = nextType; }
+        output.push("<li>" + inline((ordered || bullet)[1]) + "</li>");
+        continue;
+      }
+      closeList();
+      paragraph.push(line);
+    }
+    flushParagraph(); closeList();
+    return output.join("");
   }
 
-  function sendAIMessage(form) {
+  function renderAI() {
+    const welcome={
+      uz:"Salom! Men SmartGoal AI murabbiyiman. Maqsadlaringiz, kun tartibingiz va vazifalaringizni birga yaxshilaymiz. Istalgan mavzuda savol berishingiz mumkin.",
+      ru:"Здравствуйте! Я AI-наставник SmartGoal. Давайте вместе улучшим ваши цели, распорядок дня и задачи. Вы также можете задавать вопросы на любые темы.",
+      en:"Hello! I am your SmartGoal AI coach. Let's improve your goals, daily routine and tasks together. You can also ask me about any topic."
+    };
+    const quick={
+      uz:{today:"Maqsadlarimni tahlil qilib, bugun nima qilishim kerakligini ayt.",routine:"Kun tartibimni yaxshilashga yordam ber.",tasks:"Vazifalarimni qiyinligi va muddatiga qarab tartibla.",motivation:"Motivatsiyam tushib ketdi. Amaliy maslahat ber."},
+      ru:{today:"Проанализируй мои цели и скажи, что мне лучше сделать сегодня.",routine:"Помоги улучшить мой распорядок дня.",tasks:"Распредели мои задачи по сложности и срокам.",motivation:"У меня снизилась мотивация. Дай практический совет."},
+      en:{today:"Review my goals and tell me what I should focus on today.",routine:"Help me improve my daily routine.",tasks:"Prioritize my tasks by difficulty and deadlines.",motivation:"My motivation is low. Give me practical advice."}
+    }[settings.language]||{
+      today:"Maqsadlarimni tahlil qilib, bugun nima qilishim kerakligini ayt.",
+      routine:"Kun tartibimni yaxshilashga yordam ber.",
+      tasks:"Vazifalarimni qiyinligi va muddatiga qarab tartibla.",
+      motivation:"Motivatsiyam tushib ketdi. Amaliy maslahat ber."
+    };
+    const messages=aiConversation.length?aiConversation:[{role:"assistant",content:welcome[settings.language]||welcome.uz}];
+    const activeGoals=data.goals.filter(goal=>!goal.completed).length;
+    const openTasks=data.tasks.filter(task=>!task.completed&&!task.isRoutineEntry).length;
+    return `
+      ${pageHeader("SHAXSIY YORDAMCHI","Smart AI","Savollaringizga javob, maqsadlaringizga esa aniq reja va foydali maslahatlar.")}
+      <section class="ai-panel"><span class="eyebrow">SMARTGOAL INTELLIGENCE</span><h2>Har kuni yaxshiroq natija sari.</h2><p>AI maqsadlaringiz, vazifalaringiz va kun tartibingizni hisobga olib, amaliy maslahat beradi. Boshqa mavzularda ham bemalol so‘rashingiz mumkin.</p><div class="ai-context-pills"><span>${icon("target",14)} ${activeGoals} faol maqsad</span><span>${icon("list-checks",14)} ${openTasks} bajarilmagan vazifa</span><span>${icon("calendar-clock",14)} ${(data.dailyRoutine||[]).length} kun tartibi bandi</span></div></section>
+      <section class="card ai-chat-card" style="margin-top:20px">
+        <div class="card-header"><div><h3 class="card-title">AI bilan suhbat</h3><p class="card-description">AI siz yozgan tilda javob beradi.</p></div><button class="card-action" type="button" data-action="clear-ai-chat">Suhbatni tozalash</button></div>
+        <div class="ai-quick-prompts"><button type="button" data-ai-prompt="${escapeHTML(quick.today)}">Bugungi rejam</button><button type="button" data-ai-prompt="${escapeHTML(quick.routine)}">Kun tartibim</button><button type="button" data-ai-prompt="${escapeHTML(quick.tasks)}">Vazifalarim</button><button type="button" data-ai-prompt="${escapeHTML(quick.motivation)}">Motivatsiya</button></div>
+        <div class="ai-chat" id="ai-chat" aria-live="polite">${messages.map(item=>'<div class="ai-message '+(item.role==="user"?"user":"")+'">'+(item.role==="user"?escapeHTML(item.content):formatAIMessage(item.content))+'</div>').join("")}</div>
+        <form id="ai-form" class="ai-input-row" style="margin-top:18px"><input name="message" placeholder="Savolingizni yozing..." maxlength="500" required autocomplete="off"><button class="primary-button" type="submit" aria-label="Yuborish">${icon("send",16)}</button></form>
+      </section>`;
+  }
+
+  async function sendAIMessage(form) {
+    if (aiRequestInFlight) return;
     const input = form.elements.message;
-    const message = String(input.value || "").trim();
-    if (!message) return;
-
+    const message = String(input?.value || "").trim();
     const chat = $("#ai-chat");
-    if (!chat) return;
+    if (!message || !chat) return;
 
-    chat.insertAdjacentHTML("beforeend", `
-      <div class="ai-message user">${escapeHTML(message)}</div>
-      <div class="ai-message">
-        Hozircha AI xizmati ulanmagan. Maqsadlaringizni “Maqsadlarim” bo‘limida belgilang.
-        Keyingi bosqichda sizga mos AI tavsiyalarini ulaymiz.
-      </div>
-    `);
-
-    input.value = "";
+    aiRequestInFlight = true;
+    aiConversation.push({ role: "user", content: message });
+    aiConversation = aiConversation.slice(-12);
+    const typingText = settings.language === "ru" ? "AI печатает..." : settings.language === "en" ? "AI is typing..." : "AI javob yozmoqda...";
+    chat.insertAdjacentHTML("beforeend",
+      '<div class="ai-message user">' + escapeHTML(message) + '</div><div class="ai-message" id="ai-typing">' + escapeHTML(typingText) + '</div>');
+    if (input) input.disabled = true;
+    const submit = form.querySelector("button[type='submit']");
+    if (submit) submit.disabled = true;
     chat.scrollTop = chat.scrollHeight;
+
+    const trimChat = () => {
+      const bubbles = chat.querySelectorAll(".ai-message");
+      for (let index = 0; index < bubbles.length - 12; index++) bubbles[index].remove();
+    };
+
+    try {
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "chat", message, history: aiConversation.slice(0, -1), language: settings.language })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "AI bilan bog‘lanib bo‘lmadi.");
+      const answer = String(result.answer || "").trim();
+      if (!answer) throw new Error("AI bo‘sh javob qaytardi. Qayta urinib ko‘ring.");
+      aiConversation.push({ role: "assistant", content: answer });
+      aiConversation = aiConversation.slice(-12);
+      $("#ai-typing")?.remove();
+      chat.insertAdjacentHTML("beforeend", '<div class="ai-message">' + formatAIMessage(answer) + '</div>');
+      trimChat();
+    } catch (error) {
+      $("#ai-typing")?.remove();
+      if (aiConversation.at(-1)?.role === "user" && aiConversation.at(-1)?.content === message) aiConversation.pop();
+      const errorText = error.message || "AI hozircha javob bera olmadi.";
+      chat.insertAdjacentHTML("beforeend", '<div class="ai-message ai-message-error">' + escapeHTML(errorText) + '</div>');
+      trimChat();
+    } finally {
+      aiRequestInFlight = false;
+      if (input) { input.disabled = false; input.focus(); }
+      if (submit) submit.disabled = false;
+      chat.scrollTop = chat.scrollHeight;
+    }
+  }
+  async function generateDailyAdvice() {
+    const card=$("#daily-ai-advice-card"),output=$("#daily-ai-advice-output"),button=document.querySelector("[data-action='generate-daily-advice']");
+    if(!card||!output)return;
+    card.classList.remove("hidden");
+    output.textContent=settings.language==="ru"?"Анализирую ваши цели и задачи...":settings.language==="en"?"Reviewing your goals and tasks...":"Maqsad va vazifalaringiz tahlil qilinmoqda...";
+    if(button)button.disabled=true;
+    const prompts={
+      uz:"Bugungi maqsadlarim, vazifalarim, kun tartibim va oxirgi natijalarimni tahlil qil. Menga aynan hozir foydali bo‘ladigan 3 ta aniq, real va ustuvor maslahat ber. Har bir maslahat nima uchun kerakligini qisqa tushuntir. Ma’lumot yetishmasa, taxmin qilma.",
+      ru:"Проанализируй мои цели, задачи, распорядок дня и последние результаты. Дай 3 конкретных, реалистичных и приоритетных совета, полезных именно сейчас. Кратко объясни каждый совет. Не выдумывай недостающие данные.",
+      en:"Analyze my goals, tasks, daily routine and recent progress. Give me 3 specific, realistic, prioritized recommendations that are useful right now. Briefly explain each one. Do not invent missing information."
+    };
+    try{
+      const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message:prompts[settings.language]||prompts.uz,language:settings.language,history:[]})});
+      const result=await response.json().catch(()=>({}));
+      if(!response.ok||!result.success)throw new Error(result.message||"AI maslahat bera olmadi.");
+      output.innerHTML=formatAIMessage(result.answer);
+    }catch(error){output.textContent=error.message||"AI bilan aloqa uzildi.";}
+    finally{if(button)button.disabled=false;}
+  }
+
+  async function generateAIPlan() {
+    const output=$("#ai-plan-output"),button=document.querySelector("[data-action='generate-ai-plan']");if(!output)return;if(button)button.disabled=true;output.textContent=settings.language==="ru"?"AI анализирует ваши цели и задачи...":settings.language==="en"?"AI is analyzing your goals and tasks...":"AI maqsadlaringiz va vazifalaringizni tahlil qilmoqda...";
+    try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"plan",language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI reja tuza olmadi.");output.innerHTML=formatAIMessage(result.answer);}
+    catch(error){output.textContent=error.message||"AI reja tuzishda xatolik yuz berdi.";}
+    finally{if(button)button.disabled=false;}
   }
 
   /* -------------------- NOTIFICATIONS PAGE -------------------- */
@@ -2030,12 +2758,21 @@
     const rank = getRank();
     const profile = data.profile;
     const completedTasks = data.tasks.filter(task => task.completed).length;
+    const totalEarnedXP = Number(data.xp || 0) + Number(data.spentXP || 0);
+    const customizationScore = [Boolean(profile.avatar), Boolean(String(profile.bio || "").trim()), profile.background && profile.background !== "default", profile.avatarFrame && profile.avatarFrame !== "default", Boolean(profile.activeBadge)].filter(Boolean).length;
 
     const backgroundStyles = {
       default: "linear-gradient(120deg,#5145cf,#9282f6)",
       midnight: "linear-gradient(120deg,#101827,#283958)",
       galaxy: "radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",
-      royal: "linear-gradient(120deg,#7c4a20,#d3a24b)"
+      royal: "linear-gradient(120deg,#7c4a20,#d3a24b)",
+      sakura: "linear-gradient(120deg,#e7a5bd,#8b6bba)",
+      nebula: "radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)",
+      aurora: "linear-gradient(130deg,#123d43,#5b4a9a 55%,#a3d5c6)",
+      forest: "linear-gradient(130deg,#102f26,#39745a 55%,#b4c99a)",
+      sunrise: "linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)",
+      coral: "linear-gradient(130deg,#7c3448,#e57e73 55%,#ffd0a6)",
+      ember: "linear-gradient(130deg,#271d2e,#8b3c36 55%,#f1a15a)"
     };
 
     const bg = backgroundStyles[profile.background] || backgroundStyles.default;
@@ -2045,9 +2782,9 @@
 
       <section class="profile-main-card">
         <div class="profile-avatar-wrap">
-          <span class="avatar">
+          <span class="avatar avatar-frame-${escapeHTML(profile.avatarFrame || "default")}">
             ${profile.avatar
-              ? `<img src="${escapeHTML(profile.avatar)}" alt="Profil rasmi">`
+              ? `<img src="${escapeHTML(profile.avatar)}" alt="Profil rasmi" loading="lazy" decoding="async">`
               : icon("user-round", 42)}
           </span>
           <button class="profile-edit-avatar" type="button" data-action="edit-profile" aria-label="Profilni tahrirlash">
@@ -2057,11 +2794,13 @@
 
         <div class="profile-name">${escapeHTML(profile.name || "Foydalanuvchi")}</div>
         <div class="profile-username">@${escapeHTML(profile.username || "username")}</div>
+        <small class="profile-decoration-score">Profil bezagi: ${customizationScore} / 5</small>
+        ${profile.activeBadge ? `<span class="profile-active-badge">${icon("award",13)} ${escapeHTML(profile.activeBadge)}</span>` : ""}
 
         <p class="profile-bio">${escapeHTML(profile.bio || "Hali biografiya qo‘shilmagan.")}</p>
 
         <div class="profile-meta">
-          ${profile.age !== null && profile.age !== undefined ? `<span>${icon("calendar")} ${profile.age} yosh</span>` : ""}
+          ${profile.birthdatePublic && profile.age !== null && profile.age !== undefined ? `<span>${icon("calendar")} ${profile.age} yosh</span>` : ""}
           <span>${icon("calendar-days")} ${escapeHTML(formatDate((profile.createdAt || "").slice(0, 10)))}</span>
           <span>${icon("check-circle")} ${completedTasks} ta vazifa</span>
         </div>
@@ -2086,7 +2825,7 @@
           </div>
 
           <div class="goal-footer">
-            <span>${formatNumber(data.xp)} XP</span>
+            <span>${formatNumber(totalEarnedXP)} XP</span>
             <span>${rank.next ? `${formatNumber(rank.next.xp)} XP` : "MAX"}</span>
           </div>
         </section>
@@ -2098,12 +2837,24 @@
             <strong>${formatNumber(data.xp)}</strong>
           </div>
           <div class="setting-row">
+            <div class="setting-info"><strong>Jami ishlab topilgan XP</strong><small>Do‘konda sarflangan XP ham qo‘shilgan</small></div>
+            <strong>${formatNumber(Number(data.xp||0)+Number(data.spentXP||0))}</strong>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><strong>Sarflangan XP</strong></div>
+            <strong>${formatNumber(data.spentXP||0)}</strong>
+          </div>
+          <div class="setting-row">
             <div class="setting-info"><strong>Bajarilgan vazifalar</strong></div>
             <strong>${completedTasks}</strong>
           </div>
           <div class="setting-row">
             <div class="setting-info"><strong>Yutuqlar</strong></div>
             <strong>${data.achievements.length}</strong>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><strong>Profil bezagi</strong><small>Fon, avatar ramkasi va maxsus belgi</small></div>
+            <strong>${customizationScore} / 5</strong>
           </div>
         </section>
       </div>
@@ -2133,9 +2884,6 @@
   /* -------------------- SETTINGS PAGE -------------------- */
 
   function renderSettings() {
-    const age = data.profile.age;
-    const difficulty = getDifficulty();
-
     return `
       ${pageHeader(
         "SHAXSIY MOSLAMALAR",
@@ -2147,19 +2895,18 @@
         <nav class="settings-nav" aria-label="Sozlamalar bo‘limlari">
           <button type="button" class="${currentSettingsTab === "general" ? "active" : ""}" data-settings-tab="general">${icon("sliders-horizontal")} Umumiy</button>
           <button type="button" class="${currentSettingsTab === "appearance" ? "active" : ""}" data-settings-tab="appearance">${icon("palette")} Ko‘rinish</button>
-          <button type="button" class="${currentSettingsTab === "difficulty" ? "active" : ""}" data-settings-tab="difficulty">${icon("brain")} Murakkablik</button>
           <button type="button" class="${currentSettingsTab === "sound" ? "active" : ""}" data-settings-tab="sound">${icon("volume-2")} Ovoz</button>
           <button type="button" class="${currentSettingsTab === "data" ? "active" : ""}" data-settings-tab="data">${icon("database")} Ma’lumotlar</button>
         </nav>
 
         <div class="settings-panel">
-          ${renderSettingsPanel(age, difficulty)}
+          ${renderSettingsPanel()}
         </div>
       </div>
     `;
   }
 
-  function renderSettingsPanel(age, difficulty) {
+  function renderSettingsPanel() {
     if (currentSettingsTab === "appearance") {
       return `
         <div class="settings-section">
@@ -2174,12 +2921,20 @@
               <option value="system" ${settings.theme === "system" ? "selected" : ""}>Qurilma bo‘yicha</option>
             </select>
           </div>
+          <div class="setting-row">
+            <div class="setting-info"><strong>Matn o‘lchami</strong><small>O‘qish uchun qulay hajmni tanlang.</small></div>
+            <select class="field-select" style="max-width:150px" data-setting="fontSize">
+              <option value="small" ${settings.fontSize==="small"?"selected":""}>Kichik</option>
+              <option value="medium" ${!settings.fontSize||settings.fontSize==="medium"?"selected":""}>O‘rtacha</option>
+              <option value="large" ${settings.fontSize==="large"?"selected":""}>Katta</option>
+            </select>
+          </div>
 
           <div class="settings-section">
             <h3>Rang mavzusi</h3>
             <p>Ba’zi ranglar do‘kondan ochko evaziga olinadi.</p>
             <div class="theme-options">
-              ${["violet", "ocean", "emerald", "sunset", "rose"].map(theme => {
+              ${["violet", "ocean", "sky", "emerald", "sunset", "rose", "lavender", "mint"].map(theme => {
                 const free = theme === "violet";
                 const owned = data.inventory.some(item => item.id === `theme-${theme}`);
                 const available = free || owned;
@@ -2194,40 +2949,6 @@
               }).join("")}
             </div>
           </div>
-        </div>
-      `;
-    }
-
-    if (currentSettingsTab === "difficulty") {
-      return `
-        <div class="settings-section">
-          <h3>Interfeys murakkabligi</h3>
-          <p>Matnlar, tushuntirishlar va interfeysning murakkabligini o‘zingizga moslang.</p>
-
-          <div class="setting-row">
-            <div class="setting-info">
-              <strong>Avtomatik tanlash</strong>
-              <small>${age === null ? "Yosh aniqlanmagan" : `Tug‘ilgan sanangiz bo‘yicha yosh: ${age}`}</small>
-            </div>
-            <input type="radio" name="difficulty" value="auto" ${settings.difficulty === "auto" ? "checked" : ""}>
-          </div>
-
-          <div class="setting-row">
-            <div class="setting-info"><strong>Kichik yoshdagilar uchun</strong><small>Sodda matnlar va tushunarli interfeys.</small></div>
-            <input type="radio" name="difficulty" value="junior" ${settings.difficulty === "junior" ? "checked" : ""}>
-          </div>
-
-          <div class="setting-row">
-            <div class="setting-info"><strong>Yuqori sinf va o‘smirlar uchun</strong><small>Muvozanatli, batafsilroq interfeys.</small></div>
-            <input type="radio" name="difficulty" value="senior" ${settings.difficulty === "senior" ? "checked" : ""}>
-          </div>
-
-          <div class="setting-row">
-            <div class="setting-info"><strong>Kattalar uchun</strong><small>Professional va batafsil interfeys.</small></div>
-            <input type="radio" name="difficulty" value="adult" ${settings.difficulty === "adult" ? "checked" : ""}>
-          </div>
-
-          <p style="margin-top:15px">Hozirgi tanlov: <strong>${escapeHTML(difficulty)}</strong></p>
         </div>
       `;
     }
@@ -2255,7 +2976,7 @@
       return `
         <div class="settings-section">
           <h3>Ma’lumotlaringiz</h3>
-          <p>Ma’lumotlarni zaxiralash yoki qayta tiklash.</p>
+          <p>Kerakli bo‘limlarni alohida tozalang. XP balansi va do‘kondan xarid qilingan buyumlar himoyalangan.</p>
 
           <div class="setting-row">
             <div class="setting-info"><strong>Ma’lumotlarni eksport qilish</strong><small>Profil, vazifalar va maqsadlarni JSON faylga saqlash.</small></div>
@@ -2268,7 +2989,7 @@
           </div>
 
           <div class="setting-row">
-            <div class="setting-info"><strong>Ma’lumotlarni tozalash</strong><small>Mahalliy demo ma’lumotlarini o‘chirish.</small></div>
+            <div class="setting-info"><strong>Ma’lumotlarni o‘chirish</strong><small>Vazifa, maqsad, kun tartibi va boshqa bo‘limlarni tanlab o‘chirish.</small></div>
             <button class="secondary-button" type="button" data-action="reset-data">${icon("trash-2")} Tozalash</button>
           </div>
         </div>
@@ -2396,13 +3117,50 @@
 
   function resetData() {
     openModal(
-      "Ma’lumotlarni tozalash",
-      "<p>Barcha mahalliy ma’lumotlar, XP, vazifalar va maqsadlar o‘chiriladi. Bu amalni ortga qaytarib bo‘lmaydi.</p>",
+      "Qaysi ma’lumotlarni o‘chirmoqchisiz?",
+      `
+        <p>O‘chiriladigan bo‘limlarni tanlang. XP balansi, daraja uchun yig‘ilgan XP va do‘kondan sotib olingan barcha buyumlar hech qachon o‘chirilmaydi.</p>
+        <div class="data-delete-options">
+          <label><input type="checkbox" data-delete-scope="all" value="all"> <strong>Barchasi</strong></label>
+          <label><input type="checkbox" data-delete-scope value="tasks"> Vazifalar</label>
+          <label><input type="checkbox" data-delete-scope value="goals"> Maqsadlar</label>
+          <label><input type="checkbox" data-delete-scope value="dailyRoutine"> Kun tartibi va bajarilish tarixi</label>
+          <label><input type="checkbox" data-delete-scope value="plans"> Rejalar</label>
+          <label><input type="checkbox" data-delete-scope value="achievements"> Yutuqlar</label>
+          <label><input type="checkbox" data-delete-scope value="memories"> Saqlangan eslatmalar</label>
+          <label><input type="checkbox" data-delete-scope value="notifications"> Bildirishnomalar</label>
+          <label><input type="checkbox" data-delete-scope value="activity"> Faollik tarixi</label>
+        </div>
+      `,
       `
         <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
-        <button class="primary-button" type="button" data-action="confirm-reset">Barchasini o‘chirish</button>
+        <button class="primary-button" type="button" data-action="confirm-clear-selected">Tanlanganlarni o‘chirish</button>
       `
     );
+  }
+
+  function clearSelectedData() {
+    const selected = new Set(Array.from(document.querySelectorAll("#modal-body [data-delete-scope]:checked"), input => input.value));
+    const clearAll = selected.has("all");
+    if (!selected.size) { showToast("Avval o‘chiriladigan bo‘limni tanlang.", "error"); return; }
+    const scopes = clearAll
+      ? ["tasks","goals","dailyRoutine","plans","achievements","memories","notifications","activity"]
+      : [...selected];
+    if (scopes.includes("tasks")) data.tasks = [];
+    if (scopes.includes("goals")) data.goals = [];
+    if (scopes.includes("dailyRoutine")) { data.dailyRoutine = []; data.routineLogs = {}; data.tasks = data.tasks.filter(task => !task.isRoutineEntry); }
+    if (scopes.includes("plans")) { data.plans = []; data.aiPlans = []; }
+    if (scopes.includes("achievements")) data.achievements = [];
+    if (scopes.includes("memories")) data.memories = [];
+    if (scopes.includes("notifications")) data.notifications = [];
+    if (scopes.includes("activity")) data.activity = [];
+    data.xp = Number(data.xp || 0);
+    data.spentXP = Number(data.spentXP || 0);
+    data.inventory = Array.isArray(data.inventory) ? data.inventory : [];
+    saveData();
+    closeModal();
+    render();
+    showToast("Tanlangan ma’lumotlar o‘chirildi. XP va xaridlaringiz saqlandi.");
   }
 
   /* -------------------- SEARCH -------------------- */
@@ -2446,6 +3204,167 @@
 
   /* -------------------- NAVIGATION -------------------- */
 
+  const UI_TRANSLATIONS = {
+    ru: {
+      "Bosh sahifa":"Главная","Maqsadlarim":"Мои цели","Vazifalar":"Задачи","Rejalashtiruvchi":"Планировщик","Statistika":"Статистика","Yutuqlarim":"Мои достижения","Mukofotlar do‘koni":"Магазин наград","Hamjamiyat":"Сообщество","Smart AI":"Smart AI","Bildirishnomalar":"Уведомления","Sozlamalar":"Настройки","Mening profilim":"Мой профиль",
+      "Maqsad qo‘shish":"Добавить цель","Yangi maqsad":"Новая цель","Vazifa qo‘shish":"Добавить задачу","Yangi vazifa":"Новая задача","Saqlash":"Сохранить","Bekor qilish":"Отмена","O‘chirish":"Удалить","Tahrirlash":"Изменить","Bugungi vazifalar":"Задачи на сегодня","Barcha vazifalar":"Все задачи","Maqsadlar":"Цели","Faol maqsadlar":"Активные цели","Yakunlangan":"Завершено","O‘rtacha progress":"Средний прогресс","Jami XP":"Всего XP","Bu haftadagi XP":"XP за неделю","Bajarilgan vazifalar":"Выполненные задачи","Bajarilish foizi":"Процент выполнения","Kun tartibim":"Мой распорядок дня","Band qo‘shish":"Добавить пункт","Menga kun tartibi tuz":"Составить распорядок","Vaqtida eslatib tur":"Напоминать вовремя","Yutuq qo‘shish":"Добавить достижение","Shaxsiy xotiralar":"Личные воспоминания","Xarid":"Купить","Qo‘llash":"Применить","XP yetarli emas":"Недостаточно XP","Yorug‘":"Светлая","Qorong‘i":"Тёмная","Qurilma bo‘yicha":"Как на устройстве","Umumiy sozlamalar":"Общие настройки","Interfeys tili":"Язык интерфейса","Profilni tahrirlash":"Редактировать профиль","Username":"Имя пользователя","Tug‘ilgan sana":"Дата рождения","Qisqa mazmuni":"Краткое описание","Vazifa nomi":"Название задачи","Qaysi kuni bajariladi?":"Когда выполнить?","Vaqt":"Время","Nima qilasiz?":"Что будете делать?","Do‘st bo‘lish":"Добавить в друзья","Do‘stlar":"Друзья","Foydalanuvchilar":"Пользователи","Qidirilmoqda...":"Поиск...","Foydalanuvchi topilmadi":"Пользователь не найден","Kunlik reja":"План на день","AI reja tuzsin":"Пусть AI составит план","Maqsadlar asosida tavsiyalar":"Рекомендации по целям","Shaxsiy yordamchi":"Личный помощник","AI bilan suhbat":"Чат с AI","Profil statistikasi":"Статистика профиля","Sizning darajangiz":"Ваш уровень","Kolleksiyangiz hozircha bo‘sh":"Коллекция пока пуста"
+    },
+    en: {
+      "Bosh sahifa":"Home","Maqsadlarim":"My goals","Vazifalar":"Tasks","Rejalashtiruvchi":"Planner","Statistika":"Statistics","Yutuqlarim":"My achievements","Mukofotlar do‘koni":"Rewards shop","Hamjamiyat":"Community","Smart AI":"Smart AI","Bildirishnomalar":"Notifications","Sozlamalar":"Settings","Mening profilim":"My profile",
+      "Maqsad qo‘shish":"Add goal","Yangi maqsad":"New goal","Vazifa qo‘shish":"Add task","Yangi vazifa":"New task","Saqlash":"Save","Bekor qilish":"Cancel","O‘chirish":"Delete","Tahrirlash":"Edit","Bugungi vazifalar":"Today's tasks","Barcha vazifalar":"All tasks","Maqsadlar":"Goals","Faol maqsadlar":"Active goals","Yakunlangan":"Completed","O‘rtacha progress":"Average progress","Jami XP":"Total XP","Bu haftadagi XP":"XP this week","Bajarilgan vazifalar":"Completed tasks","Bajarilish foizi":"Completion rate","Kun tartibim":"My daily routine","Band qo‘shish":"Add item","Menga kun tartibi tuz":"Build my routine","Vaqtida eslatib tur":"Remind me on time","Yutuq qo‘shish":"Add achievement","Shaxsiy xotiralar":"Personal memories","Xarid":"Buy","Qo‘llash":"Apply","XP yetarli emas":"Not enough XP","Yorug‘":"Light","Qorong‘i":"Dark","Qurilma bo‘yicha":"System default","Umumiy sozlamalar":"General settings","Interfeys tili":"Interface language","Profilni tahrirlash":"Edit profile","Username":"Username","Tug‘ilgan sana":"Birthday","Qisqa mazmuni":"Short description","Vazifa nomi":"Task title","Qaysi kuni bajariladi?":"Due date","Vaqt":"Time","Nima qilasiz?":"What will you do?","Do‘st bo‘lish":"Add friend","Do‘stlar":"Friends","Foydalanuvchilar":"Users","Qidirilmoqda...":"Searching...","Foydalanuvchi topilmadi":"User not found","Kunlik reja":"Daily plan","AI reja tuzsin":"Generate AI plan","Maqsadlar asosida tavsiyalar":"Goal-based suggestions","Shaxsiy yordamchi":"Personal assistant","AI bilan suhbat":"Chat with AI","Profil statistikasi":"Profile statistics","Sizning darajangiz":"Your level","Kolleksiyangiz hozircha bo‘sh":"Your collection is empty"
+    }
+  };
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Bugun nimaga erishamiz?":"Чего достигнем сегодня?","Kichik qadamlar katta natijalarga olib boradi.":"Маленькие шаги приводят к большим результатам.","Rivojlanishingizni boshqarishni davom ettiring":"Продолжайте управлять своим развитием","Ustuvor vazifalarni belgilang, jarayonni kuzating va natijaga erishing.":"Определяйте приоритеты, следите за процессом и достигайте результата.","Buguncha vazifalar yo‘q":"На сегодня задач нет","Maqsadlar hali yo‘q":"Пока нет целей","Faollik grafigi":"График активности","So‘nggi 7 kun ichidagi to‘plangan XP":"XP за последние 7 дней","Batafsil":"Подробнее","Qo‘shish":"Добавить","Hozirgi rivojlanish jarayoni":"Текущий прогресс","Darajamni ko‘rish":"Посмотреть мой уровень","Umumiy natijalar":"Общие результаты","Xaridlar":"Покупки","Yaratilgan maqsadlar soni":"Количество созданных целей","Sertifikatlar, muhim kunlar va esdaliklar.":"Сертификаты, важные дни и воспоминания.","Sizning kolleksiyangiz":"Ваша коллекция","Umumiy":"Общие","Ko‘rinish":"Внешний вид","Murakkablik":"Сложность","Ovoz":"Звук","Ma’lumotlar":"Данные","Matn o‘lchami":"Размер текста","Kichik":"Маленький","O‘rtacha":"Средний","Katta":"Большой","Yangi yutuq yoki xotira":"Новое достижение или воспоминание","Sarlavha":"Заголовок","Tavsif":"Описание","Turi":"Тип","Sana":"Дата","Shaxsiy xotira":"Личное воспоминание","Sertifikat":"Сертификат","Muhim natija":"Важный результат","Profilni ulashish":"Поделиться профилем","Yutuq rasmi (ixtiyoriy)":"Фото достижения (необязательно)","Tug‘ilgan kunim va yoshim profilimda hammaga ko‘rinsin":"Показывать мой день рождения и возраст в профиле","AI bilan maslahatlashish":"Обсудить с AI"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Bugun nimaga erishamiz?":"What will we achieve today?","Kichik qadamlar katta natijalarga olib boradi.":"Small steps lead to big results.","Rivojlanishingizni boshqarishni davom ettiring":"Keep managing your growth","Ustuvor vazifalarni belgilang, jarayonni kuzating va natijaga erishing.":"Set priorities, track your progress and reach your goals.","Buguncha vazifalar yo‘q":"No tasks for today","Maqsadlar hali yo‘q":"No goals yet","Faollik grafigi":"Activity chart","So‘nggi 7 kun ichidagi to‘plangan XP":"XP earned over the last 7 days","Batafsil":"Details","Qo‘shish":"Add","Hozirgi rivojlanish jarayoni":"Current progress","Darajamni ko‘rish":"View my level","Umumiy natijalar":"Overall results","Xaridlar":"Purchases","Yaratilgan maqsadlar soni":"Number of goals created","Sertifikatlar, muhim kunlar va esdaliklar.":"Certificates, important days and memories.","Sizning kolleksiyangiz":"Your collection","Umumiy":"General","Ko‘rinish":"Appearance","Murakkablik":"Difficulty","Ovoz":"Sound","Ma’lumotlar":"Data","Matn o‘lchami":"Text size","Kichik":"Small","O‘rtacha":"Medium","Katta":"Large","Yangi yutuq yoki xotira":"New achievement or memory","Sarlavha":"Title","Tavsif":"Description","Turi":"Type","Sana":"Date","Shaxsiy xotira":"Personal memory","Sertifikat":"Certificate","Muhim natija":"Milestone","Profilni ulashish":"Share profile","Yutuq rasmi (ixtiyoriy)":"Achievement photo (optional)","Tug‘ilgan kunim va yoshim profilimda hammaga ko‘rinsin":"Show my birthday and age on my profile","AI bilan maslahatlashish":"Ask AI"
+  });
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "REJALARINGIZ":"ВАШИ ПЛАНЫ","Katta natijalarga kichik qadamlar orqali erishing.":"Достигайте больших результатов маленькими шагами.","Jami maqsadlar":"Всего целей","O‘rtacha progress":"Средний прогресс","Maqsad tavsifi kiritilmagan":"Описание цели не добавлено","Muddat belgilanmagan":"Срок не указан","Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating.":"Свяжите задачи с этой целью и отслеживайте прогресс.","Yana":"Осталось","kun":"дней","KUNLIK REJA":"ПЛАН НА ДЕНЬ","Vazifalaringizni tartibga soling va bajarilganlarini belgilang.":"Упорядочивайте задачи и отмечайте выполненные.","Vazifalar mavjud emas":"Задач пока нет","Yangi vazifa qo‘shib rejangizni boshlang.":"Добавьте первую задачу, чтобы начать планирование.","VAQTNI BOSHQARISH":"УПРАВЛЕНИЕ ВРЕМЕНЕМ","Kunlik rejangiz, odatlaringiz va maqsadlaringizni bir joyda boshqaring.":"Управляйте распорядком, привычками и целями в одном месте.","SIZNING SHAXSIY REJANGIZ":"ВАШ ЛИЧНЫЙ ПЛАН","Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.":"Назначьте время каждому делу. AI поможет составить план.","AI bilan kun tartibini tuzish":"Составить распорядок с AI","Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing.":"Укажите время пробуждения, учёбы/работы и привычки.","Bugungi vazifalar":"Задачи на сегодня","Maqsadlar asosida tavsiyalar":"Рекомендации по целям","AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.":"AI проанализирует ваши цели и задачи и составит практичный план.","NATIJALARINGIZ":"ВАШИ РЕЗУЛЬТАТЫ","Faolligingiz va rivojlanishingizni tahlil qiling.":"Анализируйте активность и прогресс.","Haftalik faollik":"Активность за неделю","Har kuni to‘plangan XP":"XP за каждый день","Maqsadlar sari bosib o‘tilgan yo‘l":"Путь к вашим целям","Har bir maqsad uchun bajarilgan ishlar va qolgan qadamlar.":"Выполненные задачи и оставшиеся шаги для каждой цели.","Yutuqlarim":"Мои достижения","Muhim kunlar, sertifikatlar va shaxsiy yutuqlaringizni saqlang.":"Сохраняйте важные дни, сертификаты и личные достижения.","SmartGoal yutuqlari":"Достижения SmartGoal","ta ochilgan":"открыто","Hali ochilmagan":"Пока не открыто","Xotiralar hali yo‘q":"Воспоминаний пока нет","Birinchi yutug‘ingiz yoki esdalik kuningizni saqlang.":"Сохраните первое достижение или памятный день.","MAXSUS IMKONIYATLAR":"ОСОБЫЕ ВОЗМОЖНОСТИ","XP bilan profilingiz va SmartGoal ko‘rinishini o‘zingizga moslang.":"Настройте профиль и SmartGoal за XP.","SIZNING BALANSINGIZ":"ВАШ БАЛАНС","Har bir haqiqiy yutuq sizga yangi imkoniyatlarni ochadi.":"Каждое настоящее достижение открывает новые возможности.","Barchasi":"Все","Mavzular":"Темы","Profil fonlari":"Фоны профиля","Belgilar":"Значки","Avatar ramkalari":"Рамки аватара","Do‘kondan birinchi mahsulotingizni xarid qiling.":"Купите первый предмет в магазине.","HAMJAMIYAT":"СООБЩЕСТВО","Username orqali boshqa foydalanuvchilarni toping.":"Находите других пользователей по имени пользователя.","Username bo‘yicha qidirish":"Поиск по имени пользователя","Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.":"Введите не менее 3 символов. Показываются пользователи, чьи имена начинаются с введённых символов.","Do‘stlik so‘rovlari":"Запросы в друзья","Yangilash":"Обновить","Kelgan so‘rovlar":"Входящие запросы","Yuborilgan so‘rovlar":"Отправленные запросы","Do‘stlaringiz":"Ваши друзья","Qidiruvga tayyor":"Готово к поиску","Username kiriting.":"Введите имя пользователя.","Foydalanuvchi topilmadi":"Пользователь не найден","SHAXSIY YORDAMCHI":"ЛИЧНЫЙ ПОМОЩНИК","Har kuni yaxshiroq natija sari.":"К лучшим результатам каждый день.","Savollaringizga javob, maqsadlaringizga esa aniq reja va foydali maslahatlar.":"Ответы на вопросы, чёткие планы и полезные советы для ваших целей.","AI siz yozgan tilda javob beradi.":"AI отвечает на языке вашего сообщения.","Suhbatni tozalash":"Очистить чат","Bugungi rejam":"Мой план на сегодня","Motivatsiya":"Мотивация","Umumiy sozlamalar":"Общие настройки","SmartGoal’ni o‘zingizga moslang.":"Настройте SmartGoal под себя.","Interfeys ko‘rinishi":"Внешний вид интерфейса","O‘zingizga qulay rang va mavzuni tanlang.":"Выберите удобные цвета и тему.","Rang mavzusi":"Цветовая тема","Ba’zi ranglar do‘kondan ochko evaziga olinadi.":"Некоторые цвета доступны за XP в магазине.","Profilni muvaffaqiyatli yangilandi.":"Профиль успешно обновлён.","Tug‘ilgan sana yangilandi.":"Дата рождения обновлена.","Maqsad saqlandi.":"Цель сохранена.","Vazifa saqlandi.":"Задача сохранена.","Kun tartibi saqlandi.":"Распорядок сохранён.","Yutuq qo‘shish":"Добавить достижение","Qisqa mazmuni":"Краткое содержание","Qaysi kuni bajariladi?":"На какой день запланировано?","Savolingizni yozing...":"Напишите свой вопрос...","Savolingizni yozing":"Напишите свой вопрос"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "REJALARINGIZ":"YOUR PLANS","Katta natijalarga kichik qadamlar orqali erishing.":"Reach big results through small steps.","Jami maqsadlar":"Total goals","O‘rtacha progress":"Average progress","Maqsad tavsifi kiritilmagan":"No goal description added","Muddat belgilanmagan":"No deadline set","Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating.":"Link tasks to this goal to track progress.","Yana":"Remaining","kun":"days","KUNLIK REJA":"DAILY PLAN","Vazifalaringizni tartibga soling va bajarilganlarini belgilang.":"Organize your tasks and mark completed ones.","Vazifalar mavjud emas":"No tasks yet","Yangi vazifa qo‘shib rejangizni boshlang.":"Add a task to start planning.","VAQTNI BOSHQARISH":"TIME MANAGEMENT","Kunlik rejangiz, odatlaringiz va maqsadlaringizni bir joyda boshqaring.":"Manage your daily routine, habits and goals in one place.","SIZNING SHAXSIY REJANGIZ":"YOUR PERSONAL ROUTINE","Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.":"Set a time for each activity. AI can help build your schedule.","AI bilan kun tartibini tuzish":"Build a routine with AI","Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing.":"Enter your wake-up time, school/work schedule and habits.","Bugungi vazifalar":"Today's tasks","Maqsadlar asosida tavsiyalar":"Goal-based suggestions","AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.":"AI analyzes your goals and tasks to create a practical plan.","NATIJALARINGIZ":"YOUR RESULTS","Faolligingiz va rivojlanishingizni tahlil qiling.":"Analyze your activity and progress.","Haftalik faollik":"Weekly activity","Har kuni to‘plangan XP":"XP earned each day","Maqsadlar sari bosib o‘tilgan yo‘l":"Progress toward your goals","Har bir maqsad uchun bajarilgan ishlar va qolgan qadamlar.":"Completed work and remaining steps for each goal.","Muhim kunlar, sertifikatlar va shaxsiy yutuqlaringizni saqlang.":"Save important days, certificates and personal achievements.","SmartGoal yutuqlari":"SmartGoal achievements","ta ochilgan":"unlocked","Hali ochilmagan":"Not unlocked yet","Xotiralar hali yo‘q":"No memories yet","Birinchi yutug‘ingiz yoki esdalik kuningizni saqlang.":"Save your first achievement or memorable day.","MAXSUS IMKONIYATLAR":"SPECIAL FEATURES","XP bilan profilingiz va SmartGoal ko‘rinishini o‘zingizga moslang.":"Customize your profile and SmartGoal with XP.","SIZNING BALANSINGIZ":"YOUR BALANCE","Har bir haqiqiy yutuq sizga yangi imkoniyatlarni ochadi.":"Every real achievement unlocks new possibilities.","Barchasi":"All","Mavzular":"Themes","Profil fonlari":"Profile backgrounds","Belgilar":"Badges","Avatar ramkalari":"Avatar frames","Do‘kondan birinchi mahsulotingizni xarid qiling.":"Purchase your first item from the shop.","HAMJAMIYAT":"COMMUNITY","Username orqali boshqa foydalanuvchilarni toping.":"Find other users by username.","Username bo‘yicha qidirish":"Search by username","Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.":"Enter at least 3 characters. Users whose usernames start with your search will appear.","Do‘stlik so‘rovlari":"Friend requests","Yangilash":"Refresh","Kelgan so‘rovlar":"Incoming requests","Yuborilgan so‘rovlar":"Sent requests","Do‘stlaringiz":"Your friends","Qidiruvga tayyor":"Ready to search","Username kiriting.":"Enter a username.","Foydalanuvchi topilmadi":"User not found","SHAXSIY YORDAMCHI":"PERSONAL ASSISTANT","Har kuni yaxshiroq natija sari.":"Toward better results every day.","Savollaringizga javob, maqsadlaringizga esa aniq reja va foydali maslahatlar.":"Answers to your questions, clear plans and useful advice for your goals.","AI siz yozgan tilda javob beradi.":"AI replies in the language you write in.","Suhbatni tozalash":"Clear chat","Bugungi rejam":"My plan for today","Motivatsiya":"Motivation","Umumiy sozlamalar":"General settings","SmartGoal’ni o‘zingizga moslang.":"Make SmartGoal yours.","Interfeys ko‘rinishi":"Interface appearance","O‘zingizga qulay rang va mavzuni tanlang.":"Choose colors and a theme that work for you.","Rang mavzusi":"Color theme","Ba’zi ranglar do‘kondan ochko evaziga olinadi.":"Some colors can be unlocked with XP in the shop.","Matnlar, tushuntirishlar va interfeysning murakkabligini o‘zingizga moslang.":"Adjust text, explanations and interface complexity.","Tug‘ilgan sana yangilandi.":"Birthday updated.","Maqsad saqlandi.":"Goal saved.","Vazifa saqlandi.":"Task saved.","Kun tartibi saqlandi.":"Daily routine saved.","Qisqa mazmuni":"Short summary","Qaysi kuni bajariladi?":"Which day should it be done?","Savolingizni yozing...":"Type your question..."
+  });
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Ocean mavzusi":"Тема Ocean","Emerald mavzusi":"Тема Emerald","Sunset mavzusi":"Тема Sunset","Rose mavzusi":"Тема Rose","Sky mavzusi":"Тема Sky","Midnight fon":"Фон Midnight","Galaxy fon":"Фон Galaxy","Royal fon":"Фон Royal","Sakura profil foni":"Фон профиля Sakura","Nebula profil foni":"Фон профиля Nebula","Focus badge":"Значок Focus","Diamond badge":"Значок Diamond","Builder belgisi":"Значок Builder","Oltin avatar ramkasi":"Золотая рамка аватара","Premium avatar ramkasi":"Премиальная рамка аватара","Profilingiz va interfeysingiz uchun sokin ko‘k rang.":"Спокойный синий цвет для профиля и интерфейса.","Yashil va nafis ko‘rinish.":"Элегантная зелёная тема.","Iliq ranglardagi maxsus interfeys.":"Особая тёплая цветовая тема.","Nafis pushti ranglar uyg‘unligi.":"Нежная розовая цветовая гамма.","Profil uchun qoramtir, maxsus fon.":"Особый тёмный фон профиля.","Maxsus kosmik profil foni.":"Космический фон профиля.","Noyob premium profil dizayni.":"Уникальный премиальный дизайн профиля.","Diqqat va intizom ramzi.":"Символ концентрации и дисциплины.","Maxsus premium belgi.":"Особый премиальный значок.","Profil rasmingiz uchun oltin bezak.":"Золотое оформление фотографии профиля.","Profil rasmingiz uchun maxsus ramka.":"Особая рамка для фотографии профиля.","Yashil va nafis ko‘rinish.":"Элегантная зелёная тема.","Sokin moviy ranglar.":"Спокойные голубые оттенки.","Qo‘lga kiritilgan":"Получено","Hali ochilmagan":"Ещё не открыто","Oddiy":"Обычный","Muhim":"Важное","Juda muhim":"Очень важно","Past":"Низкий","O‘rta":"Средний","Yuqori":"Высокий","Bajarish sanasi":"Дата выполнения","Taxminiy bajarish vaqti":"Примерное время выполнения","Qo‘shimcha sozlama (ixtiyoriy)":"Дополнительные настройки (необязательно)"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Ocean mavzusi":"Ocean theme","Emerald mavzusi":"Emerald theme","Sunset mavzusi":"Sunset theme","Rose mavzusi":"Rose theme","Sky mavzusi":"Sky theme","Midnight fon":"Midnight background","Galaxy fon":"Galaxy background","Royal fon":"Royal background","Sakura profil foni":"Sakura profile background","Nebula profil foni":"Nebula profile background","Focus badge":"Focus badge","Diamond badge":"Diamond badge","Builder belgisi":"Builder badge","Oltin avatar ramkasi":"Gold avatar frame","Premium avatar ramkasi":"Premium avatar frame","Profilingiz va interfeysingiz uchun sokin ko‘k rang.":"A calm blue look for your profile and interface.","Yashil va nafis ko‘rinish.":"An elegant green theme.","Iliq ranglardagi maxsus interfeys.":"A special warm-colored interface.","Nafis pushti ranglar uyg‘unligi.":"An elegant blend of pink tones.","Profil uchun qoramtir, maxsus fon.":"A special dark profile background.","Maxsus kosmik profil foni.":"A special cosmic profile background.","Noyob premium profil dizayni.":"A unique premium profile design.","Diqqat va intizom ramzi.":"A symbol of focus and discipline.","Maxsus premium belgi.":"A special premium badge.","Profil rasmingiz uchun oltin bezak.":"A gold decoration for your profile photo.","Profil rasmingiz uchun maxsus ramka.":"A special frame for your profile photo.","Qo‘lga kiritilgan":"Unlocked","Hali ochilmagan":"Not unlocked yet","Oddiy":"Normal","Muhim":"Important","Juda muhim":"Very important","Past":"Low","O‘rta":"Medium","Yuqori":"High","Bajarish sanasi":"Due date","Taxminiy bajarish vaqti":"Estimated time","Qo‘shimcha sozlama (ixtiyoriy)":"Additional settings (optional)"
+  });
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Taxminiy bajarish vaqti":"Примерная длительность",
+    "15 daqiqa":"15 минут","30 daqiqa":"30 минут","45 daqiqa":"45 минут","1 soat":"1 час","1,5 soat":"1,5 часа","2 soat":"2 часа","3 soat":"3 часа","4 soat":"4 часа","6 soat":"6 часов",
+    "Ustuvorlik":"Приоритет","AI’dan shaxsiy maslahat":"Персональный совет от AI","AI tavsiyasi":"Совет AI","AI bilan suhbat":"Чат с AI",
+    "Kun tartibim":"Мой распорядок дня","Menga kun tartibi tuz":"Составить мой распорядок","Band qo‘shish":"Добавить пункт распорядка",
+    "Profilni tahrirlash":"Редактировать профиль","Biografiya":"Биография","O‘zingiz haqingizda qisqacha...":"Кратко о себе...",
+    "Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.":"Задача сохранена на устройстве. Войдите в аккаунт, чтобы получать XP от AI.",
+    "AI bu vazifani aniq ish deb baholamadi. Nomini yoki qisqa mazmunini aniqroq yozing.":"AI не смог определить конкретную задачу. Уточните название или описание.",
+    "Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.":"Задача снова открыта. Ранее начисленные XP не возвращаются.",
+    "Suhbatni tozalash":"Очистить чат","Bugungi rejam":"Мой план на сегодня","Vazifalarim":"Мои задачи","Motivatsiya":"Мотивация",
+    "Bajarish sanasi":"Дата выполнения","Qaysi kuni bajariladi?":"На какой день запланировано?","Qisqa mazmuni":"Краткое описание"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Taxminiy bajarish vaqti":"Estimated duration",
+    "15 daqiqa":"15 minutes","30 daqiqa":"30 minutes","45 daqiqa":"45 minutes","1 soat":"1 hour","1,5 soat":"1.5 hours","2 soat":"2 hours","3 soat":"3 hours","4 soat":"4 hours","6 soat":"6 hours",
+    "Ustuvorlik":"Priority","AI’dan shaxsiy maslahat":"Get a personal AI tip","AI tavsiyasi":"AI recommendation","AI bilan suhbat":"Chat with AI",
+    "Kun tartim":"My daily routine","Menga kun tartibi tuz":"Build my daily routine","Band qo‘shish":"Add routine item",
+    "Profilni tahrirlash":"Edit profile","Biografiya":"Bio","O‘zingiz haqingizda qisqacha...":"A little about yourself...",
+    "Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.":"Task saved on this device. Sign in to earn AI-awarded XP.",
+    "AI bu vazifani aniq ish deb baholamadi. Nomini yoki qisqa mazmunini aniqroq yozing.":"AI could not identify a clear task. Please clarify its title or description.",
+    "Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.":"Task reopened. Previously earned XP is not refunded.",
+    "Suhbatni tozalash":"Clear chat","Bugungi rejam":"My plan for today","Vazifalarim":"My tasks","Motivatsiya":"Motivation",
+    "Bajarish sanasi":"Due date","Qaysi kuni bajariladi?":"Which day should it be done?","Qisqa mazmuni":"Short description"
+  });
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Aurora profil foni":"Фон профиля Aurora","Forest profil foni":"Лесной фон профиля","Sunrise profil foni":"Фон профиля Sunrise",
+    "Scholar belgisi":"Значок Scholar","Explorer belgisi":"Значок Explorer","Neon avatar ramkasi":"Неоновая рамка аватара",
+    "Yashil va binafsha shimol yog‘dusi uslubidagi fon.":"Фон в стиле северного сияния.",
+    "Tabiat ranglaridagi sokin profil foni.":"Спокойный фон профиля в природных тонах.",
+    "Yangi kun va yangi maqsadlar uchun iliq fon.":"Тёплый фон для нового дня и новых целей.",
+    "Bilim va muntazam o‘rganish ramzi.":"Символ знаний и регулярного обучения.",
+    "Yangi ko‘nikmalarni sinab ko‘rish ramzi.":"Символ исследования новых навыков.",
+    "Profil rasmingiz uchun yorqin neon ramka.":"Яркая неоновая рамка для фото профиля.",
+    "Eslatmalar sahifa ochiq turganda ishlaydi.":"Напоминания работают, пока страница открыта."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Aurora profil foni":"Aurora profile background","Forest profil foni":"Forest profile background","Sunrise profil foni":"Sunrise profile background",
+    "Scholar belgisi":"Scholar badge","Explorer belgisi":"Explorer badge","Neon avatar ramkasi":"Neon avatar frame",
+    "Yashil va binafsha shimol yog‘dusi uslubidagi fon.":"A green and violet northern-lights inspired background.",
+    "Tabiat ranglaridagi sokin profil foni.":"A calm nature-inspired profile background.",
+    "Yangi kun va yangi maqsadlar uchun iliq fon.":"A warm background for a fresh day and new goals.",
+    "Bilim va muntazam o‘rganish ramzi.":"A symbol of knowledge and consistent learning.",
+    "Yangi ko‘nikmalarni sinab ko‘rish ramzi.":"A symbol of exploring new skills.",
+    "Profil rasmingiz uchun yorqin neon ramka.":"A bright neon frame for your profile photo.",
+    "Eslatmalar sahifa ochiq turganda ishlaydi.":"Reminders work while the page is open."
+  });
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "SMARTGOAL MASLAHATI":"СОВЕТ SMARTGOAL","Faollik grafigi":"График активности","Maqsadlarim":"Мои цели","Hozirgi rivojlanish jarayoni":"Текущий прогресс","Darajamni ko‘rish":"Посмотреть мой уровень","Keyingi darajaga o‘tish uchun yana":"До следующего уровня осталось","Siz eng yuqori mavjud darajaga yetdingiz!":"Вы достигли максимального уровня!",
+    "Jami maqsadlar":"Всего целей","Maqsad nomi":"Название цели","Maqsad tavsifi":"Описание цели","Maqsad tavsifi kiritilmagan":"Описание цели не добавлено","Muddat belgilanmagan":"Срок не указан","Maqsadni o‘chirish":"Удалить цель","Maqsadni tahrirlash":"Редактировать цель",
+    "KUNLIK REJA":"ПЛАН НА ДЕНЬ","Barcha vazifalar":"Все задачи","Vazifalaringizni tartibga soling va bajarilganlarini belgilang.":"Упорядочивайте задачи и отмечайте выполненные.","Vazifa nomini kiriting.":"Введите название задачи.","Vazifa haqida qisqa mazmun kiriting.":"Добавьте краткое описание задачи.","Vazifa nima haqida ekanini kamida bir jumla bilan yozing.":"Опишите задачу хотя бы одним предложением.","Maqsadsiz vazifa":"Задача без цели","Qo‘shimcha sozlama (ixtiyoriy)":"Дополнительные настройки (необязательно)",
+    "SIZNING SHAXSIY REJANGIZ":"ВАШ ЛИЧНЫЙ РАСПОРЯДОК","Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.":"Назначьте время каждому делу. AI поможет составить распорядок.","AI bilan kun tartibini tuzish":"Составить распорядок с AI","Bugungi vazifalar":"Задачи на сегодня","Maqsadlar asosida tavsiyalar":"Рекомендации по целям","AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.":"AI проанализирует ваши цели и задачи и предложит практичный план.",
+    "NATIJALARINGIZ":"ВАШИ РЕЗУЛЬТАТЫ","Faolligingiz va rivojlanishingizni tahlil qiling.":"Анализируйте свою активность и развитие.","Haftalik faollik":"Активность за неделю","Har kuni to‘plangan XP":"XP, полученные каждый день","Maqsadlar sari bosib o‘tilgan yo‘l":"Прогресс к целям","Har bir maqsad uchun bajarilgan ishlar va qolgan qadamlar.":"Выполненные задачи и оставшиеся шаги по каждой цели.","Yaratilgan maqsadlar soni":"Количество созданных целей","Qo‘lga kiritilgan yutuqlar":"Полученные достижения","Do‘kondan olingan mahsulotlar":"Покупки в магазине",
+    "SIZNING NATIJALARINGIZ":"ВАШИ РЕЗУЛЬТАТЫ","Muhim kunlar, sertifikatlar va shaxsiy yutuqlaringizni saqlang.":"Сохраняйте важные дни, сертификаты и личные достижения.","SmartGoal yutuqlari":"Достижения SmartGoal","Shaxsiy xotiralar":"Личные воспоминания","Xotiralar hali yo‘q":"Воспоминаний пока нет","Birinchi yutug‘ingiz yoki esdalik kuningizni saqlang.":"Сохраните первое достижение или памятный день.",
+    "MAXSUS IMKONIYATLAR":"ОСОБЫЕ ВОЗМОЖНОСТИ","SIZNING BALANSINGIZ":"ВАШ БАЛАНС","Har bir haqiqiy yutuq sizga yangi imkoniyatlarni ochadi.":"Каждое настоящее достижение открывает новые возможности.","Bu kategoriyada mahsulot yo‘q":"В этой категории пока нет товаров","Boshqa kategoriyani tanlang.":"Выберите другую категорию.","Sizning kolleksiyangiz":"Ваша коллекция","Do‘kondan birinchi mahsulotingizni xarid qiling.":"Купите первый товар в магазине.",
+    "HAMJAMIYAT":"СООБЩЕСТВО","Username orqali boshqa foydalanuvchilarni toping.":"Находите пользователей по имени пользователя.","Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.":"Введите не менее 3 символов. Будут показаны пользователи с таким началом имени.","Kelgan so‘rovlar":"Входящие запросы","Yuborilgan so‘rovlar":"Отправленные запросы","Do‘stlaringiz":"Ваши друзья","Sizning darajangiz":"Ваш уровень",
+    "SHAXSIY YORDAMCHI":"ЛИЧНЫЙ ПОМОЩНИК","Har kuni yaxshiroq natija sari.":"К лучшим результатам каждый день.","Savollaringizga javob, maqsadlaringizga esa aniq reja va foydali maslahatlar.":"Ответы на вопросы, чёткие планы и полезные советы для ваших целей.","AI siz yozgan tilda javob beradi.":"AI отвечает на языке вашего сообщения.","Bugungi rejam":"Мой план на сегодня","Vazifalarim":"Мои задачи","Motivatsiya":"Мотивация",
+    "Profil statistikasi":"Статистика профиля","Profil bezagi":"Оформление профиля","Fon, avatar ramkasi va maxsus belgi":"Фон, рамка аватара и значок","Biografiya":"Биография","O‘zingiz haqingizda qisqacha...":"Кратко о себе..."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "SMARTGOAL MASLAHATI":"SMARTGOAL TIP","Faollik grafigi":"Activity chart","Maqsadlarim":"My goals","Hozirgi rivojlanish jarayoni":"Current progress","Darajamni ko‘rish":"View my level","Keyingi darajaga o‘tish uchun yana":"Remaining to the next level","Siz eng yuqori mavjud darajaga yetdingiz!":"You have reached the highest available level!",
+    "Jami maqsadlar":"Total goals","Maqsad nomi":"Goal title","Maqsad tavsifi":"Goal description","Maqsad tavsifi kiritilmagan":"No goal description added","Muddat belgilanmagan":"No deadline set","Maqsadni o‘chirish":"Delete goal","Maqsadni tahrirlash":"Edit goal",
+    "KUNLIK REJA":"DAILY PLAN","Barcha vazifalar":"All tasks","Vazifalaringizni tartibga soling va bajarilganlarini belgilang.":"Organize your tasks and mark completed ones.","Vazifa nomini kiriting.":"Enter a task title.","Vazifa haqida qisqa mazmun kiriting.":"Add a short task summary.","Vazifa nima haqida ekanini kamida bir jumla bilan yozing.":"Describe the task in at least one sentence.","Maqsadsiz vazifa":"Task without a goal","Qo‘shimcha sozlama (ixtiyoriy)":"Additional settings (optional)",
+    "SIZNING SHAXSIY REJANGIZ":"YOUR PERSONAL ROUTINE","Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.":"Set a time for each activity. AI can help build your routine.","AI bilan kun tartibini tuzish":"Build a routine with AI","Bugungi vazifalar":"Today's tasks","Maqsadlar asosida tavsiyalar":"Goal-based suggestions","AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.":"AI analyzes your goals and tasks to create a practical plan.",
+    "NATIJALARINGIZ":"YOUR RESULTS","Faolligingiz va rivojlanishingizni tahlil qiling.":"Analyze your activity and progress.","Haftalik faollik":"Weekly activity","Har kuni to‘plangan XP":"XP earned each day","Maqsadlar sari bosib o‘tilgan yo‘l":"Progress toward your goals","Har bir maqsad uchun bajarilgan ishlar va qolgan qadamlar.":"Completed tasks and remaining steps for each goal.","Yaratilgan maqsadlar soni":"Number of goals created","Qo‘lga kiritilgan yutuqlar":"Achievements earned","Do‘kondan olingan mahsulotlar":"Items purchased from the shop",
+    "SIZNING NATIJALARINGIZ":"YOUR RESULTS","Muhim kunlar, sertifikatlar va shaxsiy yutuqlaringizni saqlang.":"Save important days, certificates and personal achievements.","SmartGoal yutuqlari":"SmartGoal achievements","Shaxsiy xotiralar":"Personal memories","Xotiralar hali yo‘q":"No memories yet","Birinchi yutug‘ingiz yoki esdalik kuningizni saqlang.":"Save your first achievement or memorable day.",
+    "MAXSUS IMKONIYATLAR":"SPECIAL FEATURES","SIZNING BALANSINGIZ":"YOUR BALANCE","Har bir haqiqiy yutuq sizga yangi imkoniyatlarni ochadi.":"Every real achievement unlocks new possibilities.","Bu kategoriyada mahsulot yo‘q":"No items in this category","Boshqa kategoriyani tanlang.":"Choose another category.","Sizning kolleksiyangiz":"Your collection","Do‘kondan birinchi mahsulotingizni xarid qiling.":"Purchase your first item from the shop.",
+    "HAMJAMIYAT":"COMMUNITY","Username orqali boshqa foydalanuvchilarni toping.":"Find other users by username.","Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.":"Enter at least 3 characters. Users whose usernames start with your query will appear.","Kelgan so‘rovlar":"Incoming requests","Yuborilgan so‘rovlar":"Sent requests","Do‘stlaringiz":"Your friends","Sizning darajangiz":"Your level",
+    "SHAXSIY YORDAMCHI":"PERSONAL ASSISTANT","Har kuni yaxshiroq natija sari.":"Toward better results every day.","Savollaringizga javob, maqsadlaringizga esa aniq reja va foydali maslahatlar.":"Answers to your questions, clear plans and useful advice for your goals.","AI siz yozgan tilda javob beradi.":"AI replies in the language you write in.","Bugungi rejam":"My plan for today","Vazifalarim":"My tasks","Motivatsiya":"Motivation",
+    "Profil statistikasi":"Profile statistics","Profil bezagi":"Profile customization","Fon, avatar ramkasi va maxsus belgi":"Background, avatar frame and special badge","Biografiya":"Bio","O‘zingiz haqingizda qisqacha...":"A little about yourself..."
+  });
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Faollik zanjiri":"Серия активности","Ketma-ket faol kun":"Дней активности подряд"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Faollik zanjiri":"Activity streak","Ketma-ket faol kun":"Consecutive active days"
+  });
+
+  const translationOriginalText = new WeakMap();
+  const translationOriginalAttributes = new WeakMap();
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Masalan: 20 bet kitob o‘qish":"Например: прочитать 20 страниц книги","Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.":"Кратко опишите задачу. Например: прочитать 20 страниц и записать 3 главные мысли.","Qaysi maqsadga tegishli?":"К какой цели относится?","Maqsadsiz vazifa":"Без привязки к цели","Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"Например: просыпаюсь в 07:00, ухожу в школу в 08:30, возвращаюсь в 14:00. Вечером хочу учить английский."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Masalan: 20 bet kitob o‘qish":"Example: read 20 pages of a book","Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.":"Briefly describe what you will do. Example: read 20 pages and write down 3 key ideas.","Qaysi maqsadga tegishli?":"Which goal is this linked to?","Maqsadsiz vazifa":"No linked goal","Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"Example: I wake up at 7:00, leave for school at 8:30, return at 14:00, and want to study English in the evening."
+  });
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Eng faol foydalanuvchilar":"Самые активные пользователи","Jami ishlab topilgan XP bo‘yicha reyting.":"Рейтинг по общему количеству заработанных XP.","Reyting hozircha bo‘sh":"Рейтинг пока пуст","Birinchi XP yig‘gan foydalanuvchi bo‘ling.":"Станьте первым, кто заработает XP."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Eng faol foydalanuvchilar":"Top active users","Jami ishlab topilgan XP bo‘yicha reyting.":"Ranked by total XP earned.","Reyting hozircha bo‘sh":"The leaderboard is empty","Birinchi XP yig‘gan foydalanuvchi bo‘ling.":"Be the first to earn XP."
+  });
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Maqsadlarimni tahlil qilib, bugun nima qilishim kerakligini ayt.":"Проанализируй мои цели и скажи, что мне делать сегодня.","Kun tartibimni yaxshilashga yordam ber.":"Помоги улучшить мой распорядок дня.","Vazifalarimni qiyinligi va muddatiga qarab tartibla.":"Распредели мои задачи по сложности и срокам.","Motivatsiyam tushib ketdi. Amaliy maslahat ber.":"У меня пропала мотивация. Дай практический совет.","Bugun nimaga erishamiz?":"Чего мы достигнем сегодня?","Hali vazifalar yo‘q. Birinchi vazifangizni qo‘shing!":"Задач пока нет. Добавьте первую задачу!","Hali maqsad yo‘q. O‘z maqsadingizni belgilang!":"Целей пока нет. Поставьте свою первую цель!","Bugungi rejalaringizga xush kelibsiz":"Добро пожаловать к планированию дня","Yangi hisob yarating":"Создайте новый аккаунт","O‘zingiz haqingizdagi ma’lumotlarni kiriting.":"Введите информацию о себе.","Davom etish uchun ma’lumotlaringizni kiriting.":"Введите данные, чтобы продолжить.","SMARTGOAL’GA QO‘SHILING":"ПРИСОЕДИНЯЙТЕСЬ К SMARTGOAL","XUSH KELIBSIZ":"С ВОЗВРАЩЕНИЕМ","Barcha maydonlarni to‘g‘ri to‘ldiring.":"Заполните все поля правильно.","Parol 8–128 belgi bo‘lishi kerak.":"Пароль должен содержать от 8 до 128 символов.","Ro‘yxatdan o‘tishda xatolik yuz berdi.":"Ошибка при регистрации.","Server bilan bog‘lanib bo‘lmadi.":"Не удалось связаться с сервером.","Maqsadni tahrirlash":"Изменить цель","Maqsad nomini kiriting.":"Введите название цели.","Maqsad saqlandi.":"Цель сохранена.","Maqsadni o‘chirish":"Удалить цель","Vazifani tahrirlash":"Изменить задачу","Vazifa nomini kiriting.":"Введите название задачи.","Vazifa nima haqida ekanini kamida bir jumla bilan yozing.":"Кратко опишите задачу хотя бы одним предложением.","Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.":"Задача сохранена на устройстве. Войдите в аккаунт, чтобы получать XP после оценки AI.","Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.":"Задача не сохранена на сервере. Проверьте интернет и повторите попытку.","Maqsad yakunlandi!":"Цель достигнута!","Vazifani o‘chirish":"Удалить задачу","Yangi yutuq ochildi!":"Открыто новое достижение!","Xaridni amalga oshirib bo‘lmadi.":"Не удалось выполнить покупку.","Mahsulot profilingizga qo‘llandi.":"Предмет применён к вашему профилю.","Siz eng yuqori mavjud darajaga yetdingiz!":"Вы достигли максимального уровня!","Ma’lumotni saqlashda xatolik yuz berdi.":"Ошибка сохранения данных.","Ma’lumot serverga saqlanmadi.":"Данные не сохранены на сервере.","Internet yoki server bilan aloqa uzildi. Ma’lumot qurilmada saqlandi.":"Связь с интернетом или сервером потеряна. Данные сохранены на устройстве.","Ma’lumotlarni yuklab bo‘lmadi.":"Не удалось загрузить данные.","Serverdan kelgan ma’lumot noto‘g‘ri.":"Сервер вернул некорректные данные.","Serverdan chiqish so‘rovi bajarilmadi:":"Не удалось выполнить выход с сервера:","Yangi xabarlar shu yerda paydo bo‘ladi.":"Новые уведомления появятся здесь.","Hali biografiya qo‘shilmagan.":"Биография пока не добавлена.","Hali badge yo‘q":"Значков пока нет","Sozlamalar bo‘limlari":"Разделы настроек","Tug‘ilgan sanani o‘zgartirish":"Изменить дату рождения","Ma’lumotlar tiklandi.":"Данные восстановлены.","Ma’lumotlarni tozalash":"Очистить данные"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Maqsadlarimni tahlil qilib, bugun nima qilishim kerakligini ayt.":"Analyze my goals and tell me what I should do today.","Kun tartibimni yaxshilashga yordam ber.":"Help me improve my daily routine.","Vazifalarimni qiyinligi va muddatiga qarab tartibla.":"Prioritize my tasks by difficulty and deadlines.","Motivatsiyam tushib ketdi. Amaliy maslahat ber.":"I have lost motivation. Give me practical advice.","Bugun nimaga erishamiz?":"What will we achieve today?","Hali vazifalar yo‘q. Birinchi vazifangizni qo‘shing!":"No tasks yet. Add your first task!","Hali maqsad yo‘q. O‘z maqsadingizni belgilang!":"No goals yet. Set your first goal!","Bugungi rejalaringizga xush kelibsiz":"Welcome to your daily planner","Yangi hisob yarating":"Create a new account","O‘zingiz haqingizdagi ma’lumotlarni kiriting.":"Enter your information.","Davom etish uchun ma’lumotlaringizni kiriting.":"Enter your details to continue.","SMARTGOAL’GA QO‘SHILING":"JOIN SMARTGOAL","XUSH KELIBSIZ":"WELCOME BACK","Barcha maydonlarni to‘g‘ri to‘ldiring.":"Please complete all fields correctly.","Parol 8–128 belgi bo‘lishi kerak.":"Password must be 8–128 characters.","Ro‘yxatdan o‘tishda xatolik yuz berdi.":"Registration failed.","Server bilan bog‘lanib bo‘lmadi.":"Could not connect to the server.","Maqsadni tahrirlash":"Edit goal","Maqsad nomini kiriting.":"Enter a goal title.","Maqsad saqlandi.":"Goal saved.","Maqsadni o‘chirish":"Delete goal","Vazifani tahrirlash":"Edit task","Vazifa nomini kiriting.":"Enter a task title.","Vazifa nima haqida ekanini kamida bir jumla bilan yozing.":"Briefly describe the task in at least one sentence.","Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.":"Task saved on this device. Sign in to receive AI-assessed XP.","Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.":"Task was not saved to the server. Check your connection and try again.","Maqsad yakunlandi!":"Goal completed!","Vazifani o‘chirish":"Delete task","Yangi yutuq ochildi!":"New achievement unlocked!","Xaridni amalga oshirib bo‘lmadi.":"Purchase failed.","Mahsulot profilingizga qo‘llandi.":"Item applied to your profile.","Siz eng yuqori mavjud darajaga yetdingiz!":"You reached the highest available level!","Ma’lumotni saqlashda xatolik yuz berdi.":"An error occurred while saving data.","Ma’lumot serverga saqlanmadi.":"Data was not saved to the server.","Internet yoki server bilan aloqa uzildi. Ma’lumot qurilmada saqlandi.":"Connection to the internet or server was lost. Data was saved on this device.","Ma’lumotlarni yuklab bo‘lmadi.":"Could not load data.","Serverdan kelgan ma’lumot noto‘g‘ri.":"The server returned invalid data.","Serverdan chiqish so‘rovi bajarilmadi:":"The server sign-out request failed:","Yangi xabarlar shu yerda paydo bo‘ladi.":"New notifications will appear here.","Hali biografiya qo‘shilmagan.":"No biography added yet.","Hali badge yo‘q":"No badges yet","Sozlamalar bo‘limlari":"Settings sections","Tug‘ilgan sanani o‘zgartirish":"Change birthday","Ma’lumotlar tiklandi.":"Data restored.","Ma’lumotlarni tozalash":"Clear data"
+  });
+
+  function translateVisibleUI(root = document.body) {
+    if (!root) return;
+    const dictionary = UI_TRANSLATIONS[settings.language] || {};
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const parent = node.parentElement;
+      if (!parent || parent.closest("script,style,textarea,input,[contenteditable='true']")) continue;
+      if (!translationOriginalText.has(node)) translationOriginalText.set(node, node.nodeValue || "");
+      const original = translationOriginalText.get(node), trimmed = original.trim();
+      if (!trimmed) continue;
+      node.nodeValue = original.replace(trimmed, dictionary[trimmed] || trimmed);
+    }
+    root.querySelectorAll("input[placeholder],textarea[placeholder],button[aria-label],button[title],[data-ai-prompt]").forEach(element => {
+      let originals = translationOriginalAttributes.get(element);
+      if (!originals) { originals = {}; translationOriginalAttributes.set(element, originals); }
+      ["placeholder","aria-label","title","data-ai-prompt"].forEach(attribute => {
+        if (!element.hasAttribute(attribute)) return;
+        if (!(attribute in originals)) originals[attribute] = element.getAttribute(attribute) || "";
+        const original = originals[attribute];
+        element.setAttribute(attribute, dictionary[original] || original);
+      });
+    });
+  }
+
   function navigate(page) {
     if (!PAGE_TITLES[page]) return;
 
@@ -2484,12 +3403,20 @@
     };
 
     content.innerHTML = (pages[currentPage] || renderDashboard)();
+    if (lastTranslatedLanguage !== settings.language) {
+      translateVisibleUI(document.body);
+      lastTranslatedLanguage = settings.language;
+    } else {
+      translateVisibleUI(content);
+    }
 
     updateProfileDisplay();
     updateSidebarPoints();
     updateNotificationIndicators();
     updateCurrentDate();
-    refreshIcons();
+    refreshIcons(content);
+    refreshIcons($("#sidebar-avatar"));
+    refreshIcons($("#topbar-avatar"));
   }
 
   function updateSidebarPoints() {
@@ -2534,6 +3461,12 @@
       return;
     }
 
+    const aiPrompt = event.target.closest("[data-ai-prompt]");
+    if (aiPrompt) { const input=$("#ai-form input[name='message']"); if(input){input.value=aiPrompt.dataset.aiPrompt||""; $("#ai-form")?.requestSubmit();} return; }
+
+    const storeCategory = event.target.closest("[data-store-filter]");
+    if (storeCategory) { storeFilter = storeCategory.dataset.storeFilter || "all"; render(); return; }
+
     const settingsTab = event.target.closest("[data-settings-tab]");
     if (settingsTab) {
       currentSettingsTab = settingsTab.dataset.settingsTab;
@@ -2548,6 +3481,56 @@
     const id = actionElement.dataset.id;
 
     switch (action) {
+      case "view-profile":
+        openPublicProfile(actionElement.dataset.username);
+        break;
+      case "send-friend-request":
+        sendFriendRequest(actionElement.dataset.userId);
+        break;
+      case "respond-friend":
+        respondFriendRequest(actionElement.dataset.requestId, actionElement.dataset.decision);
+        break;
+      case "refresh-friends":
+        loadCommunityRelations();
+        break;
+      case "refresh-leaderboard":
+        loadCommunityLeaderboard();
+        break;
+      case "generate-ai-plan":
+        generateAIPlan();
+        break;
+      case "generate-daily-advice":
+        generateDailyAdvice();
+        break;
+      case "close-daily-advice":
+        $("#daily-ai-advice-card")?.classList.add("hidden");
+        break;
+      case "add-routine":
+        openRoutineForm();
+        break;
+      case "edit-routine":
+        openRoutineForm(id);
+        break;
+      case "delete-routine":
+        data.dailyRoutine = (data.dailyRoutine || []).filter(item => item.id !== id);
+        saveData(); render(); showToast("Kun tartibidan band o‘chirildi.");
+        break;
+      case "generate-routine":
+        generateRoutine();
+        break;
+      case "routine-status":
+        setRoutineStatus(id, actionElement.dataset.status);
+        break;
+      case "generate-routine-advice":
+        generateRoutineAdvice();
+        break;
+      case "clear-ai-chat":
+        aiConversation = [];
+        render();
+        break;
+      case "enable-routine-reminders":
+        enableRoutineReminders();
+        break;
       case "add-goal":
         openGoalForm();
         break;
@@ -2565,6 +3548,18 @@
         showToast("Maqsad o‘chirildi.");
         break;
 
+      case "load-more-tasks":
+        taskListLimit += 50;
+        render();
+        break;
+      case "load-more-goals":
+        goalListLimit += 40;
+        render();
+        break;
+      case "load-more-memories":
+        memoryListLimit += 30;
+        render();
+        break;
       case "add-task":
         openTaskForm();
         break;
@@ -2576,6 +3571,7 @@
         break;
       case "confirm-delete-task":
         data.tasks = data.tasks.filter(item => item.id !== id);
+        refreshGoalProgress();
         saveData();
         closeModal();
         render();
@@ -2587,7 +3583,7 @@
         break;
       case "share-profile":
         if (navigator.clipboard?.writeText) {
-          navigator.clipboard.writeText(`${location.origin}/@${data.profile.username || ""}`)
+          navigator.clipboard.writeText(`${location.origin}/?profile=${encodeURIComponent(data.profile.username || "")}`)
             .then(() => showToast("Profil havolasi nusxalandi."))
             .catch(() => showToast("Havolani nusxalab bo‘lmadi.", "error"));
         } else {
@@ -2646,12 +3642,8 @@
       case "reset-data":
         resetData();
         break;
-      case "confirm-reset":
-        data = createInitialData();
-        saveData();
-        closeModal();
-        render();
-        showToast("Mahalliy ma’lumotlar tozalandi.");
+      case "confirm-clear-selected":
+        clearSelectedData();
         break;
 
       case "edit-birthdate":
@@ -2714,7 +3706,7 @@
 
     if (target.matches("[data-setting]")) {
       const key = target.dataset.setting;
-      if (!["language", "theme"].includes(key)) return;
+      if (!["language", "theme", "fontSize"].includes(key)) return;
 
       settings[key] = target.value;
       saveSettings();
@@ -2722,27 +3714,38 @@
       return;
     }
 
-    if (target.matches("input[name='difficulty']")) {
-      settings.difficulty = target.value;
-      saveSettings();
-      render();
-      showToast("Interfeys murakkabligi yangilandi.");
+    if (target.matches("[data-delete-scope='all']")) {
+      Array.from(document.querySelectorAll("#modal-body [data-delete-scope]")).forEach(input => {
+        if (input !== target) input.checked = target.checked;
+      });
       return;
     }
+
+    if (target.matches("#modal-body [data-delete-scope]")) {
+      const all = $("#modal-body [data-delete-scope='all']");
+      const options = Array.from(document.querySelectorAll("#modal-body [data-delete-scope]:not([data-delete-scope='all'])"));
+      const checked = options.filter(input => input.checked).length;
+      if (all) {
+        all.checked = checked === options.length;
+        all.indeterminate = checked > 0 && checked < options.length;
+      }
+      return;
+    }
+
   }
 
   function handleSubmit(event) {
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
 
-    switch (form.id) {
+    switch (form.getAttribute("id")) {
       case "login-form":
         event.preventDefault();
-        loginLocal(form);
+        loginRemote(form);
         break;
       case "register-form":
         event.preventDefault();
-        registerLocal(form);
+        registerRemote(form);
         break;
       case "profile-form":
         event.preventDefault();
@@ -2755,6 +3758,10 @@
       case "task-form":
         event.preventDefault();
         saveTask(form);
+        break;
+      case "routine-form":
+        event.preventDefault();
+        saveRoutine(form);
         break;
       case "memory-form":
         event.preventDefault();
@@ -2785,6 +3792,205 @@
     }
   }
 
+  let communitySearchSequence = 0;
+  let communitySearchTimer = null;
+
+  function openRequestedProfile() {
+    const params=new URLSearchParams(window.location.search);
+    const username=params.get("profile");
+    if(!username) return;
+    window.history.replaceState({},document.title,window.location.pathname);
+    setTimeout(()=>openPublicProfile(username),0);
+  }
+
+  async function loadCommunityLeaderboard() {
+    const container=$("#community-leaderboard");
+    if(!container)return;
+    try{
+      const response=await fetch("/api/users/leaderboard",{credentials:"same-origin"});
+      const result=await response.json().catch(()=>({}));
+      if(!response.ok||!result.success)throw new Error(result.message||"Reyting yuklanmadi.");
+      communityLeaderboard=Array.isArray(result.users)?result.users:[];
+      if(!communityLeaderboard.length){container.innerHTML=emptyState("Reyting hozircha bo‘sh","Birinchi XP yig‘gan foydalanuvchi bo‘ling.","trophy");return;}
+      container.innerHTML=communityLeaderboard.map(user=>`<div class="leaderboard-row"><span class="leaderboard-rank">#${user.rank}</span><div class="leaderboard-user"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username)}"><strong>${escapeHTML(user.name)}</strong></button><small>@${escapeHTML(user.username)} · Level ${getRank(Number(user.totalEarnedXP||0)).level}</small></div><strong class="leaderboard-xp">${formatNumber(user.totalEarnedXP)} XP</strong></div>`).join("");
+      refreshIcons();
+    }catch(error){container.innerHTML=emptyState("Reyting yuklanmadi",error.message||"Server bilan aloqa uzildi.","alert-circle");}
+  }
+
+  async function openPublicProfile(username) {
+    if (!username) return;
+    openModal("Foydalanuvchi profili", '<div class="profile-loading">Profil yuklanmoqda...</div>', '<button class="secondary-button" type="button" data-action="close-modal">Yopish</button>');
+    try {
+      const response = await fetch("/api/users/profile?username=" + encodeURIComponent(username), {credentials:"same-origin"});
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success || !result.profile) throw new Error(result.message || "Profilni yuklab bo‘lmadi.");
+      const p = result.profile, rank = getRank(Number(p.totalEarnedXP || p.xp || 0));
+      const covers = {default:"linear-gradient(120deg,#5145cf,#9282f6)",midnight:"linear-gradient(120deg,#101827,#283958)",galaxy:"radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",royal:"linear-gradient(120deg,#7c4a20,#d3a24b)",sakura:"linear-gradient(120deg,#e7a5bd,#8b6bba)",nebula:"radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)",aurora:"linear-gradient(130deg,#123d43,#5b4a9a 55%,#a3d5c6)",forest:"linear-gradient(130deg,#102f26,#39745a 55%,#b4c99a)",sunrise:"linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)",coral:"linear-gradient(130deg,#7c3448,#e57e73 55%,#ffd0a6)",ember:"linear-gradient(130deg,#271d2e,#8b3c36 55%,#f1a15a)"};
+      const avatar = p.avatar ? '<img src="'+escapeHTML(p.avatar)+'" alt="Profil rasmi" loading="lazy" decoding="async">' : icon("user-round",40);
+      const avatarFrame = ["premium","gold","neon","crystal","flame"].includes(p.avatarFrame) ? " avatar-frame-"+p.avatarFrame : "";
+      const badge = p.activeBadge ? '<span class="profile-active-badge">'+icon("award",13)+' '+escapeHTML(p.activeBadge)+'</span>' : "";
+      const birthday = p.birthdate ? '<div class="profile-public-stat">'+icon("cake")+" "+escapeHTML(formatDate(p.birthdate))+'</div>' : "";
+      const isSelf=p.username===data.profile.username;
+      const isFriend=(communityRelations.friends||[]).some(friend=>friend.id===p.id);
+      const outgoingRequest=(communityRelations.outgoing||[]).find(request=>request.userId===p.id);
+      const incomingRequest=(communityRelations.incoming||[]).find(request=>request.userId===p.id);
+      const friendAction=isSelf?"":isFriend?'<span class="profile-active-badge">'+icon("users",13)+' Do‘stingiz</span>':outgoingRequest?'<span class="profile-active-badge">So‘rov yuborilgan</span>':incomingRequest?'<button class="primary-button" type="button" data-action="respond-friend" data-request-id="'+escapeHTML(incomingRequest.id)+'" data-decision="accept">So‘rovni qabul qilish</button>':'<button class="primary-button" type="button" data-action="send-friend-request" data-user-id="'+escapeHTML(p.id)+'">'+icon("user-plus",15)+' Do‘stlik so‘rovi yuborish</button>';
+      const levelProgress='<section class="public-profile-level"><div class="public-profile-level-head"><strong>Level '+rank.level+' · '+escapeHTML(rank.name)+'</strong><span>'+Math.round(rank.progress)+'%</span></div><div class="progress-track"><div class="progress-fill" style="width:'+rank.progress+'%"></div></div><small>'+(rank.next?formatNumber(rank.remaining)+' XP keyingi darajagacha':'Eng yuqori daraja')+'</small></section>';
+      const achievements = (Array.isArray(p.achievements) ? p.achievements : []).map(raw => {
+        const id = typeof raw === "string" ? raw : raw.id;
+        const item = ACHIEVEMENTS.find(entry => entry.id === id);
+        return item ? '<span class="public-showcase-chip">'+icon(item.icon,14)+' '+escapeHTML(item.name)+'</span>' : "";
+      }).join("");
+      const inventory = (Array.isArray(p.inventory) ? p.inventory : []).map(raw => {
+        const item = STORE_ITEMS.find(entry => entry.id === raw.id);
+        return item ? '<span class="public-showcase-chip">'+icon(item.icon,14)+' '+escapeHTML(item.name)+'</span>' : "";
+      }).join("");
+      const showcase = '<section class="public-showcase"><h3>Yutuqlari</h3><div class="public-showcase-list">'+(achievements||'<small>Hali ochilgan yutuqlar yo‘q.</small>')+'</div><h3>Do‘kondan olingan buyumlar</h3><div class="public-showcase-list">'+(inventory||'<small>Hozircha maxsus buyumlar yo‘q.</small>')+'</div></section>';
+      const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar'+avatarFrame+'">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p>'+badge+'<p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP balansi</small></div><div><strong>'+formatNumber(p.totalEarnedXP||p.xp)+'</strong><small>Jami olgan XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div></div>'+levelProgress+birthday+'<p class="card-description">Profil bezagi: '+formatNumber(p.customizationScore||0)+' / 5</p>'+showcase+friendAction+'</div>';
+      const body = $("#modal-body"); if (body) body.innerHTML = html;
+      refreshIcons();
+    } catch (error) {
+      const body = $("#modal-body"); if (body) body.innerHTML = '<div class="empty-state">'+escapeHTML(error.message||"Profilni ochib bo‘lmadi.")+'</div>';
+    }
+  }
+
+  async function searchCommunityUsers(value) {
+    const query = normalizedUsername(value);
+    const results = $("#community-results");
+    const sequence = ++communitySearchSequence;
+    if (!results) return;
+
+    if (!query) {
+      results.innerHTML = emptyState("Qidiruvga tayyor", "Username kiriting.", "users");
+      return;
+    }
+    if (query.length < 3) {
+      results.innerHTML = emptyState("Yana belgi kiriting", "Qidiruv uchun kamida 3 ta belgi kerak.", "search");
+      return;
+    }
+
+    results.innerHTML = emptyState("Qidirilmoqda...", "Foydalanuvchilar tekshirilmoqda.", "loader-circle");
+
+    try {
+      const response = await fetch("/api/users/search?username=" + encodeURIComponent(query), {
+        method: "GET",
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+      });
+      const result = await response.json().catch(() => ({}));
+      if (sequence !== communitySearchSequence) return;
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Qidiruv vaqtida xatolik yuz berdi.");
+      }
+
+      const users = Array.isArray(result.users) ? result.users : [];
+      await loadCommunityRelations();
+      if (sequence !== communitySearchSequence) return;
+      if (!users.length) {
+        results.innerHTML = emptyState("Foydalanuvchi topilmadi", "Bu username bilan boshlanadigan foydalanuvchi yo‘q.", "user-search");
+        return;
+      }
+
+      results.innerHTML = users.map(user => `
+        <div class="user-item">
+          <span class="avatar avatar-medium">${icon("user-round")}</span>
+          <div class="user-item-info">
+            <button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username || "")}"><strong>${escapeHTML(user.name || "Foydalanuvchi")}</strong></button>
+            <small>@${escapeHTML(user.username || "")} · Level ${getRank(Number(user.totalEarnedXP||user.xp||0)).level} · ${formatNumber(user.totalEarnedXP??user.xp??0)} XP jami${user.username === data.profile.username ? " · Sizning profilingiz" : ""}</small>
+          </div>
+          ${user.username === data.profile.username
+            ? `<span class="user-rank">Siz</span>`
+            : communityRelations.friends.some(item => item.username === user.username)
+              ? `<span class="user-rank">Do‘st</span>`
+              : communityRelations.outgoing.some(item => item.username === user.username)
+                ? `<span class="user-rank">So‘rov yuborilgan</span>`
+                : (() => {
+                    const incoming = communityRelations.incoming.find(item => item.username === user.username);
+                    return incoming
+                      ? `<button class="card-action" type="button" data-action="respond-friend" data-request-id="${escapeHTML(incoming.id)}" data-decision="accept">So‘rovni qabul qilish</button>`
+                      : `<button class="card-action" type="button" data-action="send-friend-request" data-user-id="${escapeHTML(user.id)}">Do‘st bo‘lish</button>`;
+                  })()}
+        </div>
+      `).join("");
+      refreshIcons();
+    } catch (error) {
+      if (sequence !== communitySearchSequence) return;
+      results.innerHTML = emptyState("Qidiruv ishlamadi", escapeHTML(error.message || "Server bilan bog‘lanib bo‘lmadi."), "alert-circle");
+    }
+  }
+
+  async function loadCommunityRelations() {
+    const container = $("#community-relations");
+    if (!container) return;
+    try {
+      const response = await fetch("/api/friends", { credentials: "same-origin" });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "Do‘stlar ro‘yxatini yuklab bo‘lmadi.");
+      const incoming = Array.isArray(result.incoming) ? result.incoming : [];
+      const outgoing = Array.isArray(result.outgoing) ? result.outgoing : [];
+      const friends = Array.isArray(result.friends) ? result.friends : [];
+      communityRelations = { incoming, outgoing, friends };
+      const section = (title, rows, renderRow, empty) => `
+        <div style="margin-top:14px">
+          <h4>${escapeHTML(title)}</h4>
+          ${rows.length ? rows.map(renderRow).join("") : `<p class="card-description">${escapeHTML(empty)}</p>`}
+        </div>`;
+      container.innerHTML =
+        section("Kelgan so‘rovlar", incoming, item => `
+          <div class="user-item">
+            <div class="user-item-info"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(item.username)}"><strong>${escapeHTML(item.name)}</strong></button><small>@${escapeHTML(item.username)}</small></div>
+            <button class="card-action" data-action="respond-friend" data-request-id="${escapeHTML(item.id)}" data-decision="accept">Qabul qilish</button>
+            <button class="card-action" data-action="respond-friend" data-request-id="${escapeHTML(item.id)}" data-decision="decline">Rad etish</button>
+          </div>`, "Hozircha kelgan so‘rov yo‘q.") +
+        section("Yuborilgan so‘rovlar", outgoing, item => `
+          <div class="user-item"><div class="user-item-info"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(item.username)}"><strong>${escapeHTML(item.name)}</strong></button><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Kutilmoqda</span></div>`, "Yuborilgan so‘rov yo‘q.") +
+        section("Do‘stlaringiz", friends, item => `
+          <div class="user-item"><div class="user-item-info"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(item.username)}"><strong>${escapeHTML(item.name)}</strong></button><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Do‘st</span></div>`, "Hali do‘stlar yo‘q.");
+    } catch (error) {
+      communityRelations = { incoming: [], outgoing: [], friends: [] };
+      container.innerHTML = emptyState("Do‘stlar yuklanmadi", error.message || "Server bilan aloqa uzildi.", "alert-circle");
+    }
+    refreshIcons();
+  }
+
+  async function sendFriendRequest(userId) {
+    try {
+      const response = await fetch("/api/friends/request", {
+        method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "So‘rov yuborilmadi.");
+      showToast(result.message || "Do‘stlik so‘rovi yuborildi.");
+      const profileButton = document.querySelector("#modal-body [data-action='send-friend-request']");
+      if (profileButton && profileButton.dataset.userId === userId) { profileButton.disabled=true; profileButton.textContent="So‘rov yuborildi"; }
+      await loadCommunityRelations();
+      const input = $("#community-search");
+      if (input?.value) searchCommunityUsers(input.value);
+    } catch (error) {
+      showToast(error.message || "So‘rov yuborilmadi.", "error");
+    }
+  }
+
+  async function respondFriendRequest(requestId, decision) {
+    try {
+      const response = await fetch("/api/friends/respond", {
+        method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestId, decision })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "Amal bajarilmadi.");
+      showToast(result.message || "So‘rov yangilandi.");
+      const profileRequestButton=document.querySelector("#modal-body [data-request-id]");
+      if(profileRequestButton && profileRequestButton.dataset.requestId===requestId){profileRequestButton.disabled=true;profileRequestButton.textContent=decision==="accept"?"Do‘stingiz":"So‘rov rad etildi";}
+      await loadCommunityRelations();
+    } catch (error) {
+      showToast(error.message || "Amal bajarilmadi.", "error");
+    }
+  }
+
   function handleInput(event) {
     const target = event.target;
 
@@ -2792,58 +3998,45 @@
       runGlobalSearch(target.value);
     }
 
-    if (target.id === "community-search") {
-      const query = normalizedUsername(target.value);
-      const results = $("#community-results");
-      if (!results) return;
-
-      if (!query) {
-        results.innerHTML = emptyState("Qidiruvga tayyor", "Username kiriting.", "users");
-      } else if (query === data.profile.username) {
-        results.innerHTML = `
-          <div class="user-item">
-            <span class="avatar avatar-medium">${data.profile.avatar ? `<img src="${escapeHTML(data.profile.avatar)}" alt="">` : icon("user-round")}</span>
-            <div class="user-item-info">
-              <strong>${escapeHTML(data.profile.name)}</strong>
-              <small>@${escapeHTML(data.profile.username)} · Sizning profilingiz</small>
-            </div>
-            <span class="user-rank">Level ${getRank().level}</span>
-          </div>
-        `;
-        refreshIcons();
-      } else {
-        results.innerHTML = emptyState(
-          "Foydalanuvchi topilmadi",
-          "Haqiqiy foydalanuvchilarni qidirish uchun backend va hamjamiyat tizimi ulanishi kerak.",
-          "user-search"
-        );
-      }
-    }
   }
 
   /* -------------------- INITIALIZATION -------------------- */
 
-  function initializeSmartGoal() {
+  async function initializeSmartGoal() {
     applySettings();
-
+    checkRoutineReminders();
+    if (!window.smartGoalReminderTimer) window.smartGoalReminderTimer = setInterval(checkRoutineReminders, 30000);
     const maxDate = $("#register-birthdate");
     if (maxDate) maxDate.max = today();
+    localStorage.removeItem(SESSION_KEY);
 
-    const session = localStorage.getItem(SESSION_KEY);
-
-    if (session && data.profile.name && data.profile.name !== "SmartGoal foydalanuvchisi") {
+    try {
+      const response = await fetch("/api/me", { credentials: "same-origin" });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success || !result.user) throw new Error("Not authenticated");
+      remoteAuthenticated = true;
+      await loadRemoteData();
+      if (!data.profile.name || data.profile.name === "SmartGoal foydalanuvchisi") {
+        data.profile.name = result.user.name || "Foydalanuvchi";
+        data.profile.email = result.user.email || "";
+        data.profile.username = result.user.username || "";
+        data.profile.birthdate = result.user.birthdate || "";
+        data.profile.age = calculateAge(data.profile.birthdate);
+      }
       showApplication();
-    } else {
+      checkAchievements();
+      checkRoutineReminders();
+      openRequestedProfile();
+    } catch {
+      remoteAuthenticated = false;
       showAuthentication();
       switchAuthTab("login");
     }
-
     updateProfileDisplay();
     refreshIcons();
   }
 
   function syncSmartGoalData() {
-    // Backend synchronization will be implemented in the next integration stage.
     saveData();
     render();
   }
@@ -2855,7 +4048,13 @@
     document.addEventListener("keydown", handleInput);
 
     document.addEventListener("input", event => {
-      if (event.target.id === "community-search") handleInput(event);
+      if (event.target.id !== "community-search") return;
+      if (communitySearchTimer) clearTimeout(communitySearchTimer);
+      const value = event.target.value;
+      communitySearchTimer = setTimeout(() => {
+        communitySearchTimer = null;
+        searchCommunityUsers(value);
+      }, 350);
     });
 
     $("#modal-overlay")?.addEventListener("click", event => {
@@ -2900,8 +4099,11 @@
 
   function start() {
     attachEvents();
-    checkAchievements();
     initializeSmartGoal();
+    setInterval(() => {
+      if (currentPage === "planner") render();
+      checkRoutineReminders();
+    }, 60000);
   }
 
   if (document.readyState === "loading") {
