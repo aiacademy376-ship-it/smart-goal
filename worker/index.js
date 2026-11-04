@@ -1,6 +1,6 @@
 const SESSION_COOKIE = "sg_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
-const PASSWORD_ITERATIONS = 100000;
+const PASSWORD_ITERATIONS = 210000;
 const MAX_BODY_BYTES = 1024 * 1024;
 
 const json = (body, status = 200, headers = {}) =>
@@ -81,7 +81,7 @@ async function readJson(request) {
   const length = Number(request.headers.get("content-length") || 0);
   if (length > MAX_BODY_BYTES) throw new Error("So‘rov hajmi juda katta.");
   const text = await request.text();
-  if (text.length > MAX_BODY_BYTES) throw new Error("So‘rov hajmi juda katta.");
+  if (new TextEncoder().encode(text).byteLength > MAX_BODY_BYTES) throw new Error("So‘rov hajmi juda katta.");
   try {
     return JSON.parse(text || "{}");
   } catch {
@@ -100,20 +100,17 @@ function validateOrigin(request, env) {
 async function enforceRateLimit(env, key, limit, windowSeconds) {
   const now = Math.floor(Date.now() / 1000);
   const windowStart = now - (now % windowSeconds);
+  // A single conditional UPSERT makes the limit safe under concurrent requests.
+  // Once the counter reaches the limit, the conflict update is skipped atomically.
   const row = await env.DB.prepare(
-    "SELECT hits, window_start FROM rate_limits WHERE rate_key = ?"
-  ).bind(key).first();
-
-  if (row && row.window_start === windowStart && row.hits >= limit) return false;
-
-  await env.DB.prepare(
     "INSERT INTO rate_limits (rate_key, window_start, hits) VALUES (?, ?, 1) " +
     "ON CONFLICT(rate_key) DO UPDATE SET " +
-    "hits = CASE WHEN window_start = excluded.window_start THEN hits + 1 ELSE 1 END, " +
-    "window_start = excluded.window_start"
-  ).bind(key, windowStart).run();
-
-  return true;
+    "hits = CASE WHEN rate_limits.window_start = excluded.window_start THEN rate_limits.hits + 1 ELSE 1 END, " +
+    "window_start = excluded.window_start " +
+    "WHERE rate_limits.window_start <> excluded.window_start OR rate_limits.hits < ? " +
+    "RETURNING hits"
+  ).bind(key, windowStart, limit).first();
+  return Boolean(row);
 }
 
 function clientKey(request, value) {
@@ -176,8 +173,12 @@ async function handleRegister(request, env) {
   if (!termsAccepted) return json({ success: false, message: "Foydalanish shartlariga rozilik kerak." }, 400);
   const birth = new Date(birthdate + "T00:00:00Z");
   const nowDate = new Date();
-  let age = nowDate.getUTCFullYear() - birth.getUTCFullYear();
-  if (nowDate.getUTCMonth() < birth.getUTCMonth() || (nowDate.getUTCMonth() === birth.getUTCMonth() && nowDate.getUTCDate() < birth.getUTCDate())) age--;
+  const localDateParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tashkent", year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(nowDate);
+  const localDate = Object.fromEntries(localDateParts.filter(part => part.type !== "literal").map(part => [part.type, Number(part.value)]));
+  let age = localDate.year - birth.getUTCFullYear();
+  if (localDate.month < birth.getUTCMonth() + 1 || (localDate.month === birth.getUTCMonth() + 1 && localDate.day < birth.getUTCDate())) age--;
   if (age < 0 || age > 120) return json({ success: false, message: "Tug‘ilgan sana yaroqsiz." }, 400);
   if (age < 13) return json({ success: false, message: "13 yoshgacha bo‘lgan foydalanuvchilar uchun ota-ona yoki qonuniy vakil roziligi jarayoni tayyorlanmoqda." }, 403);
   const ageBand = age < 16 ? "13_15" : age < 18 ? "16_17" : "adult";
@@ -266,7 +267,7 @@ async function handleData(request, env, user) {
     const balance = await env.DB.prepare("SELECT xp_balance FROM users WHERE id = ?").bind(user.id).first();
     const safeData = { ...body.data, xp: Number(balance?.xp_balance || 0) };
     const serialized = JSON.stringify(safeData);
-    if (serialized.length > MAX_BODY_BYTES) return json({ success: false, message: "Ma’lumot hajmi juda katta." }, 413);
+    if (new TextEncoder().encode(serialized).byteLength > MAX_BODY_BYTES) return json({ success: false, message: "Ma’lumot hajmi juda katta." }, 413);
     const now = new Date().toISOString();
     await env.DB.prepare(
       "INSERT INTO user_data (user_id, data_json, updated_at) VALUES (?, ?, ?) " +
@@ -337,6 +338,7 @@ async function handleTaskCompletion(request,env,user){
   const savedTask=tasks.find(item=>item&&String(item.id||"")===taskId);
   if(!savedTask)return json({success:false,message:"Bu vazifa hisobingizda saqlanmagan. Avval vazifani saqlang, keyin bajaring."},404);
 
+  if(savedTask.completed!==true||!savedTask.completedAt||Number.isNaN(Date.parse(String(savedTask.completedAt))))return json({success:false,message:"Vazifa bajarilgan holatda serverga saqlanmagan. Qayta urinib ko‘ring."},409);
   const title=String(savedTask.title||"").trim().slice(0,100);
   const dueDate=String(savedTask.date||"");
   const rawMinutes=Number(savedTask.estimatedMinutes);
@@ -537,6 +539,9 @@ export default {
       return json({ success: false, message: "API endpoint topilmadi." }, 404);
     } catch (error) {
       console.error("SmartGoal API error:", error);
+      const message = String(error?.message || "");
+      if (message === "So‘rov hajmi juda katta.") return json({ success: false, message }, 413);
+      if (message === "JSON formati noto‘g‘ri.") return json({ success: false, message }, 400);
       return json({ success: false, message: "Serverda xatolik yuz berdi." }, 500);
     }
   }
