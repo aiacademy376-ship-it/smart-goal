@@ -1950,7 +1950,7 @@
             </article>`).join("") : emptyState("Kun tartibi hali tuzilmagan","Masalan, 07:00 — uyg‘onish, 07:15 — badantarbiya kabi bandlar qo‘shing.","sunrise")}
         </div>
         <div class="routine-ai">
-          <div><strong>${icon("sparkles",16)} AI bilan kun tartibini tuzish</strong><small>Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing.</small></div>
+          <div><strong>${icon("sparkles",16)} AI bilan kun tartibini tuzish</strong><small>Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing. Eslatmalar sahifa ochiq turganda ishlaydi.</small></div>
           <textarea id="routine-ai-prompt" class="field-textarea" rows="2" maxlength="700" placeholder="Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman."></textarea>
           <button class="primary-button" type="button" data-action="generate-routine">${icon("sparkles",15)} Menga kun tartibi tuz</button>
           <button class="secondary-button" type="button" data-action="enable-routine-reminders">${icon("bell",15)} ${settings.routineReminders ? "Eslatmalar yoqilgan" : "Vaqtida eslatib tur"}</button>
@@ -2928,6 +2928,29 @@
     "Bajarish sanasi":"Due date","Qaysi kuni bajariladi?":"Which day should it be done?","Qisqa mazmuni":"Short description"
   });
 
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Aurora profil foni":"Фон профиля Aurora","Forest profil foni":"Лесной фон профиля","Sunrise profil foni":"Фон профиля Sunrise",
+    "Scholar belgisi":"Значок Scholar","Explorer belgisi":"Значок Explorer","Neon avatar ramkasi":"Неоновая рамка аватара",
+    "Yashil va binafsha shimol yog‘dusi uslubidagi fon.":"Фон в стиле северного сияния.",
+    "Tabiat ranglaridagi sokin profil foni.":"Спокойный фон профиля в природных тонах.",
+    "Yangi kun va yangi maqsadlar uchun iliq fon.":"Тёплый фон для нового дня и новых целей.",
+    "Bilim va muntazam o‘rganish ramzi.":"Символ знаний и регулярного обучения.",
+    "Yangi ko‘nikmalarni sinab ko‘rish ramzi.":"Символ исследования новых навыков.",
+    "Profil rasmingiz uchun yorqin neon ramka.":"Яркая неоновая рамка для фото профиля.",
+    "Eslatmalar sahifa ochiq turganda ishlaydi.":"Напоминания работают, пока страница открыта."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Aurora profil foni":"Aurora profile background","Forest profil foni":"Forest profile background","Sunrise profil foni":"Sunrise profile background",
+    "Scholar belgisi":"Scholar badge","Explorer belgisi":"Explorer badge","Neon avatar ramkasi":"Neon avatar frame",
+    "Yashil va binafsha shimol yog‘dusi uslubidagi fon.":"A green and violet northern-lights inspired background.",
+    "Tabiat ranglaridagi sokin profil foni.":"A calm nature-inspired profile background.",
+    "Yangi kun va yangi maqsadlar uchun iliq fon.":"A warm background for a fresh day and new goals.",
+    "Bilim va muntazam o‘rganish ramzi.":"A symbol of knowledge and consistent learning.",
+    "Yangi ko‘nikmalarni sinab ko‘rish ramzi.":"A symbol of exploring new skills.",
+    "Profil rasmingiz uchun yorqin neon ramka.":"A bright neon frame for your profile photo.",
+    "Eslatmalar sahifa ochiq turganda ishlaydi.":"Reminders work while the page is open."
+  });
+
   const translationOriginalText = new WeakMap();
   const translationOriginalAttributes = new WeakMap();
 
@@ -3412,7 +3435,8 @@
       const outgoingRequest=(communityRelations.outgoing||[]).find(request=>request.userId===p.id);
       const incomingRequest=(communityRelations.incoming||[]).find(request=>request.userId===p.id);
       const friendAction=isSelf?"":isFriend?'<span class="profile-active-badge">'+icon("users",13)+' Do‘stingiz</span>':outgoingRequest?'<span class="profile-active-badge">So‘rov yuborilgan</span>':incomingRequest?'<button class="primary-button" type="button" data-action="respond-friend" data-request-id="'+escapeHTML(incomingRequest.id)+'" data-decision="accept">So‘rovni qabul qilish</button>':'<button class="primary-button" type="button" data-action="send-friend-request" data-user-id="'+escapeHTML(p.id)+'">'+icon("user-plus",15)+' Do‘stlik so‘rovi yuborish</button>';
-      const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar'+avatarFrame+'">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p>'+badge+'<p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP balansi</small></div><div><strong>'+formatNumber(p.totalEarnedXP||p.xp)+'</strong><small>Jami olgan XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div><div><strong>'+formatNumber(p.completedTasks)+'</strong><small>Vazifa</small></div><div><strong>'+formatNumber(p.goals)+'</strong><small>Maqsad</small></div></div>'+birthday+'<p class="card-description">Profil bezagi: '+formatNumber(p.customizationScore||0)+' / 3 · SmartGoal’da '+formatNumber(p.achievements)+' ta yutuq</p>'+friendAction+'</div>';
+      const levelProgress='<section class="public-profile-level"><div class="public-profile-level-head"><strong>Level '+rank.level+' · '+escapeHTML(rank.name)+'</strong><span>'+Math.round(rank.progress)+'%</span></div><div class="progress-track"><div class="progress-fill" style="width:'+rank.progress+'%"></div></div><small>'+(rank.next?formatNumber(rank.remaining)+' XP keyingi darajagacha':'Eng yuqori daraja')+'</small></section>';
+      const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar'+avatarFrame+'">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p>'+badge+'<p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP balansi</small></div><div><strong>'+formatNumber(p.totalEarnedXP||p.xp)+'</strong><small>Jami olgan XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div><div><strong>'+formatNumber(p.completedTasks)+'</strong><small>Vazifa</small></div><div><strong>'+formatNumber(p.goals)+'</strong><small>Maqsad</small></div></div>'+levelProgress+birthday+'<p class="card-description">Profil bezagi: '+formatNumber(p.customizationScore||0)+' / 3 · SmartGoal’da '+formatNumber(p.achievements)+' ta yutuq</p>'+friendAction+'</div>';
       const body = $("#modal-body"); if (body) body.innerHTML = html;
       refreshIcons();
     } catch (error) {
