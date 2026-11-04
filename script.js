@@ -27,7 +27,7 @@
     dashboard: "Bosh sahifa",
     goals: "Maqsadlarim",
     schedule: "Vazifalar",
-    planner: "Rejalashtiruvchi",
+    planner: "Kun tartibim",
     analytics: "Statistika",
     achievements: "Yutuqlarim",
     rewards: "Mukofotlar do‘koni",
@@ -836,7 +836,7 @@
     showToast("Profil muvaffaqiyatli yangilandi.");
   }
 
-  function resizeImage(file) {
+  function resizeImage(file, maxDimension = 420, quality = 0.72) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
 
@@ -849,7 +849,7 @@
 
         image.onload = () => {
           const canvas = document.createElement("canvas");
-          const max = 420;
+          const max = Math.max(160, Math.min(1200, Number(maxDimension) || 420));
           const ratio = Math.min(1, max / Math.max(image.width, image.height));
 
           canvas.width = Math.round(image.width * ratio);
@@ -858,7 +858,7 @@
           const context = canvas.getContext("2d");
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-          resolve(canvas.toDataURL("image/jpeg", 0.72));
+          resolve(canvas.toDataURL("image/jpeg", Math.max(0.45, Math.min(0.9, Number(quality) || 0.72))));
         };
 
         image.src = reader.result;
@@ -1247,74 +1247,48 @@
     const task = data.tasks.find(item => item.id === id);
     if (!task) return;
     taskActionsInFlight.add(id);
-
     try {
       if (!task.completed) {
         task.completed = true;
         task.completedAt = new Date().toISOString();
         render();
-
         if (!task.xpAwarded || Number(task.xpEarned || 0) === 0) {
-          try {
-            const goal = data.goals.find(item => item.id === task.goalId);
-            if (remoteAuthenticated && !await flushRemoteSync()) {
-              throw new Error("Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.");
-            }
-            const response = await fetch("/api/tasks/complete", {
-              method: "POST",
-              credentials: "same-origin",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                task: {
-                  id: task.id,
-                  title: task.title,
-                  description: task.description || "",
-                  date: task.date || today(),
-                  priority: task.priority || "medium",
-                  estimatedMinutes: task.estimatedMinutes || 30,
-                  createdAt: task.createdAt || "",
-                  completedAt: task.completedAt || "",
-                  goalTitle: goal?.title || ""
-                }
-              })
-            });
-            const result = await response.json().catch(() => ({}));
-            if (!response.ok || !result.success) {
-              throw new Error(result.message || "AI vazifani baholay olmadi.");
-            }
-
-            data.xp = Number(result.xpBalance || 0);
-            task.xpAwarded = true;
-            task.xpEarned = Number(result.awarded || 0);
-            if (task.xpEarned > 0) {
-              data.activity.push({
-                id: uid(),
-                date: today(),
-                xp: task.xpEarned,
-                reason: "AI baholadi: " + task.title
+          if (!remoteAuthenticated) {
+            task.xpAwarded = false;
+            task.xpEarned = 0;
+            showToast("Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.", "error");
+          } else {
+            try {
+              if (!await flushRemoteSync()) throw new Error("Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.");
+              const response = await fetch("/api/tasks/complete", {
+                method: "POST", credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ task: { id: task.id } })
               });
-              data.activity = data.activity.slice(-180);
+              const result = await response.json().catch(() => ({}));
+              if (!response.ok || !result.success) throw new Error(result.message || "AI vazifani baholay olmadi.");
+              data.xp = Number(result.xpBalance ?? data.xp ?? 0);
+              task.xpAwarded = true;
+              task.xpEarned = Number(result.awarded || 0);
+              if (task.xpEarned > 0) {
+                data.activity.push({ id: uid(), date: today(), xp: task.xpEarned, reason: "AI baholadi: " + task.title });
+                data.activity = data.activity.slice(-180);
+              }
+              if (result.notMeaningful) showToast("AI bu vazifani aniq ish deb baholamadi. Nomini yoki qisqa mazmunini aniqroq yozing.", "error");
+              else if (result.duplicateTask) showToast(result.reason || "Bugun shu mazmundagi vazifa uchun XP avval berilgan.", "error");
+              else if (result.alreadyAwarded) showToast("Bu vazifa uchun XP avval berilgan.", "error");
+              else if (task.xpEarned > 0) showToast("AI bahosi: +" + task.xpEarned + " XP · qiyinlik " + (result.difficulty || "—") + "/5 · mehnat " + (result.effort || "—") + "/5 · " + (result.onTime ? "muddatida" : "kechikkan"));
+              else showToast(result.reason || "AI vazifani tekshirdi, lekin bu safar XP ajratilmadi.", "error");
+            } catch (error) {
+              task.completed = false;
+              task.completedAt = null;
+              saveData();
+              render();
+              showToast(error.message || "XP hisoblashda xatolik.", "error");
+              return;
             }
-
-            if (result.notMeaningful) {
-              showToast("Bu vazifa nomi tushunarsiz. Aniq nima qilganingizni yozing — shunda AI adolatli baholaydi.", "error");
-            } else if (result.duplicateTask) {
-              showToast(result.reason || "Bugun shu vazifaga o‘xshash ish uchun XP berilgan.", "error");
-            } else if (result.alreadyAwarded) {
-              showToast("Bu vazifa uchun XP avval berilgan.", "error");
-            } else {
-              showToast("AI bahosi: +" + task.xpEarned + " XP · qiyinlik " + (result.difficulty || "—") + "/5 · mehnat " + (result.effort || "—") + "/5 · " + (result.onTime ? "muddatida" : "kechikkan"));
-            }
-          } catch (error) {
-            task.completed = false;
-            task.completedAt = null;
-            saveData();
-            render();
-            showToast(error.message || "XP hisoblashda xatolik.", "error");
-            return;
           }
         }
-
         if (task.goalId) {
           const goal = data.goals.find(item => item.id === task.goalId);
           if (goal) {
@@ -1335,7 +1309,6 @@
         refreshGoalProgress();
         showToast("Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.");
       }
-
       saveData();
       render();
     } finally {
@@ -2219,9 +2192,9 @@
     let image = "";
     if (file instanceof File && file.size > 0) {
       if (!file.type.startsWith("image/") || file.size > 4 * 1024 * 1024) { showToast("Rasm 4 MB dan kichik bo‘lishi kerak.", "error"); return; }
-      try { image = await resizeImage(file); } catch { showToast("Rasmni yuklab bo‘lmadi.", "error"); return; }
+      try { image = await resizeImage(file, 320, 0.6); } catch { showToast("Rasmni yuklab bo‘lmadi.", "error"); return; }
     }
-    if (image && data.memories.filter(item => item.image).length >= 12) { showToast("Profil va yutuqlar uchun jami 12 tagacha rasm saqlash mumkin.", "error"); return; }
+    if (image && data.memories.filter(item => item.image).length >= 8) { showToast("Profil va yutuqlar uchun jami 8 tagacha rasm saqlash mumkin.", "error"); return; }
     data.memories.unshift({
       id: uid(),
       title,
