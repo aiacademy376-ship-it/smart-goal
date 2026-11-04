@@ -31,31 +31,67 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Validate D1 migration
+      - name: Validate all D1 migrations and XP safeguards
         run: |
           python - <<'PY'
           import sqlite3
           from pathlib import Path
 
           db = sqlite3.connect(":memory:")
-          db.executescript(Path("worker/migrations/0001_initial.sql").read_text())
-          expected = {"users", "sessions", "user_data", "rate_limits"}
-          actual = {
+          db.execute("PRAGMA foreign_keys = ON")
+          migrations = sorted(Path("worker/migrations").glob("*.sql"))
+          assert len(migrations) >= 3, "Expected all versioned D1 migrations"
+          for migration in migrations:
+              db.executescript(migration.read_text(encoding="utf-8"))
+
+          tables = {
               row[0] for row in db.execute(
                   "SELECT name FROM sqlite_master WHERE type='table'"
               )
           }
-          missing = expected - actual
-          assert not missing, f"Missing tables: {sorted(missing)}"
-
-          columns = {
-              row[1] for row in db.execute("PRAGMA table_info(users)")
+          expected = {
+              "users", "sessions", "user_data", "rate_limits",
+              "friend_requests", "xp_ledger"
           }
-          required = {
+          assert expected <= tables, f"Missing tables: {sorted(expected - tables)}"
+
+          user_columns = {row[1] for row in db.execute("PRAGMA table_info(users)")}
+          required_user_columns = {
               "id", "name", "username", "email", "password_hash",
               "password_salt", "password_iterations", "birthdate",
-              "age_band", "terms_accepted_at"
+              "age_band", "terms_accepted_at", "xp_balance"
           }
-          assert required <= columns, f"Missing user columns: {sorted(required - columns)}"
-          print("D1 schema validation passed.")
+          assert required_user_columns <= user_columns, (
+              f"Missing user columns: {sorted(required_user_columns - user_columns)}"
+          )
+
+          db.execute(
+              "INSERT INTO users (id,name,username,email,age_band,terms_accepted_at,"
+              "password_hash,password_salt,password_iterations,created_at,updated_at) "
+              "VALUES ('u1','Test','test_user','test@example.com','adult','now','hash','salt',210000,'now','now')"
+          )
+          db.execute(
+              "INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) "
+              "VALUES ('x1','u1','task_12345678',15,'2026-11-04','Task','now')"
+          )
+          try:
+              db.execute(
+                  "INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) "
+                  "VALUES ('x2','u1','task_87654321',16,'2026-11-04','Task','now')"
+              )
+              raise AssertionError("XP ledger accepted more than 15 XP for one task")
+          except sqlite3.IntegrityError:
+              pass
+
+          try:
+              db.execute(
+                  "INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) "
+                  "VALUES ('x3','u1','task_12345678',5,'2026-11-04','Duplicate','now')"
+              )
+              raise AssertionError("XP ledger accepted a duplicate award for one task")
+          except sqlite3.IntegrityError:
+              pass
+
+          assert not list(db.execute("PRAGMA foreign_key_check")), "Foreign key check failed"
+          print("All D1 migrations and XP safeguards passed.")
           PY
