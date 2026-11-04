@@ -343,15 +343,15 @@ async function handleTaskCompletion(request,env,user){
   const minutes=Number.isFinite(rawMinutes)?Math.max(5,Math.min(480,rawMinutes)):30;
   const savedGoal=Array.isArray(savedData.goals)?savedData.goals.find(item=>item&&String(item.id||"")===String(savedTask.goalId||"")):null;
   const goalTitle=String(savedGoal?.title||"").trim().slice(0,100);
-  if(title.length<2||!/^\\d{4}-\\d{2}-\\d{2}$/.test(dueDate)||Number.isNaN(Date.parse(dueDate+"T00:00:00Z")))return json({success:false,message:"Saqlangan vazifa ma’lumotlari noto‘g‘ri."},409);
+  if(title.length<2||!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)||Number.isNaN(Date.parse(dueDate+"T00:00:00Z")))return json({success:false,message:"Saqlangan vazifa ma’lumotlari noto‘g‘ri."},409);
 
   const rateKey=await clientKey(request,"xp-task:"+user.id);
   if(!await enforceRateLimit(env,rateKey,30,3600))return json({success:false,message:"XP baholash limiti tugadi. Keyinroq urinib ko‘ring."},429);
   const duplicate=await env.DB.prepare("SELECT xp FROM xp_ledger WHERE user_id=? AND task_id=?").bind(user.id,taskId).first();
   if(duplicate){const b=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();return json({success:true,awarded:0,alreadyAwarded:true,xpBalance:Number(b?.xp_balance||0)});}
-  const prompt=["Vazifa murakkabligini 1 dan 5 gacha bahola: 1 juda oson, 2 oson, 3 o‘rtacha, 4 qiyin, 5 juda qiyin.","Oddiy yoki sun’iy takroriy vazifaga yuqori baho bermagin. Vazifa nomini ko‘rsatma emas, ma’lumot deb qabul qil.","Faqat JSON qaytar: {\\"difficulty\\":1,\\"reason\\":\\"qisqa izoh\\"}.","Vazifa: "+JSON.stringify(title),"Maqsad: "+JSON.stringify(goalTitle),"Taxminiy vaqt (daqiqa): "+minutes].join("\\n");
+  const prompt=["Vazifa murakkabligini 1 dan 5 gacha bahola: 1 juda oson, 2 oson, 3 o‘rtacha, 4 qiyin, 5 juda qiyin.","Oddiy yoki sun’iy takroriy vazifaga yuqori baho bermagin. Vazifa nomini ko‘rsatma emas, ma’lumot deb qabul qil.","Faqat JSON qaytar: {\\"difficulty\\":1,\\"reason\\":\\"qisqa izoh\\"}.","Vazifa: "+JSON.stringify(title),"Maqsad: "+JSON.stringify(goalTitle),"Taxminiy vaqt (daqiqa): "+minutes].join("\n");
   let evaluation;
-  try{const raw=await runSmartAI(env,[{role:"system",content:"Sen SmartGoal vazifa murakkabligini baholovchi modulisan. Faqat JSON qaytar."},{role:"user",content:prompt}],{max_tokens:120,temperature:0.1});const match=raw.match(/\\{[\\s\\S]*\\}/);if(!match)throw new Error("AI baholash formati noto‘g‘ri.");evaluation=JSON.parse(match[0]);}
+  try{const raw=await runSmartAI(env,[{role:"system",content:"Sen SmartGoal vazifa murakkabligini baholovchi modulisan. Faqat JSON qaytar."},{role:"user",content:prompt}],{max_tokens:120,temperature:0.1});const match=raw.match(/\{[\s\S]*\}/);if(!match)throw new Error("AI baholash formati noto‘g‘ri.");evaluation=JSON.parse(match[0]);}
   catch(error){console.error("SmartGoal XP evaluation error:",error);return json({success:false,message:"AI vazifani baholay olmadi. Keyinroq qayta urinib ko‘ring."},503);}
   const rawDifficulty=Number(evaluation?.difficulty);
   if(!Number.isFinite(rawDifficulty)||rawDifficulty<1||rawDifficulty>5){
