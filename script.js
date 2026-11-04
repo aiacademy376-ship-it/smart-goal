@@ -2200,13 +2200,17 @@
   /* -------------------- AI PAGE -------------------- */
 
   function renderAI() {
-    const messages=aiConversation.length?aiConversation:[{role:"assistant",content:"Salom! Men SmartGoal AI murabbiyiman. Maqsadlaringiz, kun tartibingiz va vazifalaringizni birga yaxshilaymiz."}];
+    const messages=aiConversation.length?aiConversation:[{role:"assistant",content:"Salom! Men SmartGoal AI murabbiyiman. Maqsadlaringiz, kun tartibingiz va vazifalaringizni birga yaxshilaymiz. Istalgan mavzuda savol berishingiz mumkin."}];
+    const activeGoals=data.goals.filter(goal=>!goal.completed).length;
+    const openTasks=data.tasks.filter(task=>!task.completed).length;
     return `
-      ${pageHeader("SHAXSIY YORDAMCHI","Smart AI","Maqsadlar, kun tartibi va vazifalar bo‘yicha jonli AI yordami.")}
-      <section class="ai-panel"><span class="eyebrow">SMARTGOAL INTELLIGENCE</span><h2>Rejangizni birga yaxshilaymiz.</h2><p>AI maqsadlaringiz va vazifalaringizni tahlil qilib, aniq tavsiyalar beradi.</p></section>
-      <section class="card" style="margin-top:20px"><h3 class="card-title">AI bilan suhbat</h3><p class="card-description">Savolingizni yozing — AI maqsadlaringiz kontekstida javob beradi.</p>
-        <div class="ai-chat" id="ai-chat">${messages.map(item=>'<div class="ai-message '+(item.role==="user"?"user":"")+'">'+escapeHTML(item.content)+'</div>').join("")}</div>
-        <form id="ai-form" class="ai-input-row" style="margin-top:18px"><input name="message" placeholder="Masalan: Imtihonga qanday tayyorlansam bo‘ladi?" maxlength="500" required><button class="primary-button" type="submit">${icon("send",16)}</button></form>
+      ${pageHeader("SHAXSIY YORDAMCHI","Smart AI","Savollaringizga javob, maqsadlaringizga esa aniq reja va foydali maslahatlar.")}
+      <section class="ai-panel"><span class="eyebrow">SMARTGOAL INTELLIGENCE</span><h2>Har kuni yaxshiroq natija sari.</h2><p>AI maqsadlaringiz, vazifalaringiz va kun tartibingizni hisobga olib, amaliy maslahat beradi. Boshqa mavzularda ham bemalol so‘rashingiz mumkin.</p><div class="ai-context-pills"><span>${icon("target",14)} ${activeGoals} faol maqsad</span><span>${icon("list-checks",14)} ${openTasks} bajarilmagan vazifa</span><span>${icon("calendar-clock",14)} ${(data.dailyRoutine||[]).length} kun tartibi bandi</span></div></section>
+      <section class="card ai-chat-card" style="margin-top:20px">
+        <div class="card-header"><div><h3 class="card-title">AI bilan suhbat</h3><p class="card-description">AI siz yozgan tilda javob beradi.</p></div><button class="card-action" type="button" data-action="clear-ai-chat">Suhbatni tozalash</button></div>
+        <div class="ai-quick-prompts"><button type="button" data-ai-prompt="Maqsadlarimni tahlil qilib, bugun nima qilishim kerakligini ayt.">Bugungi rejam</button><button type="button" data-ai-prompt="Kun tartibimni yaxshilashga yordam ber.">Kun tartibim</button><button type="button" data-ai-prompt="Vazifalarimni qiyinligi va muddatiga qarab tartibla.">Vazifalarim</button><button type="button" data-ai-prompt="Motivatsiyam tushib ketdi. Amaliy maslahat ber.">Motivatsiya</button></div>
+        <div class="ai-chat" id="ai-chat" aria-live="polite">${messages.map(item=>'<div class="ai-message '+(item.role==="user"?"user":"")+'">'+escapeHTML(item.content)+'</div>').join("")}</div>
+        <form id="ai-form" class="ai-input-row" style="margin-top:18px"><input name="message" placeholder="Savolingizni yozing..." maxlength="500" required autocomplete="off"><button class="primary-button" type="submit" aria-label="Yuborish">${icon("send",16)}</button></form>
       </section>`;
   }
   async function sendAIMessage(form) {
@@ -2801,6 +2805,9 @@
       return;
     }
 
+    const aiPrompt = event.target.closest("[data-ai-prompt]");
+    if (aiPrompt) { const input=$("#ai-form input[name='message']"); if(input){input.value=aiPrompt.dataset.aiPrompt||""; $("#ai-form")?.requestSubmit();} return; }
+
     const storeCategory = event.target.closest("[data-store-filter]");
     if (storeCategory) { storeFilter = storeCategory.dataset.storeFilter || "all"; render(); return; }
 
@@ -2845,6 +2852,10 @@
         break;
       case "generate-routine":
         generateRoutine();
+        break;
+      case "clear-ai-chat":
+        aiConversation = [];
+        render();
         break;
       case "enable-routine-reminders":
         enableRoutineReminders();
