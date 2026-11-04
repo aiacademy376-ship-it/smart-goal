@@ -1620,11 +1620,51 @@
     const overdue=data.tasks.filter(task=>!task.completed&&task.date&&task.date<today()).length;
     const todayPending=data.tasks.filter(task=>!task.completed&&task.date===today()).length;
     const active=data.goals.filter(goal=>!goal.completed);
-    if(overdue) return {title:"Avval kechikkan ishlarni yengillashtiring",text:`${overdue} ta vazifa muddati o‘tgan. Hammasini birdan bajarishga urinmang: eng muhim bittasini tanlab, 20–25 daqiqa ishlang.`};
-    if(todayPending>4) return {title:"Bugun ustuvorlikni tanlang",text:`Bugun ${todayPending} ta vazifa bor. Eng muhim 3 tasini tanlang, ular orasida qisqa tanaffus qiling.`};
-    if(!active.length) return {title:"Yangi maqsad sari qadam qo‘ying",text:"Keyingi 30 kun ichida erishmoqchi bo‘lgan bitta aniq natijani belgilang."};
-    if(!(data.dailyRoutine||[]).length) return {title:"Kun tartibini shakllantiring",text:"Uyg‘onish, o‘qish yoki ish va dam olish vaqtlarini belgilang. Barqaror tartib maqsadlarga erishishni osonlashtiradi."};
-    return {title:"Kichik, muntazam qadamlar katta natija beradi",text:"Bugun faol maqsadlaringizdan bittasiga tegishli vazifani bajaring. Kechqurun natijani ko‘rib, ertangi kunni rejalashtiring."};
+    const lang=settings.language||"uz";
+    const copy={
+      uz:{
+        overdueTitle:"Avval kechikkan ishlarni yengillashtiring",
+        overdueText:n=>n+" ta vazifa muddati o‘tgan. Hammasini birdan bajarishga urinmang: eng muhim bittasini tanlab, 20–25 daqiqa ishlang.",
+        todayTitle:"Bugun ustuvorlikni tanlang",
+        todayText:n=>"Bugun "+n+" ta vazifa bor. Eng muhim 3 tasini tanlang, ular orasida qisqa tanaffus qiling.",
+        goalTitle:"Yangi maqsad sari qadam qo‘ying",
+        goalText:"Keyingi 30 kun ichida erishmoqchi bo‘lgan bitta aniq natijani belgilang.",
+        routineTitle:"Kun tartibini shakllantiring",
+        routineText:"Uyg‘onish, o‘qish yoki ish va dam olish vaqtlarini belgilang. Barqaror tartib maqsadlarga erishishni osonlashtiradi.",
+        defaultTitle:"Kichik, muntazam qadamlar katta natija beradi",
+        defaultText:"Bugun faol maqsadlaringizdan bittasiga tegishli vazifani bajaring. Kechqurun natijani ko‘rib, ertangi kunni rejalashtiring."
+      },
+      ru:{
+        overdueTitle:"Сначала разберите просроченные задачи",
+        overdueText:n=>n+" задач просрочено. Не пытайтесь сделать всё сразу: выберите одну самую важную и поработайте над ней 20–25 минут.",
+        todayTitle:"Выберите главный приоритет на сегодня",
+        todayText:n=>"На сегодня запланировано "+n+" задач. Выберите три самые важные и делайте короткие перерывы.",
+        goalTitle:"Сделайте шаг к новой цели",
+        goalText:"Определите один конкретный результат, которого хотите достичь в ближайшие 30 дней.",
+        routineTitle:"Сформируйте распорядок дня",
+        routineText:"Укажите время пробуждения, учёбы или работы и отдыха. Регулярный распорядок помогает достигать целей.",
+        defaultTitle:"Небольшие регулярные шаги приводят к большим результатам",
+        defaultText:"Сегодня выполните одну задачу, связанную с активной целью. Вечером оцените результат и спланируйте завтра."
+      },
+      en:{
+        overdueTitle:"Start by simplifying overdue tasks",
+        overdueText:n=>n+" tasks are overdue. Do not try to do everything at once: choose the most important one and work on it for 20–25 minutes.",
+        todayTitle:"Choose today's top priority",
+        todayText:n=>"You have "+n+" tasks planned for today. Pick the three most important and take short breaks between them.",
+        goalTitle:"Take a step toward a new goal",
+        goalText:"Choose one specific result you want to achieve in the next 30 days.",
+        routineTitle:"Build a daily routine",
+        routineText:"Set your wake-up, study or work, and rest times. A steady routine makes goals easier to reach.",
+        defaultTitle:"Small, consistent steps lead to big results",
+        defaultText:"Complete one task linked to an active goal today. Review your progress tonight and plan tomorrow."
+      }
+    };
+    const t=copy[lang]||copy.uz;
+    if(overdue)return {title:t.overdueTitle,text:t.overdueText(overdue)};
+    if(todayPending>4)return {title:t.todayTitle,text:t.todayText(todayPending)};
+    if(!active.length)return {title:t.goalTitle,text:t.goalText};
+    if(!(data.dailyRoutine||[]).length)return {title:t.routineTitle,text:t.routineText};
+    return {title:t.defaultTitle,text:t.defaultText};
   }
 
   function renderDashboard() {
