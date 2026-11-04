@@ -1276,6 +1276,8 @@
 
             if (result.notMeaningful) {
               showToast("Bu vazifa nomi tushunarsiz. Aniq nima qilganingizni yozing — shunda AI adolatli baholaydi.", "error");
+            } else if (result.duplicateTask) {
+              showToast(result.reason || "Bugun shu vazifaga o‘xshash ish uchun XP berilgan.", "error");
             } else if (result.alreadyAwarded) {
               showToast("Bu vazifa uchun XP avval berilgan.", "error");
             } else {
@@ -1917,7 +1919,18 @@
     showToast("Kun tartibi eslatmalari yoqildi. Sayt ochiq turganda eslatadi.");
   }
 
+  function checkDueTaskNotifications() {
+    const day=today();
+    for (const task of (data.tasks||[]).filter(item=>!item.completed && item.date===day).slice(0,80)) {
+      const key="smartgoal_task_due_"+day+"_"+task.id;
+      if(localStorage.getItem(key)) continue;
+      localStorage.setItem(key,"1");
+      addNotification("Bugungi vazifa",task.title+" — bugun bajarish rejalashtirilgan.");
+    }
+  }
+
   function checkRoutineReminders() {
+    checkDueTaskNotifications();
     if (!settings.routineReminders || !Array.isArray(data.dailyRoutine) || !data.dailyRoutine.length) return;
     const now = new Date(), time = String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
     const day = now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
