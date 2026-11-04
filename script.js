@@ -350,9 +350,9 @@
     return `<i data-lucide="${escapeHTML(name)}" width="${size}" height="${size}"></i>`;
   }
 
-  function refreshIcons() {
+  function refreshIcons(root = document) {
     if (window.lucide && typeof window.lucide.createIcons === "function") {
-      window.lucide.createIcons();
+      window.lucide.createIcons({ root: root || document });
     }
   }
 
@@ -441,6 +441,8 @@
   let remoteSyncRunning = false;
   let remoteSyncQueued = false;
   let aiConversation = [];
+  let aiRequestInFlight = false;
+  let lastTranslatedLanguage = null;
   let communityRelations = { incoming: [], outgoing: [], friends: [] };
   let communityLeaderboard = [];
   const taskActionsInFlight = new Set();
@@ -854,6 +856,7 @@
             <input class="field-input" id="profile-avatar" name="avatar"
               type="file" accept="image/png,image/jpeg,image/webp">
             <small>PNG, JPG yoki WEBP. Rasm 2 MB dan kichik bo‘lsin.</small>
+            <label class="checkbox-label"><input type="checkbox" name="removeAvatar"><span>Profil rasmini olib tashlash</span></label>
           </div>
         </form>
       `,
@@ -872,8 +875,9 @@
     const file = formData.get("avatar");
     if (name.length < 2) { showToast("Ism va familiyani to‘g‘ri kiriting.", "error"); return; }
     if (!isValidUsername(username)) { showToast("Username formati noto‘g‘ri.", "error"); return; }
-    let avatar = data.profile.avatar || "";
-    if (file instanceof File && file.size > 0) {
+    const removeAvatar = formData.get("removeAvatar") === "on";
+    let avatar = removeAvatar ? "" : (data.profile.avatar || "");
+    if (!removeAvatar && file instanceof File && file.size > 0) {
       if (!file.type.startsWith("image/") || file.size > 2 * 1024 * 1024) { showToast("Rasm 2 MB dan kichik bo‘lishi kerak.", "error"); return; }
       try { avatar = await resizeImage(file); } catch { showToast("Rasmni yuklashda xatolik yuz berdi.", "error"); return; }
     }
@@ -2136,8 +2140,12 @@
       const usedTimes = new Set();
       const cleaned = items.slice(0,14).filter(item => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(item.time || "")) && String(item.title || "").trim().length >= 2 && !usedTimes.has(item.time) && usedTimes.add(item.time)).map(item => ({id:uid(),time:item.time,title:String(item.title).slice(0,90),description:String(item.description || "").slice(0,180)}));
       if (!cleaned.length) throw new Error("AI yaratgan vaqtlar noto‘g‘ri formatda.");
-      data.dailyRoutine = cleaned.sort((a,b) => a.time.localeCompare(b.time));
-      saveData(); render(); showToast("AI kun tartibingizni tayyorladi. Xohlasangiz, bandlarni tahrirlang.");
+      const existing = Array.isArray(data.dailyRoutine) ? data.dailyRoutine : [];
+      const occupiedTimes = new Set(existing.map(item => String(item.time || "")));
+      const additions = cleaned.filter(item => !occupiedTimes.has(item.time));
+      if (!additions.length) throw new Error("Mavjud kun tartibingiz saqlandi. AI takliflari mavjud vaqtlar bilan to‘qnashdi; boshqa vaqt oralig‘ini so‘rang.");
+      data.dailyRoutine = [...existing, ...additions].sort((a,b) => a.time.localeCompare(b.time));
+      saveData(); render(); showToast("Mavjud bandlaringiz saqlandi, AI yangi mashg‘ulotlarni qo‘shdi.");
     } catch (error) { showToast(error.message || "AI xatolik berdi.", "error"); }
     finally { if (button) { button.disabled = false; button.innerHTML = icon("sparkles",15) + " Menga kun tartibi tuz"; translateVisibleUI(button); refreshIcons(); } }
   }
@@ -2254,8 +2262,8 @@
       <section class="card" style="margin-top:20px">
         <div class="card-header">
           <div>
-            <h3 class="card-title">Shaxsiy xotiralar</h3>
-            <p class="card-description">Sertifikatlar, muhim kunlar va esdaliklar.</p>
+            <h3 class="card-title">Mening yutuqlarim va esdaliklarim</h3>
+            <p class="card-description">Rasm, sarlavha va izoh bilan o‘zingiz uchun muhim natijalarni saqlang.</p>
           </div>
         </div>
 
@@ -2457,12 +2465,56 @@
   }
 
   async function sendAIMessage(form) {
-    const input=form.elements.message,message=String(input.value||"").trim();if(!message)return;const chat=$("#ai-chat");if(!chat)return;
-    aiConversation.push({role:"user",content:message});aiConversation=aiConversation.slice(-12);const typingText=settings.language==="ru"?"AI печатает...":settings.language==="en"?"AI is typing...":"AI javob yozmoqda...";chat.insertAdjacentHTML("beforeend",'<div class="ai-message user">'+escapeHTML(message)+'</div><div class="ai-message" id="ai-typing">'+escapeHTML(typingText)+'</div>');
-    input.value="";const submit=form.querySelector("button[type='submit']");if(submit)submit.disabled=true;chat.scrollTop=chat.scrollHeight;
-    try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message,history:aiConversation.slice(0,-1),language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI bilan bog‘lanib bo‘lmadi.");aiConversation.push({role:"assistant",content:result.answer});aiConversation=aiConversation.slice(-12);$("#ai-typing")?.remove();chat.insertAdjacentHTML("beforeend",'<div class="ai-message">'+escapeHTML(result.answer)+'</div>');}
-    catch(error){$("#ai-typing")?.remove();const msg=error.message||"AI hozircha javob bera olmadi.";if(aiConversation.at(-1)?.role==="user"&&aiConversation.at(-1)?.content===message)aiConversation.pop();chat.insertAdjacentHTML("beforeend",'<div class="ai-message">'+escapeHTML(msg)+'</div>');}
-    finally{if(submit)submit.disabled=false;chat.scrollTop=chat.scrollHeight;}
+    if (aiRequestInFlight) return;
+    const input = form.elements.message;
+    const message = String(input?.value || "").trim();
+    const chat = $("#ai-chat");
+    if (!message || !chat) return;
+
+    aiRequestInFlight = true;
+    aiConversation.push({ role: "user", content: message });
+    aiConversation = aiConversation.slice(-12);
+    const typingText = settings.language === "ru" ? "AI печатает..." : settings.language === "en" ? "AI is typing..." : "AI javob yozmoqda...";
+    chat.insertAdjacentHTML("beforeend",
+      '<div class="ai-message user">' + escapeHTML(message) + '</div><div class="ai-message" id="ai-typing">' + escapeHTML(typingText) + '</div>');
+    if (input) input.disabled = true;
+    const submit = form.querySelector("button[type='submit']");
+    if (submit) submit.disabled = true;
+    chat.scrollTop = chat.scrollHeight;
+
+    const trimChat = () => {
+      const bubbles = chat.querySelectorAll(".ai-message");
+      for (let index = 0; index < bubbles.length - 12; index++) bubbles[index].remove();
+    };
+
+    try {
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "chat", message, history: aiConversation.slice(0, -1), language: settings.language })
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "AI bilan bog‘lanib bo‘lmadi.");
+      const answer = String(result.answer || "").trim();
+      if (!answer) throw new Error("AI bo‘sh javob qaytardi. Qayta urinib ko‘ring.");
+      aiConversation.push({ role: "assistant", content: answer });
+      aiConversation = aiConversation.slice(-12);
+      $("#ai-typing")?.remove();
+      chat.insertAdjacentHTML("beforeend", '<div class="ai-message">' + escapeHTML(answer) + '</div>');
+      trimChat();
+    } catch (error) {
+      $("#ai-typing")?.remove();
+      if (aiConversation.at(-1)?.role === "user" && aiConversation.at(-1)?.content === message) aiConversation.pop();
+      const errorText = error.message || "AI hozircha javob bera olmadi.";
+      chat.insertAdjacentHTML("beforeend", '<div class="ai-message ai-message-error">' + escapeHTML(errorText) + '</div>');
+      trimChat();
+    } finally {
+      aiRequestInFlight = false;
+      if (input) { input.disabled = false; input.focus(); }
+      if (submit) submit.disabled = false;
+      chat.scrollTop = chat.scrollHeight;
+    }
   }
   async function generateDailyAdvice() {
     const card=$("#daily-ai-advice-card"),output=$("#daily-ai-advice-output"),button=document.querySelector("[data-action='generate-daily-advice']");
@@ -2531,7 +2583,7 @@
     const profile = data.profile;
     const completedTasks = data.tasks.filter(task => task.completed).length;
     const totalEarnedXP = Number(data.xp || 0) + Number(data.spentXP || 0);
-    const customizationScore = [profile.background && profile.background !== "default", profile.avatarFrame && profile.avatarFrame !== "default", Boolean(profile.activeBadge)].filter(Boolean).length;
+    const customizationScore = [Boolean(profile.avatar), Boolean(String(profile.bio || "").trim()), profile.background && profile.background !== "default", profile.avatarFrame && profile.avatarFrame !== "default", Boolean(profile.activeBadge)].filter(Boolean).length;
 
     const backgroundStyles = {
       default: "linear-gradient(120deg,#5145cf,#9282f6)",
@@ -2542,7 +2594,9 @@
       nebula: "radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)",
       aurora: "linear-gradient(130deg,#123d43,#5b4a9a 55%,#a3d5c6)",
       forest: "linear-gradient(130deg,#102f26,#39745a 55%,#b4c99a)",
-      sunrise: "linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)"
+      sunrise: "linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)",
+      coral: "linear-gradient(130deg,#7c3448,#e57e73 55%,#ffd0a6)",
+      ember: "linear-gradient(130deg,#271d2e,#8b3c36 55%,#f1a15a)"
     };
 
     const bg = backgroundStyles[profile.background] || backgroundStyles.default;
@@ -2564,7 +2618,7 @@
 
         <div class="profile-name">${escapeHTML(profile.name || "Foydalanuvchi")}</div>
         <div class="profile-username">@${escapeHTML(profile.username || "username")}</div>
-        <small class="profile-decoration-score">Profil bezagi: ${[profile.background && profile.background!=="default",profile.avatarFrame && profile.avatarFrame!=="default",Boolean(profile.activeBadge)].filter(Boolean).length} / 3</small>
+        <small class="profile-decoration-score">Profil bezagi: ${customizationScore} / 5</small>
         ${profile.activeBadge ? `<span class="profile-active-badge">${icon("award",13)} ${escapeHTML(profile.activeBadge)}</span>` : ""}
 
         <p class="profile-bio">${escapeHTML(profile.bio || "Hali biografiya qo‘shilmagan.")}</p>
@@ -2624,7 +2678,7 @@
           </div>
           <div class="setting-row">
             <div class="setting-info"><strong>Profil bezagi</strong><small>Fon, avatar ramkasi va maxsus belgi</small></div>
-            <strong>${customizationScore} / 3</strong>
+            <strong>${customizationScore} / 5</strong>
           </div>
         </section>
       </div>
@@ -2708,7 +2762,7 @@
             <h3>Rang mavzusi</h3>
             <p>Ba’zi ranglar do‘kondan ochko evaziga olinadi.</p>
             <div class="theme-options">
-              ${["violet", "ocean", "sky", "emerald", "sunset", "rose"].map(theme => {
+              ${["violet", "ocean", "sky", "emerald", "sunset", "rose", "lavender", "mint"].map(theme => {
                 const free = theme === "violet";
                 const owned = data.inventory.some(item => item.id === `theme-${theme}`);
                 const available = free || owned;
@@ -3118,7 +3172,7 @@
     let node;
     while ((node = walker.nextNode())) {
       const parent = node.parentElement;
-      if (!parent || parent.closest("script,style,textarea,input,select,option,[contenteditable='true']")) continue;
+      if (!parent || parent.closest("script,style,textarea,input,[contenteditable='true']")) continue;
       if (!translationOriginalText.has(node)) translationOriginalText.set(node, node.nodeValue || "");
       const original = translationOriginalText.get(node), trimmed = original.trim();
       if (!trimmed) continue;
@@ -3174,13 +3228,20 @@
     };
 
     content.innerHTML = (pages[currentPage] || renderDashboard)();
-    translateVisibleUI(document.body);
+    if (lastTranslatedLanguage !== settings.language) {
+      translateVisibleUI(document.body);
+      lastTranslatedLanguage = settings.language;
+    } else {
+      translateVisibleUI(content);
+    }
 
     updateProfileDisplay();
     updateSidebarPoints();
     updateNotificationIndicators();
     updateCurrentDate();
-    refreshIcons();
+    refreshIcons(content);
+    refreshIcons($("#sidebar-avatar"));
+    refreshIcons($("#topbar-avatar"));
   }
 
   function updateSidebarPoints() {
@@ -3576,9 +3637,9 @@
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success || !result.profile) throw new Error(result.message || "Profilni yuklab bo‘lmadi.");
       const p = result.profile, rank = getRank(Number(p.totalEarnedXP || p.xp || 0));
-      const covers = {default:"linear-gradient(120deg,#5145cf,#9282f6)",midnight:"linear-gradient(120deg,#101827,#283958)",galaxy:"radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",royal:"linear-gradient(120deg,#7c4a20,#d3a24b)",sakura:"linear-gradient(120deg,#e7a5bd,#8b6bba)",nebula:"radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)",aurora:"linear-gradient(130deg,#123d43,#5b4a9a 55%,#a3d5c6)",forest:"linear-gradient(130deg,#102f26,#39745a 55%,#b4c99a)",sunrise:"linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)"};
+      const covers = {default:"linear-gradient(120deg,#5145cf,#9282f6)",midnight:"linear-gradient(120deg,#101827,#283958)",galaxy:"radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",royal:"linear-gradient(120deg,#7c4a20,#d3a24b)",sakura:"linear-gradient(120deg,#e7a5bd,#8b6bba)",nebula:"radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)",aurora:"linear-gradient(130deg,#123d43,#5b4a9a 55%,#a3d5c6)",forest:"linear-gradient(130deg,#102f26,#39745a 55%,#b4c99a)",sunrise:"linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)",coral:"linear-gradient(130deg,#7c3448,#e57e73 55%,#ffd0a6)",ember:"linear-gradient(130deg,#271d2e,#8b3c36 55%,#f1a15a)"};
       const avatar = p.avatar ? '<img src="'+escapeHTML(p.avatar)+'" alt="Profil rasmi" loading="lazy" decoding="async">' : icon("user-round",40);
-      const avatarFrame = ["premium","gold","neon"].includes(p.avatarFrame) ? " avatar-frame-"+p.avatarFrame : "";
+      const avatarFrame = ["premium","gold","neon","crystal","flame"].includes(p.avatarFrame) ? " avatar-frame-"+p.avatarFrame : "";
       const badge = p.activeBadge ? '<span class="profile-active-badge">'+icon("award",13)+' '+escapeHTML(p.activeBadge)+'</span>' : "";
       const birthday = p.birthdate ? '<div class="profile-public-stat">'+icon("cake")+" "+escapeHTML(formatDate(p.birthdate))+'</div>' : "";
       const isSelf=p.username===data.profile.username;
@@ -3587,7 +3648,7 @@
       const incomingRequest=(communityRelations.incoming||[]).find(request=>request.userId===p.id);
       const friendAction=isSelf?"":isFriend?'<span class="profile-active-badge">'+icon("users",13)+' Do‘stingiz</span>':outgoingRequest?'<span class="profile-active-badge">So‘rov yuborilgan</span>':incomingRequest?'<button class="primary-button" type="button" data-action="respond-friend" data-request-id="'+escapeHTML(incomingRequest.id)+'" data-decision="accept">So‘rovni qabul qilish</button>':'<button class="primary-button" type="button" data-action="send-friend-request" data-user-id="'+escapeHTML(p.id)+'">'+icon("user-plus",15)+' Do‘stlik so‘rovi yuborish</button>';
       const levelProgress='<section class="public-profile-level"><div class="public-profile-level-head"><strong>Level '+rank.level+' · '+escapeHTML(rank.name)+'</strong><span>'+Math.round(rank.progress)+'%</span></div><div class="progress-track"><div class="progress-fill" style="width:'+rank.progress+'%"></div></div><small>'+(rank.next?formatNumber(rank.remaining)+' XP keyingi darajagacha':'Eng yuqori daraja')+'</small></section>';
-      const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar'+avatarFrame+'">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p>'+badge+'<p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP balansi</small></div><div><strong>'+formatNumber(p.totalEarnedXP||p.xp)+'</strong><small>Jami olgan XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div><div><strong>'+formatNumber(p.completedTasks)+'</strong><small>Vazifa</small></div><div><strong>'+formatNumber(p.goals)+'</strong><small>Maqsad</small></div></div>'+levelProgress+birthday+'<p class="card-description">Profil bezagi: '+formatNumber(p.customizationScore||0)+' / 3 · SmartGoal’da '+formatNumber(p.achievements)+' ta yutuq</p>'+friendAction+'</div>';
+      const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar'+avatarFrame+'">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p>'+badge+'<p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP balansi</small></div><div><strong>'+formatNumber(p.totalEarnedXP||p.xp)+'</strong><small>Jami olgan XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div><div><strong>'+formatNumber(p.completedTasks)+'</strong><small>Vazifa</small></div><div><strong>'+formatNumber(p.goals)+'</strong><small>Maqsad</small></div></div>'+levelProgress+birthday+'<p class="card-description">Profil bezagi: '+formatNumber(p.customizationScore||0)+' / 5 · SmartGoal’da '+formatNumber(p.achievements)+' ta yutuq</p>'+friendAction+'</div>';
       const body = $("#modal-body"); if (body) body.innerHTML = html;
       refreshIcons();
     } catch (error) {
