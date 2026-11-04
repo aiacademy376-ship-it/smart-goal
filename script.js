@@ -2395,7 +2395,22 @@
   /* -------------------- AI PAGE -------------------- */
 
   function renderAI() {
-    const messages=aiConversation.length?aiConversation:[{role:"assistant",content:"Salom! Men SmartGoal AI murabbiyiman. Maqsadlaringiz, kun tartibingiz va vazifalaringizni birga yaxshilaymiz. Istalgan mavzuda savol berishingiz mumkin."}];
+    const welcome={
+      uz:"Salom! Men SmartGoal AI murabbiyiman. Maqsadlaringiz, kun tartibingiz va vazifalaringizni birga yaxshilaymiz. Istalgan mavzuda savol berishingiz mumkin.",
+      ru:"Здравствуйте! Я AI-наставник SmartGoal. Давайте вместе улучшим ваши цели, распорядок дня и задачи. Вы также можете задавать вопросы на любые темы.",
+      en:"Hello! I am your SmartGoal AI coach. Let's improve your goals, daily routine and tasks together. You can also ask me about any topic."
+    };
+    const quick={
+      uz:{today:"Maqsadlarimni tahlil qilib, bugun nima qilishim kerakligini ayt.",routine:"Kun tartibimni yaxshilashga yordam ber.",tasks:"Vazifalarimni qiyinligi va muddatiga qarab tartibla.",motivation:"Motivatsiyam tushib ketdi. Amaliy maslahat ber."},
+      ru:{today:"Проанализируй мои цели и скажи, что мне лучше сделать сегодня.",routine:"Помоги улучшить мой распорядок дня.",tasks:"Распредели мои задачи по сложности и срокам.",motivation:"У меня снизилась мотивация. Дай практический совет."},
+      en:{today:"Review my goals and tell me what I should focus on today.",routine:"Help me improve my daily routine.",tasks:"Prioritize my tasks by difficulty and deadlines.",motivation:"My motivation is low. Give me practical advice."}
+    }[settings.language]||{
+      today:"Maqsadlarimni tahlil qilib, bugun nima qilishim kerakligini ayt.",
+      routine:"Kun tartibimni yaxshilashga yordam ber.",
+      tasks:"Vazifalarimni qiyinligi va muddatiga qarab tartibla.",
+      motivation:"Motivatsiyam tushib ketdi. Amaliy maslahat ber."
+    };
+    const messages=aiConversation.length?aiConversation:[{role:"assistant",content:welcome[settings.language]||welcome.uz}];
     const activeGoals=data.goals.filter(goal=>!goal.completed).length;
     const openTasks=data.tasks.filter(task=>!task.completed).length;
     return `
@@ -2403,11 +2418,12 @@
       <section class="ai-panel"><span class="eyebrow">SMARTGOAL INTELLIGENCE</span><h2>Har kuni yaxshiroq natija sari.</h2><p>AI maqsadlaringiz, vazifalaringiz va kun tartibingizni hisobga olib, amaliy maslahat beradi. Boshqa mavzularda ham bemalol so‘rashingiz mumkin.</p><div class="ai-context-pills"><span>${icon("target",14)} ${activeGoals} faol maqsad</span><span>${icon("list-checks",14)} ${openTasks} bajarilmagan vazifa</span><span>${icon("calendar-clock",14)} ${(data.dailyRoutine||[]).length} kun tartibi bandi</span></div></section>
       <section class="card ai-chat-card" style="margin-top:20px">
         <div class="card-header"><div><h3 class="card-title">AI bilan suhbat</h3><p class="card-description">AI siz yozgan tilda javob beradi.</p></div><button class="card-action" type="button" data-action="clear-ai-chat">Suhbatni tozalash</button></div>
-        <div class="ai-quick-prompts"><button type="button" data-ai-prompt="Maqsadlarimni tahlil qilib, bugun nima qilishim kerakligini ayt.">Bugungi rejam</button><button type="button" data-ai-prompt="Kun tartibimni yaxshilashga yordam ber.">Kun tartibim</button><button type="button" data-ai-prompt="Vazifalarimni qiyinligi va muddatiga qarab tartibla.">Vazifalarim</button><button type="button" data-ai-prompt="Motivatsiyam tushib ketdi. Amaliy maslahat ber.">Motivatsiya</button></div>
+        <div class="ai-quick-prompts"><button type="button" data-ai-prompt="${escapeHTML(quick.today)}">Bugungi rejam</button><button type="button" data-ai-prompt="${escapeHTML(quick.routine)}">Kun tartibim</button><button type="button" data-ai-prompt="${escapeHTML(quick.tasks)}">Vazifalarim</button><button type="button" data-ai-prompt="${escapeHTML(quick.motivation)}">Motivatsiya</button></div>
         <div class="ai-chat" id="ai-chat" aria-live="polite">${messages.map(item=>'<div class="ai-message '+(item.role==="user"?"user":"")+'">'+escapeHTML(item.content)+'</div>').join("")}</div>
         <form id="ai-form" class="ai-input-row" style="margin-top:18px"><input name="message" placeholder="Savolingizni yozing..." maxlength="500" required autocomplete="off"><button class="primary-button" type="submit" aria-label="Yuborish">${icon("send",16)}</button></form>
       </section>`;
   }
+
   async function sendAIMessage(form) {
     const input=form.elements.message,message=String(input.value||"").trim();if(!message)return;const chat=$("#ai-chat");if(!chat)return;
     aiConversation.push({role:"user",content:message});aiConversation=aiConversation.slice(-12);chat.insertAdjacentHTML("beforeend",'<div class="ai-message user">'+escapeHTML(message)+'</div><div class="ai-message" id="ai-typing">AI javob yozmoqda...</div>');
