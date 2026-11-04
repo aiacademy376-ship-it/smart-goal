@@ -6058,3 +6058,5 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 }
 
 .profile-decoration-score { display:block; margin:4px 0 8px; color:var(--text-muted); font-size:10px; }
+
+@media (min-width: 761px) { .stats-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); } }
