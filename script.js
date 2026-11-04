@@ -1735,29 +1735,20 @@
   }
 
   function renderDashboard() {
-    const completed = data.tasks.filter(task => task.completed).length;
+    const completed = data.tasks.filter(task => task.isRoutineEntry && task.completed).length;
     const activeGoals = data.goals.filter(goal => !goal.completed).length;
-    const todayTasks = data.tasks.filter(task => task.date === today());
+    const todayTasks = data.tasks.filter(task => task.isRoutineEntry && task.date === today());
     const completedToday = todayTasks.filter(task => task.completed).length;
+    const routineToday = getRoutineProgress(data.dailyRoutine || []);
     const rank = getRank();
     const coachTip = getDailyCoachTip();
 
-    const tasksHTML = todayTasks.length
-      ? todayTasks.slice(0, 5).map(task => `
-          <div class="task-item ${task.completed ? "task-completed" : ""}">
-            <input class="task-checkbox" type="checkbox"
-              data-action="toggle-task" data-id="${escapeHTML(task.id)}"
-              ${task.completed ? "checked" : ""} aria-label="Vazifani bajarildi deb belgilash">
-
-            <div class="task-info">
-              <strong>${escapeHTML(task.title)}</strong>
-              <small>${escapeHTML(formatDate(task.date))} · ${Number(task.estimatedMinutes||30)} daqiqa</small>
-            </div>
-
-            <span class="task-reward">${icon("zap", 12)} AI: 0–15 XP</span>
-          </div>
-        `).join("")
-      : emptyState("Buguncha vazifalar yo‘q", textForUser("emptyTasks"), "calendar-check");
+    const routineHTML = routineToday.items.length
+      ? routineToday.items.slice(0, 5).map(item => {
+          const label = item.status === "done" ? "Bajarildi" : item.status === "missed" ? "O‘tkazib yuborildi" : item.status === "no-time" ? "Vaqt yetmadi" : "Kutilmoqda";
+          return '<div class="dashboard-routine-row"><time>'+escapeHTML(item.time)+'</time><strong>'+escapeHTML(item.title)+'</strong><span class="routine-status-pill '+(item.status==="done"?"done":["missed","no-time"].includes(item.status)?"missed":"upcoming")+'">'+label+'</span></div>';
+        }).join("")
+      : emptyState("Kun tartibi hali tuzilmagan", "Birinchi kun tartibi bandingizni qo‘shing.", "calendar-check");
 
     const goalsHTML = data.goals.length
       ? data.goals.filter(goal => !goal.completed).slice(0, 4).map(goal => `
@@ -1783,7 +1774,7 @@
           <h2>${escapeHTML(textForUser("welcome"))}</h2>
           <p>${escapeHTML(textForUser("description"))}</p>
           <div class="welcome-actions">
-            ${actionButton("add-task", textForUser("addTask"), "plus")}
+            ${actionButton("add-routine", "Kun tartibiga band qo‘shish", "plus")}
             <button class="secondary-button" type="button" data-page="goals">
               ${icon("target", 15)} Maqsadlarim
             </button>
@@ -1859,12 +1850,12 @@
           <section class="card">
             <div class="card-header">
               <div>
-                <h3 class="card-title">Bugungi vazifalar</h3>
-                <p class="card-description">${completedToday}/${todayTasks.length} ta bajarildi</p>
+                <h3 class="card-title">Bugungi kun tartibim</h3>
+                <p class="card-description">${routineToday.completedPercent}% bajarildi · ${completedToday}/${todayTasks.length} ta band</p>
               </div>
-              <button class="card-action" type="button" data-action="add-task">+ Qo‘shish</button>
+              <button class="card-action" type="button" data-page="planner">Batafsil</button>
             </div>
-            ${tasksHTML}
+            <div class="dashboard-routine-list">${routineHTML}</div>
           </section>
         </div>
 
@@ -2111,7 +2102,6 @@
 
   function renderPlanner() {
     const activeGoals = data.goals.filter(goal => !goal.completed);
-    const pendingTasks = data.tasks.filter(task => !task.completed && !task.isRoutineEntry);
     const routine = [...(data.dailyRoutine || [])].sort((a,b) => String(a.time).localeCompare(String(b.time)));
     const routineProgress = getRoutineProgress(routine);
 
@@ -2158,14 +2148,7 @@
         </div>
       </section>
 
-      <section class="card" style="margin-top:20px">
-        <div class="card-header"><div><h3 class="card-title">Bugungi vazifalar</h3><p class="card-description">${escapeHTML(formatDate(today()))}</p></div>${actionButton("add-task","Vazifa qo‘shish")}</div>
-        ${pendingTasks.filter(task => task.date === today()).length
-          ? `<div class="task-list">${pendingTasks.filter(task => task.date === today()).map(task => `<div class="task-item"><input class="task-checkbox" type="checkbox" data-action="toggle-task" data-id="${escapeHTML(task.id)}"><div class="task-info"><strong>${escapeHTML(task.title)}</strong><small>${escapeHTML(task.description || formatDate(task.date))}</small></div><span class="task-reward">${icon("zap",12)} AI: 0–15 XP</span></div>`).join("")}</div>`
-          : emptyState("Bugungi vazifalar yo‘q","Yangi vazifa qo‘shib, kunlik rejangizni boshlang.","calendar-check")}
-      </section>
-
-      <section class="card" style="margin-top:20px">
+remove planner task block      <section class="card" style="margin-top:20px">
         <div class="card-header"><div><h3 class="card-title">Maqsadlar asosida tavsiyalar</h3><p class="card-description">AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.</p></div><button class="card-action" type="button" data-action="generate-ai-plan">AI reja tuzsin</button></div>
         <div id="ai-plan-output" class="card-description" style="white-space:pre-wrap;margin:12px 0"></div>
         ${activeGoals.length ? activeGoals.map(goal => `<div class="goal-item"><div class="goal-item-header"><div><strong>${escapeHTML(goal.title)}</strong><small>${escapeHTML(goal.description || "Maqsadga erishish uchun muntazam ishlang.")}</small></div><span class="goal-percentage">${getGoalProgress(goal).progress}%</span></div><p class="card-description">Tavsiya: ushbu maqsad uchun bugun kamida bitta kichik vazifa belgilang.</p></div>`).join("") : emptyState("Faol maqsad yo‘q","Avval maqsad yarating.","target")}
@@ -2725,7 +2708,7 @@
       const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message:prompts[settings.language]||prompts.uz,language:settings.language,history:[]})});
       const result=await response.json().catch(()=>({}));
       if(!response.ok||!result.success)throw new Error(result.message||"AI maslahat bera olmadi.");
-      output.textContent=result.answer;
+      output.innerHTML=formatAIMessage(result.answer);
     }catch(error){output.textContent=error.message||"AI bilan aloqa uzildi.";}
     finally{if(button)button.disabled=false;}
   }
