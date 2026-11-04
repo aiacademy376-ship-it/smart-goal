@@ -410,6 +410,7 @@ async function handleTaskCompletion(request,env,user){
   const body=await readJson(request),requestedTask=body.task||{},taskId=String(requestedTask.id||"").trim();
   const responseLanguage=["uz","ru","en"].includes(String(body.language))?String(body.language):"uz";
   const reasonLanguage={uz:"o‘zbek tilida",ru:"на русском языке",en:"in English"}[responseLanguage];
+  const duplicateReason={uz:"Bugun shu mazmundagi vazifa uchun XP avval berilgan.",ru:"За похожую задачу XP уже начислялись сегодня.",en:"XP has already been awarded today for a similar task."}[responseLanguage];
   if(!/^[A-Za-z0-9_-]{8,80}$/.test(taskId))return json({success:false,message:"Vazifa identifikatori noto‘g‘ri."},400);
 
   // XP can only be earned for a task already stored in this user's own account.
@@ -445,7 +446,7 @@ async function handleTaskCompletion(request,env,user){
   const normalizedTitle=normalizeTaskText(title);
   if(normalizedTitle && (sameDayRows.results||[]).some(row=>normalizeTaskText(row.reason)===normalizedTitle)){
     const balance=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();
-    return json({success:true,awarded:0,duplicateTask:true,xpBalance:Number(balance?.xp_balance||0),reason:"Bugun shu mazmundagi vazifa uchun XP avval berilgan."});
+    return json({success:true,awarded:0,duplicateTask:true,xpBalance:Number(balance?.xp_balance||0),reason:duplicateReason});
   }
   const rateKey=await clientKey(request,"xp-task:"+user.id);
   if(!await enforceRateLimit(env,rateKey,120,3600))return json({success:false,message:"Juda ko‘p vazifa ketma-ket bajarildi. Biroz kutib qayta urinib ko‘ring."},429);
