@@ -605,6 +605,8 @@
 
     data.notifications = data.notifications.slice(0, 60);
     saveData();
+    updateNotificationIndicators();
+    if (currentPage === "notifications") render();
   }
 
   function unreadCount() {
