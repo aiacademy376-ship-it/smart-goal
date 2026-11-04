@@ -16,7 +16,6 @@
     language: "uz",
     theme: "light",
     colorTheme: "violet",
-    difficulty: "auto",
     sound: false,
     reducedMotion: false,
     routineReminders: false,
@@ -435,8 +434,7 @@
   function loadSettings() {
     const saved = safeJSON(localStorage.getItem(SETTINGS_KEY), {});
     const loaded = { ...DEFAULT_SETTINGS, ...(saved || {}) };
-    if (loaded.difficulty === "adult") loaded.difficulty = "senior";
-    if (!["auto","junior","senior"].includes(loaded.difficulty)) loaded.difficulty = "auto";
+    delete loaded.difficulty;
     return loaded;
   }
 
@@ -568,38 +566,17 @@
     return age >= 0 && age <= 120 ? age : null;
   }
 
-  function getDifficulty() {
-    if (settings.difficulty !== "auto") return settings.difficulty === "adult" ? "senior" : settings.difficulty;
-
-    const age = data.profile.age;
-
-    if (age === null || age === undefined) return "senior";
-    if (age <= 11) return "junior";
-    return "senior";
-  }
-
   const UI_TEXT = {
-    junior: {
-      welcome: "Bugun nimaga erishamiz?",
-      description: "Kichik qadamlar katta natijalarga olib boradi.",
-      addTask: "Vazifa qo‘shish",
-      addGoal: "Maqsad qo‘shish",
-      emptyTasks: "Hali vazifalar yo‘q. Birinchi vazifangizni qo‘shing!",
-      emptyGoals: "Hali maqsad yo‘q. O‘z maqsadingizni belgilang!"
-    },
-    senior: {
-      welcome: "Bugungi rejalaringizga xush kelibsiz",
-      description: "Vaqtingizni samarali boshqaring va natijalarni kuzating.",
-      addTask: "Yangi vazifa",
-      addGoal: "Yangi maqsad",
-      emptyTasks: "Hozircha vazifalar mavjud emas.",
-      emptyGoals: "Hozircha maqsadlar mavjud emas."
-    },
+    welcome: "Bugungi rejalaringizga xush kelibsiz",
+    description: "Vaqtingizni samarali boshqaring va natijalarni kuzating.",
+    addTask: "Yangi vazifa",
+    addGoal: "Yangi maqsad",
+    emptyTasks: "Hozircha vazifalar mavjud emas.",
+    emptyGoals: "Hozircha maqsadlar mavjud emas."
   };
 
   function textForUser(key) {
-    const level = getDifficulty();
-    return UI_TEXT[level]?.[key] || UI_TEXT.senior[key] || "";
+    return UI_TEXT[key] || "";
   }
 
   /* -------------------- XP AND RANKS -------------------- */
@@ -1065,7 +1042,6 @@
       data.profile.age = age;
       data.profile.username = username;
       data.profile.email = email;
-      settings.difficulty = "auto";
       saveSettings();
       saveData();
       showApplication();
@@ -1133,10 +1109,10 @@
     localStorage.setItem(DATA_KEY, JSON.stringify(result.data));
     data = loadData();
     const remotePreferences = data.preferences || {};
-    ["language","theme","colorTheme","fontSize","sound","reducedMotion","routineReminders","difficulty"].forEach(key => {
+    ["language","theme","colorTheme","fontSize","sound","reducedMotion","routineReminders"].forEach(key => {
       if (Object.prototype.hasOwnProperty.call(remotePreferences,key) && remotePreferences[key] !== undefined) settings[key] = remotePreferences[key];
     });
-    if (settings.difficulty === "adult") settings.difficulty = "senior";
+    delete remotePreferences.difficulty;
     data.preferences = { ...remotePreferences, ...settings };
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     applySettings();
@@ -2910,9 +2886,6 @@ remove planner task block      <section class="card" style="margin-top:20px">
   /* -------------------- SETTINGS PAGE -------------------- */
 
   function renderSettings() {
-    const age = data.profile.age;
-    const difficulty = getDifficulty();
-
     return `
       ${pageHeader(
         "SHAXSIY MOSLAMALAR",
@@ -2924,19 +2897,18 @@ remove planner task block      <section class="card" style="margin-top:20px">
         <nav class="settings-nav" aria-label="Sozlamalar bo‘limlari">
           <button type="button" class="${currentSettingsTab === "general" ? "active" : ""}" data-settings-tab="general">${icon("sliders-horizontal")} Umumiy</button>
           <button type="button" class="${currentSettingsTab === "appearance" ? "active" : ""}" data-settings-tab="appearance">${icon("palette")} Ko‘rinish</button>
-          <button type="button" class="${currentSettingsTab === "difficulty" ? "active" : ""}" data-settings-tab="difficulty">${icon("brain")} Murakkablik</button>
           <button type="button" class="${currentSettingsTab === "sound" ? "active" : ""}" data-settings-tab="sound">${icon("volume-2")} Ovoz</button>
           <button type="button" class="${currentSettingsTab === "data" ? "active" : ""}" data-settings-tab="data">${icon("database")} Ma’lumotlar</button>
         </nav>
 
         <div class="settings-panel">
-          ${renderSettingsPanel(age, difficulty)}
+          ${renderSettingsPanel()}
         </div>
       </div>
     `;
   }
 
-  function renderSettingsPanel(age, difficulty) {
+  function renderSettingsPanel() {
     if (currentSettingsTab === "appearance") {
       return `
         <div class="settings-section">
@@ -2979,35 +2951,6 @@ remove planner task block      <section class="card" style="margin-top:20px">
               }).join("")}
             </div>
           </div>
-        </div>
-      `;
-    }
-
-    if (currentSettingsTab === "difficulty") {
-      return `
-        <div class="settings-section">
-          <h3>Interfeys murakkabligi</h3>
-          <p>Matnlar, tushuntirishlar va interfeysning murakkabligini o‘zingizga moslang.</p>
-
-          <div class="setting-row">
-            <div class="setting-info">
-              <strong>Avtomatik tanlash</strong>
-              <small>${age === null ? "Yosh aniqlanmagan" : `Tug‘ilgan sanangiz bo‘yicha yosh: ${age}`}</small>
-            </div>
-            <input type="radio" name="difficulty" value="auto" ${settings.difficulty === "auto" ? "checked" : ""}>
-          </div>
-
-          <div class="setting-row">
-            <div class="setting-info"><strong>Kichik yoshdagilar uchun</strong><small>Sodda matnlar va tushunarli interfeys.</small></div>
-            <input type="radio" name="difficulty" value="junior" ${settings.difficulty === "junior" ? "checked" : ""}>
-          </div>
-
-          <div class="setting-row">
-            <div class="setting-info"><strong>Yuqori sinf va o‘smirlar uchun</strong><small>Muvozanatli, batafsilroq interfeys.</small></div>
-            <input type="radio" name="difficulty" value="senior" ${settings.difficulty === "senior" ? "checked" : ""}>
-          </div>
-
-          <p style="margin-top:15px">Hozirgi tanlov: <strong>${escapeHTML(difficulty === "adult" ? "senior" : difficulty)}</strong></p>
         </div>
       `;
     }
@@ -3285,7 +3228,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "REJALARINGIZ":"ВАШИ ПЛАНЫ","Katta natijalarga kichik qadamlar orqali erishing.":"Достигайте больших результатов маленькими шагами.","Jami maqsadlar":"Всего целей","O‘rtacha progress":"Средний прогресс","Maqsad tavsifi kiritilmagan":"Описание цели не добавлено","Muddat belgilanmagan":"Срок не указан","Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating.":"Свяжите задачи с этой целью и отслеживайте прогресс.","Yana":"Осталось","kun":"дней","KUNLIK REJA":"ПЛАН НА ДЕНЬ","Vazifalaringizni tartibga soling va bajarilganlarini belgilang.":"Упорядочивайте задачи и отмечайте выполненные.","Vazifalar mavjud emas":"Задач пока нет","Yangi vazifa qo‘shib rejangizni boshlang.":"Добавьте первую задачу, чтобы начать планирование.","VAQTNI BOSHQARISH":"УПРАВЛЕНИЕ ВРЕМЕНЕМ","Kunlik rejangiz, odatlaringiz va maqsadlaringizni bir joyda boshqaring.":"Управляйте распорядком, привычками и целями в одном месте.","SIZNING SHAXSIY REJANGIZ":"ВАШ ЛИЧНЫЙ ПЛАН","Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.":"Назначьте время каждому делу. AI поможет составить план.","AI bilan kun tartibini tuzish":"Составить распорядок с AI","Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing.":"Укажите время пробуждения, учёбы/работы и привычки.","Bugungi vazifalar":"Задачи на сегодня","Maqsadlar asosida tavsiyalar":"Рекомендации по целям","AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.":"AI проанализирует ваши цели и задачи и составит практичный план.","NATIJALARINGIZ":"ВАШИ РЕЗУЛЬТАТЫ","Faolligingiz va rivojlanishingizni tahlil qiling.":"Анализируйте активность и прогресс.","Haftalik faollik":"Активность за неделю","Har kuni to‘plangan XP":"XP за каждый день","Maqsadlar sari bosib o‘tilgan yo‘l":"Путь к вашим целям","Har bir maqsad uchun bajarilgan ishlar va qolgan qadamlar.":"Выполненные задачи и оставшиеся шаги для каждой цели.","Yutuqlarim":"Мои достижения","Muhim kunlar, sertifikatlar va shaxsiy yutuqlaringizni saqlang.":"Сохраняйте важные дни, сертификаты и личные достижения.","SmartGoal yutuqlari":"Достижения SmartGoal","ta ochilgan":"открыто","Hali ochilmagan":"Пока не открыто","Xotiralar hali yo‘q":"Воспоминаний пока нет","Birinchi yutug‘ingiz yoki esdalik kuningizni saqlang.":"Сохраните первое достижение или памятный день.","MAXSUS IMKONIYATLAR":"ОСОБЫЕ ВОЗМОЖНОСТИ","XP bilan profilingiz va SmartGoal ko‘rinishini o‘zingizga moslang.":"Настройте профиль и SmartGoal за XP.","SIZNING BALANSINGIZ":"ВАШ БАЛАНС","Har bir haqiqiy yutuq sizga yangi imkoniyatlarni ochadi.":"Каждое настоящее достижение открывает новые возможности.","Barchasi":"Все","Mavzular":"Темы","Profil fonlari":"Фоны профиля","Belgilar":"Значки","Avatar ramkalari":"Рамки аватара","Do‘kondan birinchi mahsulotingizni xarid qiling.":"Купите первый предмет в магазине.","HAMJAMIYAT":"СООБЩЕСТВО","Username orqali boshqa foydalanuvchilarni toping.":"Находите других пользователей по имени пользователя.","Username bo‘yicha qidirish":"Поиск по имени пользователя","Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.":"Введите не менее 3 символов. Показываются пользователи, чьи имена начинаются с введённых символов.","Do‘stlik so‘rovlari":"Запросы в друзья","Yangilash":"Обновить","Kelgan so‘rovlar":"Входящие запросы","Yuborilgan so‘rovlar":"Отправленные запросы","Do‘stlaringiz":"Ваши друзья","Qidiruvga tayyor":"Готово к поиску","Username kiriting.":"Введите имя пользователя.","Foydalanuvchi topilmadi":"Пользователь не найден","SHAXSIY YORDAMCHI":"ЛИЧНЫЙ ПОМОЩНИК","Har kuni yaxshiroq natija sari.":"К лучшим результатам каждый день.","Savollaringizga javob, maqsadlaringizga esa aniq reja va foydali maslahatlar.":"Ответы на вопросы, чёткие планы и полезные советы для ваших целей.","AI siz yozgan tilda javob beradi.":"AI отвечает на языке вашего сообщения.","Suhbatni tozalash":"Очистить чат","Bugungi rejam":"Мой план на сегодня","Motivatsiya":"Мотивация","Umumiy sozlamalar":"Общие настройки","SmartGoal’ni o‘zingizga moslang.":"Настройте SmartGoal под себя.","Interfeys ko‘rinishi":"Внешний вид интерфейса","O‘zingizga qulay rang va mavzuni tanlang.":"Выберите удобные цвета и тему.","Rang mavzusi":"Цветовая тема","Ba’zi ranglar do‘kondan ochko evaziga olinadi.":"Некоторые цвета доступны за XP в магазине.","Interfeys murakkabligi":"Сложность интерфейса","Matnlar, tushuntirishlar va interfeysning murakkabligini o‘zingizga moslang.":"Настройте сложность текста, объяснений и интерфейса.","Avtomatik tanlash":"Автоматический выбор","Kichik yoshdagilar uchun":"Для младшего возраста","Yuqori sinf va o‘smirlar uchun":"Для старших школьников и подростков","Profilni muvaffaqiyatli yangilandi.":"Профиль успешно обновлён.","Tug‘ilgan sana yangilandi.":"Дата рождения обновлена.","Maqsad saqlandi.":"Цель сохранена.","Vazifa saqlandi.":"Задача сохранена.","Kun tartibi saqlandi.":"Распорядок сохранён.","Yutuq qo‘shish":"Добавить достижение","Qisqa mazmuni":"Краткое содержание","Qaysi kuni bajariladi?":"На какой день запланировано?","Savolingizni yozing...":"Напишите свой вопрос...","Savolingizni yozing":"Напишите свой вопрос"
   });
   Object.assign(UI_TRANSLATIONS.en, {
-    "REJALARINGIZ":"YOUR PLANS","Katta natijalarga kichik qadamlar orqali erishing.":"Reach big results through small steps.","Jami maqsadlar":"Total goals","O‘rtacha progress":"Average progress","Maqsad tavsifi kiritilmagan":"No goal description added","Muddat belgilanmagan":"No deadline set","Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating.":"Link tasks to this goal to track progress.","Yana":"Remaining","kun":"days","KUNLIK REJA":"DAILY PLAN","Vazifalaringizni tartibga soling va bajarilganlarini belgilang.":"Organize your tasks and mark completed ones.","Vazifalar mavjud emas":"No tasks yet","Yangi vazifa qo‘shib rejangizni boshlang.":"Add a task to start planning.","VAQTNI BOSHQARISH":"TIME MANAGEMENT","Kunlik rejangiz, odatlaringiz va maqsadlaringizni bir joyda boshqaring.":"Manage your daily routine, habits and goals in one place.","SIZNING SHAXSIY REJANGIZ":"YOUR PERSONAL ROUTINE","Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.":"Set a time for each activity. AI can help build your schedule.","AI bilan kun tartibini tuzish":"Build a routine with AI","Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing.":"Enter your wake-up time, school/work schedule and habits.","Bugungi vazifalar":"Today's tasks","Maqsadlar asosida tavsiyalar":"Goal-based suggestions","AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.":"AI analyzes your goals and tasks to create a practical plan.","NATIJALARINGIZ":"YOUR RESULTS","Faolligingiz va rivojlanishingizni tahlil qiling.":"Analyze your activity and progress.","Haftalik faollik":"Weekly activity","Har kuni to‘plangan XP":"XP earned each day","Maqsadlar sari bosib o‘tilgan yo‘l":"Progress toward your goals","Har bir maqsad uchun bajarilgan ishlar va qolgan qadamlar.":"Completed work and remaining steps for each goal.","Muhim kunlar, sertifikatlar va shaxsiy yutuqlaringizni saqlang.":"Save important days, certificates and personal achievements.","SmartGoal yutuqlari":"SmartGoal achievements","ta ochilgan":"unlocked","Hali ochilmagan":"Not unlocked yet","Xotiralar hali yo‘q":"No memories yet","Birinchi yutug‘ingiz yoki esdalik kuningizni saqlang.":"Save your first achievement or memorable day.","MAXSUS IMKONIYATLAR":"SPECIAL FEATURES","XP bilan profilingiz va SmartGoal ko‘rinishini o‘zingizga moslang.":"Customize your profile and SmartGoal with XP.","SIZNING BALANSINGIZ":"YOUR BALANCE","Har bir haqiqiy yutuq sizga yangi imkoniyatlarni ochadi.":"Every real achievement unlocks new possibilities.","Barchasi":"All","Mavzular":"Themes","Profil fonlari":"Profile backgrounds","Belgilar":"Badges","Avatar ramkalari":"Avatar frames","Do‘kondan birinchi mahsulotingizni xarid qiling.":"Purchase your first item from the shop.","HAMJAMIYAT":"COMMUNITY","Username orqali boshqa foydalanuvchilarni toping.":"Find other users by username.","Username bo‘yicha qidirish":"Search by username","Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.":"Enter at least 3 characters. Users whose usernames start with your search will appear.","Do‘stlik so‘rovlari":"Friend requests","Yangilash":"Refresh","Kelgan so‘rovlar":"Incoming requests","Yuborilgan so‘rovlar":"Sent requests","Do‘stlaringiz":"Your friends","Qidiruvga tayyor":"Ready to search","Username kiriting.":"Enter a username.","Foydalanuvchi topilmadi":"User not found","SHAXSIY YORDAMCHI":"PERSONAL ASSISTANT","Har kuni yaxshiroq natija sari.":"Toward better results every day.","Savollaringizga javob, maqsadlaringizga esa aniq reja va foydali maslahatlar.":"Answers to your questions, clear plans and useful advice for your goals.","AI siz yozgan tilda javob beradi.":"AI replies in the language you write in.","Suhbatni tozalash":"Clear chat","Bugungi rejam":"My plan for today","Motivatsiya":"Motivation","Umumiy sozlamalar":"General settings","SmartGoal’ni o‘zingizga moslang.":"Make SmartGoal yours.","Interfeys ko‘rinishi":"Interface appearance","O‘zingizga qulay rang va mavzuni tanlang.":"Choose colors and a theme that work for you.","Rang mavzusi":"Color theme","Ba’zi ranglar do‘kondan ochko evaziga olinadi.":"Some colors can be unlocked with XP in the shop.","Interfeys murakkabligi":"Interface complexity","Matnlar, tushuntirishlar va interfeysning murakkabligini o‘zingizga moslang.":"Adjust text, explanations and interface complexity.","Avtomatik tanlash":"Automatic selection","Kichik yoshdagilar uchun":"For younger users","Yuqori sinf va o‘smirlar uchun":"For older students and teens","Tug‘ilgan sana yangilandi.":"Birthday updated.","Maqsad saqlandi.":"Goal saved.","Vazifa saqlandi.":"Task saved.","Kun tartibi saqlandi.":"Daily routine saved.","Qisqa mazmuni":"Short summary","Qaysi kuni bajariladi?":"Which day should it be done?","Savolingizni yozing...":"Type your question..."
+    "REJALARINGIZ":"YOUR PLANS","Katta natijalarga kichik qadamlar orqali erishing.":"Reach big results through small steps.","Jami maqsadlar":"Total goals","O‘rtacha progress":"Average progress","Maqsad tavsifi kiritilmagan":"No goal description added","Muddat belgilanmagan":"No deadline set","Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating.":"Link tasks to this goal to track progress.","Yana":"Remaining","kun":"days","KUNLIK REJA":"DAILY PLAN","Vazifalaringizni tartibga soling va bajarilganlarini belgilang.":"Organize your tasks and mark completed ones.","Vazifalar mavjud emas":"No tasks yet","Yangi vazifa qo‘shib rejangizni boshlang.":"Add a task to start planning.","VAQTNI BOSHQARISH":"TIME MANAGEMENT","Kunlik rejangiz, odatlaringiz va maqsadlaringizni bir joyda boshqaring.":"Manage your daily routine, habits and goals in one place.","SIZNING SHAXSIY REJANGIZ":"YOUR PERSONAL ROUTINE","Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.":"Set a time for each activity. AI can help build your schedule.","AI bilan kun tartibini tuzish":"Build a routine with AI","Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing.":"Enter your wake-up time, school/work schedule and habits.","Bugungi vazifalar":"Today's tasks","Maqsadlar asosida tavsiyalar":"Goal-based suggestions","AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.":"AI analyzes your goals and tasks to create a practical plan.","NATIJALARINGIZ":"YOUR RESULTS","Faolligingiz va rivojlanishingizni tahlil qiling.":"Analyze your activity and progress.","Haftalik faollik":"Weekly activity","Har kuni to‘plangan XP":"XP earned each day","Maqsadlar sari bosib o‘tilgan yo‘l":"Progress toward your goals","Har bir maqsad uchun bajarilgan ishlar va qolgan qadamlar.":"Completed work and remaining steps for each goal.","Muhim kunlar, sertifikatlar va shaxsiy yutuqlaringizni saqlang.":"Save important days, certificates and personal achievements.","SmartGoal yutuqlari":"SmartGoal achievements","ta ochilgan":"unlocked","Hali ochilmagan":"Not unlocked yet","Xotiralar hali yo‘q":"No memories yet","Birinchi yutug‘ingiz yoki esdalik kuningizni saqlang.":"Save your first achievement or memorable day.","MAXSUS IMKONIYATLAR":"SPECIAL FEATURES","XP bilan profilingiz va SmartGoal ko‘rinishini o‘zingizga moslang.":"Customize your profile and SmartGoal with XP.","SIZNING BALANSINGIZ":"YOUR BALANCE","Har bir haqiqiy yutuq sizga yangi imkoniyatlarni ochadi.":"Every real achievement unlocks new possibilities.","Barchasi":"All","Mavzular":"Themes","Profil fonlari":"Profile backgrounds","Belgilar":"Badges","Avatar ramkalari":"Avatar frames","Do‘kondan birinchi mahsulotingizni xarid qiling.":"Purchase your first item from the shop.","HAMJAMIYAT":"COMMUNITY","Username orqali boshqa foydalanuvchilarni toping.":"Find other users by username.","Username bo‘yicha qidirish":"Search by username","Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.":"Enter at least 3 characters. Users whose usernames start with your search will appear.","Do‘stlik so‘rovlari":"Friend requests","Yangilash":"Refresh","Kelgan so‘rovlar":"Incoming requests","Yuborilgan so‘rovlar":"Sent requests","Do‘stlaringiz":"Your friends","Qidiruvga tayyor":"Ready to search","Username kiriting.":"Enter a username.","Foydalanuvchi topilmadi":"User not found","SHAXSIY YORDAMCHI":"PERSONAL ASSISTANT","Har kuni yaxshiroq natija sari.":"Toward better results every day.","Savollaringizga javob, maqsadlaringizga esa aniq reja va foydali maslahatlar.":"Answers to your questions, clear plans and useful advice for your goals.","AI siz yozgan tilda javob beradi.":"AI replies in the language you write in.","Suhbatni tozalash":"Clear chat","Bugungi rejam":"My plan for today","Motivatsiya":"Motivation","Umumiy sozlamalar":"General settings","SmartGoal’ni o‘zingizga moslang.":"Make SmartGoal yours.","Interfeys ko‘rinishi":"Interface appearance","O‘zingizga qulay rang va mavzuni tanlang.":"Choose colors and a theme that work for you.","Rang mavzusi":"Color theme","Ba’zi ranglar do‘kondan ochko evaziga olinadi.":"Some colors can be unlocked with XP in the shop.","Matnlar, tushuntirishlar va interfeysning murakkabligini o‘zingizga moslang.":"Adjust text, explanations and interface complexity.","Tug‘ilgan sana yangilandi.":"Birthday updated.","Maqsad saqlandi.":"Goal saved.","Vazifa saqlandi.":"Task saved.","Kun tartibi saqlandi.":"Daily routine saved.","Qisqa mazmuni":"Short summary","Qaysi kuni bajariladi?":"Which day should it be done?","Savolingizni yozing...":"Type your question..."
   });
 
   Object.assign(UI_TRANSLATIONS.ru, {
@@ -3791,13 +3734,6 @@ remove planner task block      <section class="card" style="margin-top:20px">
       return;
     }
 
-    if (target.matches("input[name='difficulty']")) {
-      settings.difficulty = target.value === "adult" ? "senior" : target.value;
-      saveSettings();
-      render();
-      showToast("Interfeys murakkabligi yangilandi.");
-      return;
-    }
   }
 
   function handleSubmit(event) {
