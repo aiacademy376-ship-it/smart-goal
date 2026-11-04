@@ -1674,6 +1674,7 @@
     const todayTasks = data.tasks.filter(task => task.date === today());
     const completedToday = todayTasks.filter(task => task.completed).length;
     const rank = getRank();
+    const coachTip = getDailyCoachTip();
 
     const tasksHTML = todayTasks.length
       ? todayTasks.slice(0, 5).map(task => `
@@ -1765,7 +1766,7 @@
 
       <section class="card daily-coach-card">
         <div class="daily-coach-icon">${icon("sparkles",22)}</div>
-        <div><span class="eyebrow">SMARTGOAL MASLAHATI</span><h3>${escapeHTML(getDailyCoachTip().title)}</h3><p>${escapeHTML(getDailyCoachTip().text)}</p></div>
+        <div><span class="eyebrow">SMARTGOAL MASLAHATI</span><h3>${escapeHTML(coachTip.title)}</h3><p>${escapeHTML(coachTip.text)}</p></div>
         <div class="daily-coach-actions"><button class="secondary-button" type="button" data-action="generate-daily-advice">${icon("sparkles",14)} AI’dan shaxsiy maslahat</button><button class="card-action" type="button" data-page="ai">AI bilan suhbat ${icon("arrow-right",14)}</button></div>
       </section>
       <section class="card daily-ai-advice-output hidden" id="daily-ai-advice-card" aria-live="polite"><div class="card-header"><h3 class="card-title">AI tavsiyasi</h3><button class="card-action" type="button" data-action="close-daily-advice">Yopish</button></div><div id="daily-ai-advice-output" class="card-description"></div></section>
