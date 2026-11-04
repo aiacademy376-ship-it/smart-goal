@@ -752,7 +752,7 @@
       if (!element) return;
 
       element.innerHTML = avatar
-        ? `<img src="${escapeHTML(avatar)}" alt="Profil rasmi">`
+        ? `<img src="${escapeHTML(avatar)}" alt="Profil rasmi" loading="lazy" decoding="async">`
         : icon("user-round");
     });
   }
@@ -2081,7 +2081,7 @@
             <div class="achievement-icon">${icon(memory.type === "certificate" ? "file-badge" : "bookmark", 20)}</div>
             <div>
               <strong>${escapeHTML(memory.title)}</strong>
-              ${memory.image ? `<img class="memory-image" src="${escapeHTML(memory.image)}" alt="${escapeHTML(memory.title)}">` : ""}
+              ${memory.image ? `<img class="memory-image" src="${escapeHTML(memory.image)}" alt="${escapeHTML(memory.title)}" loading="lazy" decoding="async">` : ""}
               <p>${escapeHTML(memory.description || "")}</p>
               <small>${escapeHTML(formatDate(memory.date))}</small>
             </div>
@@ -2323,7 +2323,7 @@
         <div class="profile-avatar-wrap">
           <span class="avatar avatar-frame-${escapeHTML(profile.avatarFrame || "default")}">
             ${profile.avatar
-              ? `<img src="${escapeHTML(profile.avatar)}" alt="Profil rasmi">`
+              ? `<img src="${escapeHTML(profile.avatar)}" alt="Profil rasmi" loading="lazy" decoding="async">`
               : icon("user-round", 42)}
           </span>
           <button class="profile-edit-avatar" type="button" data-action="edit-profile" aria-label="Profilni tahrirlash">
@@ -3186,7 +3186,7 @@
       if (!response.ok || !result.success || !result.profile) throw new Error(result.message || "Profilni yuklab bo‘lmadi.");
       const p = result.profile, rank = getRank(Number(p.xp || 0));
       const covers = {default:"linear-gradient(120deg,#5145cf,#9282f6)",midnight:"linear-gradient(120deg,#101827,#283958)",galaxy:"radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",royal:"linear-gradient(120deg,#7c4a20,#d3a24b)",sakura:"linear-gradient(120deg,#e7a5bd,#8b6bba)",nebula:"radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)"};
-      const avatar = p.avatar ? '<img src="'+escapeHTML(p.avatar)+'" alt="Profil rasmi">' : icon("user-round",40);
+      const avatar = p.avatar ? '<img src="'+escapeHTML(p.avatar)+'" alt="Profil rasmi" loading="lazy" decoding="async">' : icon("user-round",40);
       const avatarFrame = ["premium","gold"].includes(p.avatarFrame) ? " avatar-frame-"+p.avatarFrame : "";
       const badge = p.activeBadge ? '<span class="profile-active-badge">'+icon("award",13)+' '+escapeHTML(p.activeBadge)+'</span>' : "";
       const birthday = p.birthdate ? '<div class="profile-public-stat">'+icon("cake")+" "+escapeHTML(formatDate(p.birthdate))+'</div>' : "";
