@@ -464,12 +464,14 @@
   }
 
   function saveSettings() {
+    data.preferences = { ...(data.preferences || {}), ...settings };
     try {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     } catch (error) {
       console.error("Settings storage error:", error);
     }
     applySettings();
+    saveData();
   }
 
   /* -------------------- AGE AND DIFFICULTY -------------------- */
@@ -1025,6 +1027,12 @@
     if (!result.success || !result.data) throw new Error("Serverdan kelgan ma’lumot noto‘g‘ri.");
     localStorage.setItem(DATA_KEY, JSON.stringify(result.data));
     data = loadData();
+    const remotePreferences = data.preferences || {};
+    ["language","theme","colorTheme","fontSize","sound","reducedMotion","routineReminders","difficulty"].forEach(key => {
+      if (Object.prototype.hasOwnProperty.call(remotePreferences,key) && remotePreferences[key] !== undefined) settings[key] = remotePreferences[key];
+    });
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    applySettings();
     if (data.profile.birthdate) data.profile.age = calculateAge(data.profile.birthdate);
   }
 
