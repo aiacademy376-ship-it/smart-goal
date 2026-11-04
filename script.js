@@ -1763,11 +1763,11 @@
                 <small>${escapeHTML(goal.description || "Maqsad tavsifi kiritilmagan")}</small>
                 <small>${goal.deadline ? `Muddat: ${escapeHTML(formatDate(goal.deadline))}` : "Muddat belgilanmagan"}</small>
               </div>
-              <span class="goal-percentage">${goal.progress || 0}%</span>
+              <span class="goal-percentage">${getGoalProgress(goal).progress}%</span>
             </div>
 
             <div class="progress-track">
-              <div class="progress-fill" style="width:${Math.min(100, goal.progress || 0)}%"></div>
+              <div class="progress-fill" style="width:${getGoalProgress(goal).progress}%"></div>
             </div>
 
             <div class="goal-progress-detail"><span>${getGoalProgress(goal).total ? `${getGoalProgress(goal).completed}/${getGoalProgress(goal).total} vazifa bajarildi · yana ${getGoalProgress(goal).remaining} ta qoldi` : "Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating."}</span><span>${getGoalProgress(goal).daysLeft===null ? "Muddat yo‘q" : getGoalProgress(goal).daysLeft<0 ? "Muddat o‘tgan" : getGoalProgress(goal).daysLeft===0 ? "Bugun oxirgi kun" : `Yana ${getGoalProgress(goal).daysLeft} kun`}</span></div>
@@ -1879,7 +1879,7 @@
       <section class="card" style="margin-top:20px">
         <div class="card-header"><div><h3 class="card-title">Maqsadlar asosida tavsiyalar</h3><p class="card-description">AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.</p></div><button class="card-action" type="button" data-action="generate-ai-plan">AI reja tuzsin</button></div>
         <div id="ai-plan-output" class="card-description" style="white-space:pre-wrap;margin:12px 0"></div>
-        ${activeGoals.length ? activeGoals.map(goal => `<div class="goal-item"><div class="goal-item-header"><div><strong>${escapeHTML(goal.title)}</strong><small>${escapeHTML(goal.description || "Maqsadga erishish uchun muntazam ishlang.")}</small></div><span class="goal-percentage">${goal.progress || 0}%</span></div><p class="card-description">Tavsiya: ushbu maqsad uchun bugun kamida bitta kichik vazifa belgilang.</p></div>`).join("") : emptyState("Faol maqsad yo‘q","Avval maqsad yarating.","target")}
+        ${activeGoals.length ? activeGoals.map(goal => `<div class="goal-item"><div class="goal-item-header"><div><strong>${escapeHTML(goal.title)}</strong><small>${escapeHTML(goal.description || "Maqsadga erishish uchun muntazam ishlang.")}</small></div><span class="goal-percentage">${getGoalProgress(goal).progress}%</span></div><p class="card-description">Tavsiya: ushbu maqsad uchun bugun kamida bitta kichik vazifa belgilang.</p></div>`).join("") : emptyState("Faol maqsad yo‘q","Avval maqsad yarating.","target")}
       </section>
     `;
   }
@@ -1996,6 +1996,12 @@
           </div>
         </div>
         ${chartMarkup()}
+      </section>
+
+      <section class="card" style="margin-top:20px">
+        <h3 class="card-title">Maqsadlar sari bosib o‘tilgan yo‘l</h3>
+        <p class="card-description">Har bir maqsad uchun bajarilgan ishlar va qolgan qadamlar.</p>
+        ${data.goals.length ? data.goals.map(goal => { const progress=getGoalProgress(goal); return `<div class="goal-progress-analytics"><div class="goal-item-header"><strong>${escapeHTML(goal.title)}</strong><span class="goal-percentage">${progress.progress}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${progress.progress}%"></div></div><div class="goal-progress-detail"><span>${progress.completed} / ${progress.total} vazifa bajarildi</span><span>${progress.remaining} ta qoldi</span></div></div>`; }).join("") : emptyState("Hali maqsad yo‘q","Maqsad yarating va unga tegishli vazifalarni belgilang.","target")}
       </section>
 
       <section class="card" style="margin-top:20px">
