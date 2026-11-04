@@ -1528,6 +1528,25 @@
     return result;
   }
 
+  function getActivityStreak() {
+    const activeDays=new Set();
+    for(const item of (data.activity||[]))if(/^\\d{4}-\\d{2}-\\d{2}$/.test(String(item.date||"")))activeDays.add(String(item.date));
+    for(const task of (data.tasks||[])){
+      if(!task.completed||!task.completedAt)continue;
+      const date=new Date(task.completedAt);
+      if(Number.isNaN(date.getTime()))continue;
+      const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date);
+      activeDays.add(parts.filter(part=>part.type!=="literal").map(part=>part.value).join("-"));
+    }
+    const todayParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+    let cursor=todayParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-");
+    const shiftDay=key=>{const date=new Date(key+"T12:00:00Z");date.setUTCDate(date.getUTCDate()-1);return date.toISOString().slice(0,10);};
+    if(!activeDays.has(cursor))cursor=shiftDay(cursor);
+    let streak=0;
+    while(streak<366&&activeDays.has(cursor)){streak++;cursor=shiftDay(cursor);}
+    return streak;
+  }
+
   function chartMarkup() {
     const days = getLastSevenDays();
     const max = Math.max(50, ...days.map(day => day.xp));
@@ -1761,6 +1780,12 @@
           <p class="stat-label">Yutuqlar</p>
           <div class="stat-value">${formatNumber(data.achievements.length)}</div>
           <span class="stat-change">Qo‘lga kiritilgan</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top"><span class="stat-icon purple">${icon("flame")}</span></div>
+          <p class="stat-label">Faollik zanjiri</p>
+          <div class="stat-value">${formatNumber(getActivityStreak())}</div>
+          <span class="stat-change">Ketma-ket faol kun</span>
         </div>
       </div>
 
@@ -2148,6 +2173,11 @@
         <div class="stat-card">
           <p class="stat-label">Bajarilish foizi</p>
           <div class="stat-value">${completion}%</div>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Faollik zanjiri</p>
+          <div class="stat-value">${formatNumber(getActivityStreak())} kun</div>
+          <span class="stat-change">Ketma-ket faol kun</span>
         </div>
       </div>
 
