@@ -808,47 +808,26 @@
     const username = normalizedUsername(formData.get("username"));
     const bio = String(formData.get("bio") || "").trim();
     const file = formData.get("avatar");
-
-    if (name.length < 2) {
-      showToast("Ism va familiyani to‘g‘ri kiriting.", "error");
-      return;
+    if (name.length < 2) { showToast("Ism va familiyani to‘g‘ri kiriting.", "error"); return; }
+    if (!isValidUsername(username)) { showToast("Username formati noto‘g‘ri.", "error"); return; }
+    let avatar = data.profile.avatar || "";
+    if (file instanceof File && file.size > 0) {
+      if (!file.type.startsWith("image/") || file.size > 2 * 1024 * 1024) { showToast("Rasm 2 MB dan kichik bo‘lishi kerak.", "error"); return; }
+      try { avatar = await resizeImage(file); } catch { showToast("Rasmni yuklashda xatolik yuz berdi.", "error"); return; }
     }
-
-    if (!isValidUsername(username)) {
-      showToast("Username formati noto‘g‘ri.", "error");
-      return;
+    if (remoteAuthenticated) {
+      try {
+        const response = await fetch("/api/profile", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,username})});
+        const result = await response.json().catch(()=>({}));
+        if (!response.ok || !result.success) throw new Error(result.message || "Profil serverda saqlanmadi.");
+      } catch (error) { showToast(error.message || "Profilni saqlashda xatolik.", "error"); return; }
     }
-
-    // Real uniqueness checking will be connected to the backend.
-    // Local demo can only check the current account.
-    if (username !== data.profile.username && username === "admin") {
-      showToast("Bu username band.", "error");
-      return;
-    }
-
     data.profile.name = name;
     data.profile.username = username;
     data.profile.bio = bio;
+    data.profile.avatar = avatar;
     data.profile.birthdatePublic = formData.get("birthdatePublic") === "on";
-
-    if (file instanceof File && file.size > 0) {
-      if (!file.type.startsWith("image/") || file.size > 2 * 1024 * 1024) {
-        showToast("Rasm 2 MB dan kichik bo‘lishi kerak.", "error");
-        return;
-      }
-
-      try {
-        data.profile.avatar = await resizeImage(file);
-      } catch {
-        showToast("Rasmni yuklashda xatolik yuz berdi.", "error");
-        return;
-      }
-    }
-
-    saveData();
-    updateProfileDisplay();
-    closeModal();
-    render();
+    saveData(); updateProfileDisplay(); closeModal(); render();
     showToast("Profil muvaffaqiyatli yangilandi.");
   }
 
