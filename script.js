@@ -1026,6 +1026,7 @@
       }
       showApplication();
       checkAchievements();
+      openRequestedProfile();
       showToast("Xush kelibsiz!");
     } catch (error) {
       remoteAuthenticated = false;
@@ -2949,7 +2950,7 @@
         break;
       case "share-profile":
         if (navigator.clipboard?.writeText) {
-          navigator.clipboard.writeText(`${location.origin}/@${data.profile.username || ""}`)
+          navigator.clipboard.writeText(`${location.origin}/?profile=${encodeURIComponent(data.profile.username || "")}`)
             .then(() => showToast("Profil havolasi nusxalandi."))
             .catch(() => showToast("Havolani nusxalab bo‘lmadi.", "error"));
         } else {
@@ -3154,6 +3155,14 @@
   let communitySearchSequence = 0;
   let communitySearchTimer = null;
 
+  function openRequestedProfile() {
+    const params=new URLSearchParams(window.location.search);
+    const username=params.get("profile");
+    if(!username) return;
+    window.history.replaceState({},document.title,window.location.pathname);
+    setTimeout(()=>openPublicProfile(username),0);
+  }
+
   async function openPublicProfile(username) {
     if (!username) return;
     openModal("Foydalanuvchi profili", '<div class="profile-loading">Profil yuklanmoqda...</div>', '<button class="secondary-button" type="button" data-action="close-modal">Yopish</button>');
@@ -3340,6 +3349,7 @@
       }
       showApplication();
       checkAchievements();
+      openRequestedProfile();
     } catch {
       remoteAuthenticated = false;
       showAuthentication();
