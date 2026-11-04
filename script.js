@@ -3176,7 +3176,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
   }
 
   function clearSelectedData() {
-    const selected = new Set($("#modal-body [data-delete-scope]:checked").map(input => input.value));
+    const selected = new Set(Array.from(document.querySelectorAll("#modal-body [data-delete-scope]:checked"), input => input.value));
     const clearAll = selected.has("all");
     if (!selected.size) { showToast("Avval o‘chiriladigan bo‘limni tanlang.", "error"); return; }
     const scopes = clearAll
