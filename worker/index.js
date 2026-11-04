@@ -325,7 +325,10 @@ async function handleData(request, env, user) {
       const date=String(task.date||"");
       const changed=Boolean(previous)&&(title!==String(previous.title||"")||description!==String(previous.description||"")||date!==String(previous.date||"")||String(task.priority||"medium")!==String(previous.priority||"medium")||Number(task.estimatedMinutes||30)!==Number(previous.estimatedMinutes||30)||String(task.goalId||"")!==String(previous.goalId||""));
       let completed=Boolean(task.completed),completedAt=null;
-      const createdAt=previous?String(previous.createdAt||now):now;
+      const routineItem=task.isRoutineEntry&&Array.isArray(body.data.dailyRoutine)?body.data.dailyRoutine.find(item=>item&&String(item.id||"")===String(task.routineId||"")):null;
+      const routineTime=String(routineItem?.time||"");
+      const routineStart=routineItem&&/^([01]\\d|2[0-3]):[0-5]\\d$/.test(routineTime)&&/^\\d{4}-\\d{2}-\\d{2}$/.test(date)?date+"T"+routineTime+":00+05:00":"";
+      const createdAt=previous?String(previous.createdAt||now):routineStart||now;
       if(!previous){completedAt=completed?now:null;}
       else if(changed && Number(previous.xpEarned||0)===0){completed=false;completedAt=null;}
       else if(completed){completedAt=previous.completed===true&&previous.completedAt?previous.completedAt:now;}
