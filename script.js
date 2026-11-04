@@ -3409,7 +3409,9 @@
       const birthday = p.birthdate ? '<div class="profile-public-stat">'+icon("cake")+" "+escapeHTML(formatDate(p.birthdate))+'</div>' : "";
       const isSelf=p.username===data.profile.username;
       const isFriend=(communityRelations.friends||[]).some(friend=>friend.id===p.id);
-      const friendAction=isSelf?"":isFriend?'<span class="profile-active-badge">'+icon("users",13)+' Do‘stingiz</span>':'<button class="primary-button" type="button" data-action="send-friend-request" data-user-id="'+escapeHTML(p.id)+'">'+icon("user-plus",15)+' Do‘stlik so‘rovi yuborish</button>';
+      const outgoingRequest=(communityRelations.outgoing||[]).find(request=>request.userId===p.id);
+      const incomingRequest=(communityRelations.incoming||[]).find(request=>request.userId===p.id);
+      const friendAction=isSelf?"":isFriend?'<span class="profile-active-badge">'+icon("users",13)+' Do‘stingiz</span>':outgoingRequest?'<span class="profile-active-badge">So‘rov yuborilgan</span>':incomingRequest?'<button class="primary-button" type="button" data-action="respond-friend" data-request-id="'+escapeHTML(incomingRequest.id)+'" data-decision="accept">So‘rovni qabul qilish</button>':'<button class="primary-button" type="button" data-action="send-friend-request" data-user-id="'+escapeHTML(p.id)+'">'+icon("user-plus",15)+' Do‘stlik so‘rovi yuborish</button>';
       const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar'+avatarFrame+'">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p>'+badge+'<p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP balansi</small></div><div><strong>'+formatNumber(p.totalEarnedXP||p.xp)+'</strong><small>Jami olgan XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div><div><strong>'+formatNumber(p.completedTasks)+'</strong><small>Vazifa</small></div><div><strong>'+formatNumber(p.goals)+'</strong><small>Maqsad</small></div></div>'+birthday+'<p class="card-description">Profil bezagi: '+formatNumber(p.customizationScore||0)+' / 3 · SmartGoal’da '+formatNumber(p.achievements)+' ta yutuq</p>'+friendAction+'</div>';
       const body = $("#modal-body"); if (body) body.innerHTML = html;
       refreshIcons();
@@ -3527,6 +3529,8 @@
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success) throw new Error(result.message || "So‘rov yuborilmadi.");
       showToast(result.message || "Do‘stlik so‘rovi yuborildi.");
+      const profileButton = document.querySelector("#modal-body [data-action='send-friend-request']");
+      if (profileButton && profileButton.dataset.userId === userId) { profileButton.disabled=true; profileButton.textContent="So‘rov yuborildi"; }
       await loadCommunityRelations();
       const input = $("#community-search");
       if (input?.value) searchCommunityUsers(input.value);
