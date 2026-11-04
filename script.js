@@ -3080,6 +3080,13 @@
     "Profil statistikasi":"Profile statistics","Profil bezagi":"Profile customization","Fon, avatar ramkasi va maxsus belgi":"Background, avatar frame and special badge","Biografiya":"Bio","O‘zingiz haqingizda qisqacha...":"A little about yourself..."
   });
 
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Faollik zanjiri":"Серия активности","Ketma-ket faol kun":"Дней активности подряд"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Faollik zanjiri":"Activity streak","Ketma-ket faol kun":"Consecutive active days"
+  });
+
   const translationOriginalText = new WeakMap();
   const translationOriginalAttributes = new WeakMap();
 
