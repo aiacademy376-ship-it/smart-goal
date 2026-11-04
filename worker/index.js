@@ -518,7 +518,7 @@ const STORE_CATALOG = {
   "background-royal":{price:650,type:"background",value:"royal"},
   "badge-focus":{price:120,type:"badge",value:"focus"},
   "badge-diamond":{price:300,type:"badge",value:"diamond"},
-  "theme-sky":{price:90,type:"theme",value:"ocean"},
+  "theme-sky":{price:90,type:"theme",value:"sky"},
   "background-sakura":{price:220,type:"background",value:"sakura"},
   "background-nebula":{price:360,type:"background",value:"nebula"},
   "badge-builder":{price:100,type:"badge",value:"builder"},
