@@ -503,6 +503,53 @@ async function handleUpdateProfile(request,env,user){
   }
 }
 
+const STORE_CATALOG = {
+  "theme-ocean":{price:80,type:"theme",value:"ocean"},
+  "theme-emerald":{price:120,type:"theme",value:"emerald"},
+  "theme-sunset":{price:160,type:"theme",value:"sunset"},
+  "theme-rose":{price:200,type:"theme",value:"rose"},
+  "background-midnight":{price:250,type:"background",value:"midnight"},
+  "background-galaxy":{price:400,type:"background",value:"galaxy"},
+  "background-royal":{price:650,type:"background",value:"royal"},
+  "badge-focus":{price:120,type:"badge",value:"focus"},
+  "badge-diamond":{price:300,type:"badge",value:"diamond"},
+  "theme-sky":{price:90,type:"theme",value:"ocean"},
+  "background-sakura":{price:220,type:"background",value:"sakura"},
+  "background-nebula":{price:360,type:"background",value:"nebula"},
+  "badge-builder":{price:100,type:"badge",value:"builder"},
+  "avatar-frame-gold":{price:260,type:"avatar",value:"gold"},
+  "avatar-premium":{price:180,type:"avatar",value:"premium"}
+};
+
+async function handleStorePurchase(request,env,user){
+  const body=await readJson(request),itemId=String(body.itemId||"");
+  const item=STORE_CATALOG[itemId];
+  if(!item)return json({success:false,message:"Do‘kon mahsuloti topilmadi."},404);
+  const rateKey=await clientKey(request,"store:"+user.id);
+  if(!await enforceRateLimit(env,rateKey,30,60))return json({success:false,message:"Xaridlar juda tez takrorlandi. Biroz kuting."},429);
+  const now=new Date().toISOString();
+  const purchasedItem={id:itemId,type:item.type,value:item.value,purchasedAt:now};
+  const itemJson=JSON.stringify(purchasedItem);
+  const batch=await env.DB.batch([
+    env.DB.prepare("UPDATE user_data SET data_json=json_insert(json_set(json_set(data_json,'$.inventory',CASE WHEN json_type(data_json,'$.inventory')='array' THEN json_extract(data_json,'$.inventory') ELSE json('[]') END),'$.spentXP',COALESCE(CAST(json_extract(data_json,'$.spentXP') AS INTEGER),0)+?),'$.inventory[#]',json(?)),updated_at=? WHERE user_id=? AND EXISTS(SELECT 1 FROM users WHERE id=? AND xp_balance>=?) AND NOT EXISTS(SELECT 1 FROM json_each(CASE WHEN json_type(data_json,'$.inventory')='array' THEN json_extract(data_json,'$.inventory') ELSE json('[]') END) AS item WHERE json_extract(item.value,'$.id')=?)")
+      .bind(item.price,itemJson,now,user.id,user.id,item.price,itemId),
+    env.DB.prepare("UPDATE users SET xp_balance=xp_balance-?,updated_at=? WHERE id=? AND xp_balance>=? AND EXISTS(SELECT 1 FROM user_data WHERE user_id=? AND json_extract(data_json,'$.inventory[#-1].id')=? AND json_extract(data_json,'$.inventory[#-1].purchasedAt')=?)")
+      .bind(item.price,now,user.id,item.price,user.id,itemId,now),
+    env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id)
+  ]);
+  const changed=Number(batch[0]?.meta?.changes||0);
+  if(!changed){
+    const row=await env.DB.prepare("SELECT data_json FROM user_data WHERE user_id=?").bind(user.id).first();
+    let owned=false;try{owned=(JSON.parse(row?.data_json||"{}").inventory||[]).some(entry=>entry&&entry.id===itemId);}catch{}
+    const balance=Number(batch[2]?.results?.[0]?.xp_balance||0);
+    if(owned)return json({success:false,message:"Bu mahsulot sizda allaqachon mavjud."},409);
+    if(balance<item.price)return json({success:false,message:"Bu xarid uchun XP yetarli emas."},409);
+    return json({success:false,message:"Xaridni yakunlab bo‘lmadi. Qayta urinib ko‘ring."},409);
+  }
+  const balance=Number(batch[2]?.results?.[0]?.xp_balance||0);
+  return json({success:true,xpBalance:balance,item:purchasedItem});
+}
+
 async function handleSpendXP(request,env,user){
   const body=await readJson(request),amount=Math.floor(Number(body.amount)||0);if(amount<1||amount>5000)return json({success:false,message:"XP miqdori noto‘g‘ri."},400);
   const updated=await env.DB.prepare("UPDATE users SET xp_balance=xp_balance-?,updated_at=? WHERE id=? AND xp_balance>=? RETURNING xp_balance").bind(amount,new Date().toISOString(),user.id,amount).first();
@@ -527,12 +574,13 @@ export default {
       if (request.method === "POST" && path === "/api/register") return await handleRegister(request, env);
       if (request.method === "POST" && path === "/api/login") return await handleLogin(request, env);
       if (request.method === "POST" && path === "/api/logout") return await handleLogout(request, env);
-      if (request.method === "POST" && ["/api/ai","/api/tasks/complete","/api/xp/spend","/api/profile"].includes(path)) {
+      if (request.method === "POST" && ["/api/ai","/api/tasks/complete","/api/xp/spend","/api/profile","/api/store/purchase"].includes(path)) {
         const user=await authenticatedUser(request,env);
         if(!user)return json({success:false,message:"Avtorizatsiya talab qilinadi."},401);
         if(path==="/api/ai")return await handleAI(request,env,user);
         if(path==="/api/tasks/complete")return await handleTaskCompletion(request,env,user);
         if(path==="/api/profile")return await handleUpdateProfile(request,env,user);
+        if(path==="/api/store/purchase")return await handleStorePurchase(request,env,user);
         return await handleSpendXP(request,env,user);
       }
 
