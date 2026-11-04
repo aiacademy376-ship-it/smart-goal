@@ -44,6 +44,12 @@ jobs:
               assert breakpoint in css, f"Missing responsive breakpoint: {breakpoint}"
           assert "prefers-reduced-motion: reduce" in css, "Reduced-motion support is missing"
           assert "viewport-fit=cover" in html, "Mobile safe-area viewport support is missing"
+          assert "Interfeys murakkabligi" not in script, "Age-based interface complexity must stay removed"
+          assert 'data-settings-tab="difficulty"' not in script, "Complexity settings tab must stay removed"
+          assert "name='difficulty'" not in script and 'name="difficulty"' not in script, "Complexity selector must stay removed"
+          assert 'data-setting="language"' in script and 'data-setting="fontSize"' in script, "Language and font-size settings must remain available"
+          assert 'data-action="edit-birthdate"' in script and 'name="username"' in script, "Profile and birthday editing must remain available"
+          assert "aiacademy376-ship-it.github.io" in html and "smart-goal.pages.dev" in html, "GitHub Pages canonical redirect is missing"
 
           assert "translationOriginalText = new WeakMap()" in script, "Language switching source-text cache is missing"
           assert 'name="estimatedMinutes"' in script and 'name="priority"' in script, "AI task-scoring inputs are missing"
