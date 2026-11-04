@@ -240,7 +240,15 @@
       value: "neon",
       price: 420,
       icon: "zap"
-    }
+    },
+    { id: "theme-lavender", name: "Lavender mavzusi", description: "Yumshoq lavanda ranglaridagi interfeys.", type: "theme", value: "lavender", price: 150, icon: "flower" },
+    { id: "theme-mint", name: "Mint mavzusi", description: "Yengil va tetiklantiruvchi yashil ranglar.", type: "theme", value: "mint", price: 180, icon: "sprout" },
+    { id: "background-coral", name: "Coral profil foni", description: "Iliq marjon ranglari bilan o‘ziga xos profil.", type: "background", value: "coral", price: 520, icon: "sun" },
+    { id: "background-ember", name: "Ember profil foni", description: "Chuqur ranglar va olovli aksentlar.", type: "background", value: "ember", price: 720, icon: "flame" },
+    { id: "badge-streak", name: "Streak belgisi", description: "Muntazamlik va davomiy harakat ramzi.", type: "badge", value: "Streak", price: 360, icon: "calendar-check" },
+    { id: "badge-creator", name: "Creator belgisi", description: "Yangi g‘oyalarni amaliy natijaga aylantiruvchilar uchun.", type: "badge", value: "Creator", price: 480, icon: "lightbulb" },
+    { id: "avatar-frame-crystal", name: "Crystal avatar ramkasi", description: "Profil rasmingiz uchun billurdek yorqin ramka.", type: "avatar", value: "crystal", price: 620, icon: "diamond" },
+    { id: "avatar-frame-flame", name: "Flame avatar ramkasi", description: "Profilingizga jo‘shqin va yorqin uslub.", type: "avatar", value: "flame", price: 760, icon: "flame" }
   ];
 
   const ACHIEVEMENTS = [
@@ -2186,6 +2194,21 @@
           <p class="stat-label">Faollik zanjiri</p>
           <div class="stat-value">${formatNumber(getActivityStreak())} kun</div>
           <span class="stat-change">Ketma-ket faol kun</span>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Bajarilgan ishlar vaqti</p>
+          <div class="stat-value">${Math.floor(data.tasks.filter(task=>task.completed).reduce((sum,task)=>sum+Math.max(0,Math.min(480,Number(task.estimatedMinutes)||0)),0)/60)} soat</div>
+          <span class="stat-change">Vazifalarga rejalashtirilgan vaqt</span>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Qolgan vazifalar</p>
+          <div class="stat-value">${data.tasks.filter(task=>!task.completed).length}</div>
+          <span class="stat-change">Bajarilishi kutilayotgan ishlar</span>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Maqsadlar o‘rtacha progressi</p>
+          <div class="stat-value">${data.goals.length?Math.round(data.goals.reduce((sum,goal)=>sum+getGoalProgress(goal).progress,0)/data.goals.length):0}%</div>
+          <span class="stat-change">Barcha maqsadlar bo‘yicha</span>
         </div>
       </div>
 
