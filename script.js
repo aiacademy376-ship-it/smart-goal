@@ -284,14 +284,14 @@
       name: "500 XP",
       description: "500 ochko to‘plang.",
       icon: "coins",
-      condition: data => data.xp >= 500
+      condition: data => Number(data.xp || 0) + Number(data.spentXP || 0) >= 500
     },
     {
       id: "xp-1000",
       name: "Minglik marrasi",
       description: "1000 ochko to‘plang.",
       icon: "gem",
-      condition: data => data.xp >= 1000
+      condition: data => Number(data.xp || 0) + Number(data.spentXP || 0) >= 1000
     }
   ];
 
@@ -399,14 +399,9 @@
 
   function loadData() {
     const saved = safeJSON(localStorage.getItem(DATA_KEY), null);
-
-    if (!saved || typeof saved !== "object") {
-      return createInitialData();
-    }
-
+    if (!saved || typeof saved !== "object") return createInitialData();
     const initial = createInitialData();
-
-    return {
+    const loaded = {
       ...initial,
       ...saved,
       profile: { ...initial.profile, ...(saved.profile || {}) },
@@ -420,6 +415,11 @@
       notifications: Array.isArray(saved.notifications) ? saved.notifications : [],
       memories: Array.isArray(saved.memories) ? saved.memories : []
     };
+    if (!Number(saved.spentXP) && loaded.inventory.length) {
+      const legacyPrices = {"theme-ocean":250,"theme-emerald":400,"theme-sunset":550,"theme-rose":750,"background-midnight":1200,"background-galaxy":2500,"background-royal":5000,"badge-focus":900,"badge-diamond":3000,"avatar-premium":1800};
+      loaded.spentXP = loaded.inventory.reduce((sum,item)=>sum+(legacyPrices[item?.id]||0),0);
+    }
+    return loaded;
   }
 
   function loadSettings() {
@@ -597,7 +597,7 @@
 
   /* -------------------- XP AND RANKS -------------------- */
 
-  function getRank(xp = data.xp) {
+  function getRank(xp = Number(data.xp || 0) + Number(data.spentXP || 0)) {
     let rank = RANKS[0];
 
     for (const item of RANKS) {
@@ -3534,7 +3534,7 @@
           <span class="avatar avatar-medium">${icon("user-round")}</span>
           <div class="user-item-info">
             <button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username || "")}"><strong>${escapeHTML(user.name || "Foydalanuvchi")}</strong></button>
-            <small>@${escapeHTML(user.username || "")} · Level ${getRank(Number(user.xp||0)).level} · ${formatNumber(user.xp||0)} XP${user.username === data.profile.username ? " · Sizning profilingiz" : ""}</small>
+            <small>@${escapeHTML(user.username || "")} · Level ${getRank(Number(user.totalEarnedXP||user.xp||0)).level} · ${formatNumber(user.xp||0)} XP${user.username === data.profile.username ? " · Sizning profilingiz" : ""}</small>
           </div>
           ${user.username === data.profile.username
             ? `<span class="user-rank">Siz</span>`
