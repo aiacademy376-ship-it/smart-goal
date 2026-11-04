@@ -267,7 +267,7 @@
     }
   };
 
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => { const d=new Date(); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-"); };
 
   const formatDate = value => {
     if (!value) return "Sana belgilanmagan";
@@ -1452,7 +1452,7 @@
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const key = date.toISOString().slice(0, 10);
+      const key = [date.getFullYear(),String(date.getMonth()+1).padStart(2,"0"),String(date.getDate()).padStart(2,"0")].join("-");
 
       const xp = data.activity
         .filter(item => item.date === key)
@@ -1589,10 +1589,10 @@
                 <strong>${escapeHTML(goal.title)}</strong>
                 <small>${goal.deadline ? `Muddat: ${escapeHTML(formatDate(goal.deadline))}` : "Muddat belgilanmagan"}</small>
               </div>
-              <span class="goal-percentage">${goal.progress || 0}%</span>
+              <span class="goal-percentage">${getGoalProgress(goal).progress}%</span>
             </div>
             <div class="progress-track">
-              <div class="progress-fill" style="width:${Math.min(100, goal.progress || 0)}%"></div>
+              <div class="progress-fill" style="width:${getGoalProgress(goal).progress}%"></div>
             </div>
           </div>
         `).join("")
@@ -1716,6 +1716,14 @@
 
   /* -------------------- GOALS PAGE -------------------- */
 
+  function getGoalProgress(goal) {
+    const linked = data.tasks.filter(task => task.goalId === goal.id);
+    const completed = linked.filter(task => task.completed).length;
+    const progress = linked.length ? Math.round(completed / linked.length * 100) : Math.max(0,Math.min(100,Number(goal.progress)||0));
+    const daysLeft = goal.deadline ? Math.ceil((new Date(goal.deadline+"T12:00:00").getTime()-new Date(today()+"T12:00:00").getTime())/86400000) : null;
+    return { total:linked.length, completed, remaining:Math.max(0,linked.length-completed), progress, daysLeft };
+  }
+
   function renderGoals() {
     const goals = data.goals;
 
@@ -1742,7 +1750,7 @@
         </div>
         <div class="stat-card">
           <p class="stat-label">O‘rtacha progress</p>
-          <div class="stat-value">${goals.length ? Math.round(goals.reduce((s, g) => s + (g.progress || 0), 0) / goals.length) : 0}%</div>
+          <div class="stat-value">${goals.length ? Math.round(goals.reduce((sum, goal) => sum + getGoalProgress(goal).progress, 0) / goals.length) : 0}%</div>
         </div>
       </div>
 
@@ -1762,6 +1770,7 @@
               <div class="progress-fill" style="width:${Math.min(100, goal.progress || 0)}%"></div>
             </div>
 
+            <div class="goal-progress-detail"><span>${getGoalProgress(goal).total ? `${getGoalProgress(goal).completed}/${getGoalProgress(goal).total} vazifa bajarildi · yana ${getGoalProgress(goal).remaining} ta qoldi` : "Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating."}</span><span>${getGoalProgress(goal).daysLeft===null ? "Muddat yo‘q" : getGoalProgress(goal).daysLeft<0 ? "Muddat o‘tgan" : getGoalProgress(goal).daysLeft===0 ? "Bugun oxirgi kun" : `Yana ${getGoalProgress(goal).daysLeft} kun`}</span></div>
             <div class="goal-footer">
               <span>${goal.completed ? "Yakunlangan" : `Ustuvorlik: ${escapeHTML(goal.priority || "medium")}`}</span>
               <span>
