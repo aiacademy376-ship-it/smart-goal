@@ -194,9 +194,13 @@ async function handleRegister(request, env) {
   const rateKey = await clientKey(request, "register:" + email);
   const registrationWindow = 300;
   if (!await enforceRateLimit(env, rateKey, 8, registrationWindow)) {
-    const state = await env.DB.prepare("SELECT window_start FROM rate_limits WHERE rate_key = ?").bind(rateKey).first();
+    const state = await env.DB.prepare("SELECT window_start, hits FROM rate_limits WHERE rate_key = ?").bind(rateKey).first();
     const nowSeconds = Math.floor(Date.now() / 1000);
-    const retryAfter = Math.max(1, registrationWindow - (nowSeconds - Number(state?.window_start || nowSeconds)));
+    if (Number(state?.hits || 0) === 8) {
+      await env.DB.prepare("UPDATE rate_limits SET window_start = ?, hits = 9 WHERE rate_key = ? AND hits = 8").bind(nowSeconds, rateKey).run();
+    }
+    const refreshed = Number(state?.hits || 0) === 8 ? nowSeconds : Number(state?.window_start || nowSeconds);
+    const retryAfter = Math.max(1, registrationWindow - (nowSeconds - refreshed));
     return json(
       { success: false, message: "Ro‘yxatdan o‘tish urinishlari limiti tugadi. 5 daqiqadan keyin qayta urinib ko‘ring.", retryAfter },
       429,
@@ -364,7 +368,10 @@ function detectMessageLanguage(value, fallback = "uz") {
   const source = String(value || "").trim();
   if (!source) return fallback;
   if (/[қғҳўҚҒҲЎ]/u.test(source)) return "uz";
-  if (/[а-яёА-ЯЁ]/u.test(source)) return "ru";
+  if (/[а-яёА-ЯЁ]/u.test(source)) {
+    if (/(ким|нима|ҳақида|хакида|маълумот|қандай|кандай|учун|салом|илтимос|раҳмат|рахмат|мен|сен|бу|нимага)/iu.test(source)) return "uz";
+    return "ru";
+  }
   const words = source.toLocaleLowerCase().match(/[a-z']+/g) || [];
   const uzWords = new Set(["salom","assalomu","alaykum","kim","nima","haqida","malumot","ma'lumot","qanday","qachon","qayerda","nega","uchun","men","sen","siz","biz","bu","shu","va","ham","bor","yo'q","emas","ayt","tushuntir","yordam","rahmat","iltimos","kun","tartib","maqsad","vazifa","yaxshilash"]);
   const enWords = new Set(["the","who","what","where","when","why","how","is","are","was","were","tell","explain","about","please","thanks","hello","hi","can","could","would","should","help","information","airplanes","aircraft","history"]);
@@ -779,7 +786,6 @@ export default {
           background:String(profileData.background||"default"),avatarFrame:String(profileData.avatarFrame||"default"),activeBadge:String(profileData.activeBadge||"").slice(0,30),
           birthdate:birthdatePublic?String(profileData.birthdate||""):null,
           customizationScore:[Boolean(profileData.avatar),Boolean(String(profileData.bio||"").trim()),profileData.background&&profileData.background!=="default",profileData.avatarFrame&&profileData.avatarFrame!=="default",Boolean(profileData.activeBadge)].filter(Boolean).length,
-          completedTasks:profileData._tasks.filter(item=>item&&item.completed).length,
           achievements:profileData._achievements.slice(0,50).map(item=>typeof item==="string"?item:{id:String(item?.id||""),name:String(item?.name||"").slice(0,80),icon:String(item?.icon||"award").slice(0,40)}),inventory:profileData._inventory.slice(0,100).map(item=>({id:String(item?.id||"").slice(0,80),type:String(item?.type||"").slice(0,30),value:String(item?.value||"").slice(0,80)}))
         }});
       }
