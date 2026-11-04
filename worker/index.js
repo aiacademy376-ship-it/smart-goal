@@ -319,7 +319,7 @@ async function handleAI(request,env,user){
   if(!await enforceRateLimit(env,rateKey,20,60))return json({success:false,message:"AI so‘rovlari juda tez yuborildi. Bir daqiqa kuting."},429);
   const row=await env.DB.prepare("SELECT data_json FROM user_data WHERE user_id=?").bind(user.id).first();
   let userData={};try{userData=row?JSON.parse(row.data_json):{};}catch{userData={};}
-  const profile=userData.profile||{},goals=Array.isArray(userData.goals)?userData.goals.slice(0,12):[],tasks=Array.isArray(userData.tasks)?userData.tasks.slice(0,30):[];
+  const profile=userData.profile||{},goals=Array.isArray(userData.goals)?userData.goals.slice(0,12):[],tasks=Array.isArray(userData.tasks)?userData.tasks.slice(0,30):[],dailyRoutine=Array.isArray(userData.dailyRoutine)?userData.dailyRoutine.slice(0,20):[];
   const language=["uz","ru","en"].includes(String(body.language))?body.language:"uz",lang={uz:"o‘zbek tilida",ru:"на русском языке",en:"in English"}[language];
   const ageNote=user.age_band==="adult"?"Foydalanuvchi voyaga yetgan.":"Foydalanuvchi 18 yoshdan kichik bo‘lishi mumkin: faqat yoshga mos va xavfsiz tavsiyalar ber.";
   const system=[
@@ -349,7 +349,7 @@ async function handleAI(request,env,user){
       {role:"system",content:"Sen foydalanuvchiga real, sog‘lom va bajariladigan kun tartibi tuzadigan murabbiysan. Foydalanuvchi qaysi tilda yozsa, o‘sha tilda javob ber. Uyg‘onish, gigiyena, ovqatlanish, o‘qish/ish, tanaffus, harakat va uyquni muvozanatla. Vaqtlar 24 soat HH:MM formatida bo‘lsin, bandlar bir-biriga ustma-ust tushmasin. Faqat JSON massiv qaytar: [{\"time\":\"07:00\",\"title\":\"Uyg‘onish\",\"description\":\"Suv ichish va kunni boshlash\"}]. 5–14 ta band."},
       {role:"user",content:"Mening odatlarim va xohishlarim: "+requestText+"\nSmartGoal maqsadlari va vazifalari: "+routineContext}
     ];
-  }else if(action==="plan")messages=[{role:"system",content:system+" Faqat berilgan ma’lumotlarga asoslan. Kunlik reja real va bajariladigan bo‘lsin."},{role:"user",content:"Maqsad va vazifalarimni tahlil qilib bugungi va yaqin kunlar uchun ustuvor kun tartibi tuz. Vaqt taxmini, tanaffuslar va tavsiyalarni yoz. Ma’lumotlar: "+context}];
+  }else if(action==="plan")messages=[{role:"system",content:system+" Faqat berilgan ma’lumotlarga asoslan. Kunlik reja real va bajariladigan bo‘lsin."},{role:"user",content:"Maqsadlarim, vazifalarim va mavjud kun tartibimni tahlil qilib bugungi va yaqin kunlar uchun ustuvor reja tuz. Vaqt taxmini, tanaffuslar va tavsiyalarni yoz; mavjud tartibim bilan to‘qnashuv bo‘lmasin. Ma’lumotlar: "+context}];
   else{
     const message=String(body.message||"").trim();if(!message||message.length>500)return json({success:false,message:"Xabar 1–500 belgi bo‘lishi kerak."},400);
     messages=[{role:"system",content:system+" Foydalanuvchining SmartGoal konteksti: "+context}];
