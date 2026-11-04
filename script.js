@@ -1994,7 +1994,7 @@
   /* -------------------- SCHEDULE PAGE -------------------- */
 
   function renderSchedule() {
-    const tasks = [...data.tasks].sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    const tasks = [...data.tasks].filter(task => !task.isRoutineEntry).sort((a, b) => (a.date || "").localeCompare(b.date || ""));
     const visibleTasks = tasks.slice(0, taskListLimit);
 
     return `
@@ -2044,10 +2044,68 @@
 
   /* -------------------- PLANNER PAGE -------------------- */
 
+  function getRoutineProgress(routine, date = today()) {
+    const now = new Date();
+    const currentTime = String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
+    const savedLogs = data.routineLogs?.[date] || {};
+    const items = routine.map(item => {
+      const saved = savedLogs[item.id];
+      const status = saved?.status || (String(item.time || "99:99") <= currentTime ? "missed" : "upcoming");
+      return { ...item, status, xpEarned: Number(saved?.xpEarned || 0) };
+    });
+    const total = items.length;
+    const completed = items.filter(item => item.status === "done").length;
+    const missed = items.filter(item => item.status === "missed" || item.status === "no-time").length;
+    return { items, total, completed, missed, completedPercent: total ? Math.round(completed / total * 100) : 0, missedPercent: total ? Math.round(missed / total * 100) : 0 };
+  }
+
+  async function setRoutineStatus(id, status) {
+    if (!["done","missed","no-time"].includes(status)) return;
+    const item = (data.dailyRoutine || []).find(row => row.id === id);
+    if (!item) return;
+    const day = today();
+    if (!data.routineLogs || typeof data.routineLogs !== "object") data.routineLogs = {};
+    if (!data.routineLogs[day] || typeof data.routineLogs[day] !== "object") data.routineLogs[day] = {};
+    if (data.routineLogs[day][id]?.status === "done") {
+      showToast("Bajarilgan band va uning XP bahosi o‘zgartirilmaydi.", "error");
+      return;
+    }
+    if (status !== "done") {
+      data.routineLogs[day][id] = { status, updatedAt: new Date().toISOString(), xpEarned: 0 };
+      saveData(); render();
+      return;
+    }
+    const existingTask = data.tasks.find(task => task.isRoutineEntry && task.routineId === id && task.date === day);
+    const task = existingTask || {
+      id: uid(), title: String(item.title || "Kun tartibi bandi").slice(0,100),
+      description: ("Kun tartibi: " + String(item.description || item.title || "")).slice(0,500),
+      date: day, priority: "medium", estimatedMinutes: Math.max(5,Math.min(480,Number(item.estimatedMinutes||30))),
+      goalId: "", completed: false, xpAwarded: false, xpEarned: 0, completedAt: null,
+      createdAt: day + "T" + String(item.time || "00:00") + ":00+05:00", isRoutineEntry: true, routineId: id
+    };
+    if (!existingTask) data.tasks.push(task);
+    saveData();
+    if (!remoteAuthenticated || !await flushRemoteSync()) {
+      if (!existingTask) data.tasks = data.tasks.filter(row => row.id !== task.id);
+      saveData(); render();
+      showToast("Kun tartibi bandi serverga saqlanmadi. Internetni tekshirib qayta urinib ko‘ring.", "error");
+      return;
+    }
+    await toggleTask(task.id);
+    if (!task.completed) {
+      if (!existingTask) data.tasks = data.tasks.filter(row => row.id !== task.id);
+      saveData(); render();
+      return;
+    }
+    data.routineLogs[day][id] = { status: "done", updatedAt: new Date().toISOString(), taskId: task.id, xpEarned: Number(task.xpEarned || 0) };
+    saveData(); render();
+  }
+
   function renderPlanner() {
     const activeGoals = data.goals.filter(goal => !goal.completed);
-    const pendingTasks = data.tasks.filter(task => !task.completed);
+    const pendingTasks = data.tasks.filter(task => !task.completed && !task.isRoutineEntry);
     const routine = [...(data.dailyRoutine || [])].sort((a,b) => String(a.time).localeCompare(String(b.time)));
+    const routineProgress = getRoutineProgress(routine);
 
     return `
       ${pageHeader("VAQTNI BOSHQARISH","Kun tartibim","Kunlik rejangiz, odatlaringiz va maqsadlaringizni bir joyda boshqaring.")}
@@ -2057,21 +2115,37 @@
           <div><span class="eyebrow">SIZNING SHAXSIY REJANGIZ</span><h3 class="card-title">Kun tartibim</h3><p class="card-description">Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.</p></div>
           ${actionButton("add-routine","Band qo‘shish","plus")}
         </div>
+        <div class="routine-progress-summary">
+          <div class="routine-progress-head"><strong>Bugungi bajarilish</strong><span>${routineProgress.completedPercent}% bajarildi</span></div>
+          <div class="routine-progress-track"><span class="routine-progress-done" style="width:${routineProgress.completedPercent}%"></span><span class="routine-progress-missed" style="width:${routineProgress.missedPercent}%"></span></div>
+          <div class="routine-progress-legend"><span class="routine-legend-done">${routineProgress.completed} bajarildi</span><span class="routine-legend-missed">${routineProgress.missed} bajarilmadi</span><span>${Math.max(0,routineProgress.total-routineProgress.completed-routineProgress.missed)} kutilmoqda</span></div>
+        </div>
         <div class="routine-list">
-          ${routine.length ? routine.map(item => `
-            <article class="routine-item">
-              <time>${escapeHTML(item.time || "--:--")}</time>
-              <div class="routine-item-content"><strong>${escapeHTML(item.title)}</strong><small>${escapeHTML(item.description || "")}</small></div>
-              <div class="routine-item-actions">
-                <button class="icon-button" type="button" data-action="edit-routine" data-id="${escapeHTML(item.id)}" aria-label="Tahrirlash">${icon("pencil",15)}</button>
-                <button class="icon-button" type="button" data-action="delete-routine" data-id="${escapeHTML(item.id)}" aria-label="O‘chirish">${icon("trash-2",15)}</button>
-              </div>
-            </article>`).join("") : emptyState("Kun tartibi hali tuzilmagan","Masalan, 07:00 — uyg‘onish, 07:15 — badantarbiya kabi bandlar qo‘shing.","sunrise")}
+          ${routineProgress.items.length ? routineProgress.items.map(item => {
+            const labels = {done:"Bajarildi",missed:"O‘tkazib yuborildi","no-time":"Vaqt yetmadi",upcoming:"Kutilmoqda"};
+            const statusClass = item.status === "done" ? "done" : ["missed","no-time"].includes(item.status) ? "missed" : "upcoming";
+            return `
+              <article class="routine-item routine-item-${statusClass}">
+                <time>${escapeHTML(item.time || "--:--")}</time>
+                <div class="routine-item-content"><strong>${escapeHTML(item.title)}</strong><small>${escapeHTML(item.description || "")}</small><span class="routine-status-pill ${statusClass}">${labels[item.status]}${item.status==="done"?" · +"+item.xpEarned+" XP":""}</span></div>
+                <div class="routine-item-actions">
+                  ${item.status !== "done" ? `
+                    <button class="routine-mark-button routine-mark-done" type="button" data-action="routine-status" data-status="done" data-id="${escapeHTML(item.id)}" title="Bajarildi">✓</button>
+                    <button class="routine-mark-button routine-mark-missed" type="button" data-action="routine-status" data-status="missed" data-id="${escapeHTML(item.id)}" title="Bajarilmadi">×</button>
+                    <button class="routine-mark-button routine-mark-time" type="button" data-action="routine-status" data-status="no-time" data-id="${escapeHTML(item.id)}" title="Vaqt yetmadi">◷</button>
+                  ` : ""}
+                  <button class="icon-button" type="button" data-action="edit-routine" data-id="${escapeHTML(item.id)}" aria-label="Tahrirlash">${icon("pencil",15)}</button>
+                  <button class="icon-button" type="button" data-action="delete-routine" data-id="${escapeHTML(item.id)}" aria-label="O‘chirish">${icon("trash-2",15)}</button>
+                </div>
+              </article>`;
+          }).join("") : emptyState("Kun tartibi hali tuzilmagan","Masalan, 07:00 — uyg‘onish, 07:15 — badantarbiya kabi bandlar qo‘shing.","sunrise")}
         </div>
         <div class="routine-ai">
           <div><strong>${icon("sparkles",16)} AI bilan kun tartibini tuzish</strong><small>Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing. Eslatmalar sahifa ochiq turganda ishlaydi.</small></div>
           <textarea id="routine-ai-prompt" class="field-textarea" rows="2" maxlength="700" placeholder="Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman."></textarea>
           <button class="primary-button" type="button" data-action="generate-routine">${icon("sparkles",15)} Menga kun tartibi tuz</button>
+          <button class="secondary-button" type="button" data-action="generate-routine-advice">${icon("message-circle-heart",15)} AI maslahat olish</button>
+          <div id="routine-ai-advice-output" class="daily-ai-advice-output" aria-live="polite"></div>
           <button class="secondary-button" type="button" data-action="enable-routine-reminders">${icon("bell",15)} ${settings.routineReminders ? "Eslatmalar yoqilgan" : "Vaqtida eslatib tur"}</button>
         </div>
       </section>
@@ -2109,7 +2183,7 @@
     const time = String(fd.get("time") || ""), title = String(fd.get("title") || "").trim();
     if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time) || title.length < 2) { showToast("Vaqt va mashg‘ulot nomini to‘g‘ri kiriting.", "error"); return; }
     if ((data.dailyRoutine || []).some(item => item.time === time && item.id !== id)) { showToast("Bu vaqtga boshqa mashg‘ulot belgilangan. Boshqa vaqt tanlang.", "error"); return; }
-    const values = { time, title, description: String(fd.get("description") || "").trim().slice(0,180) };
+    const values = { time, title, description: String(fd.get("description") || "").trim().slice(0,180), estimatedMinutes: Math.max(5,Math.min(480,Number(fd.get("estimatedMinutes")||30)||30)) };
     if (id) { const item = data.dailyRoutine.find(row => row.id === id); if (item) Object.assign(item, values); }
     else data.dailyRoutine.push({ id: uid(), ...values });
     data.dailyRoutine.sort((a,b) => a.time.localeCompare(b.time));
@@ -2163,6 +2237,30 @@
       if ("Notification" in window && Notification.permission === "granted") {
         try { new Notification("SmartGoal · "+item.title,{body:item.description || "Rejangizdagi navbatdagi ish vaqti keldi."}); } catch {}
       }
+    }
+  }
+
+  async function generateRoutineAdvice() {
+    const output = $("#routine-ai-advice-output");
+    const button = document.querySelector("[data-action='generate-routine-advice']");
+    if (!output) return;
+    const language = settings.language;
+    const prompts = {
+      uz: "Bugungi kun tartibimni va bajarilish holatini tahlil qil. Bajarilgan, o‘tkazib yuborilgan va vaqt yetmagan bandlarni hisobga olib, ertangi kun tartibimni qanday yaxshilashimni ayt. 3 ta aniq, muloyim va amaliy maslahat ber. Muvaffaqiyatsizlik uchun ayblama, ortiqcha bandlarni kamaytir va real vaqt oralig‘ini taklif qil.",
+      ru: "Проанализируй мой распорядок и сегодняшнее выполнение. Учти выполненные, пропущенные пункты и пункты, на которые не хватило времени. Дай 3 конкретных и доброжелательных совета, как улучшить расписание на завтра. Не обвиняй, предложи реалистичные интервалы и разумную нагрузку.",
+      en: "Review my daily routine and today's completion. Consider completed, missed and time-constrained items. Give 3 practical, supportive recommendations to improve tomorrow's schedule. Do not blame me; suggest realistic time blocks and a sustainable workload."
+    };
+    output.innerHTML = "<p>AI kun tartibingizni tahlil qilmoqda…</p>";
+    if (button) button.disabled = true;
+    try {
+      const response = await fetch("/api/ai", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message:prompts[language]||prompts.uz,language,history:[]})});
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "AI maslahat bera olmadi.");
+      output.innerHTML = formatAIMessage(result.answer || "");
+    } catch (error) {
+      output.textContent = error.message || "AI bilan aloqa uzildi.";
+    } finally {
+      if (button) button.disabled = false;
     }
   }
 
@@ -2491,6 +2589,37 @@
 
   /* -------------------- AI PAGE -------------------- */
 
+  function formatAIMessage(value) {
+    const source = escapeHTML(String(value || "").replace(/\\([*_#])/g, "$1")).replace(/\r\n?/g, "\n");
+    const inline = line => line
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
+    const output = [];
+    let paragraph = [], listType = "";
+    const closeList = () => { if (listType) { output.push("</" + listType + ">"); listType = ""; } };
+    const flushParagraph = () => { if (paragraph.length) { output.push("<p>" + inline(paragraph.join(" ")) + "</p>"); paragraph = []; } };
+    for (const rawLine of source.split("\n")) {
+      const line = rawLine.trim();
+      if (!line) { flushParagraph(); closeList(); continue; }
+      const heading = line.match(/^#{1,3}\s+(.+)$/);
+      const ordered = line.match(/^\d+[.)]\s+(.+)$/);
+      const bullet = line.match(/^[-•]\s+(.+)$/);
+      if (heading) { flushParagraph(); closeList(); output.push("<h3>" + inline(heading[1]) + "</h3>"); continue; }
+      if (ordered || bullet) {
+        flushParagraph();
+        const nextType = ordered ? "ol" : "ul";
+        if (listType !== nextType) { closeList(); output.push("<" + nextType + ">"); listType = nextType; }
+        output.push("<li>" + inline((ordered || bullet)[1]) + "</li>");
+        continue;
+      }
+      closeList();
+      paragraph.push(line);
+    }
+    flushParagraph(); closeList();
+    return output.join("");
+  }
+
   function renderAI() {
     const welcome={
       uz:"Salom! Men SmartGoal AI murabbiyiman. Maqsadlaringiz, kun tartibingiz va vazifalaringizni birga yaxshilaymiz. Istalgan mavzuda savol berishingiz mumkin.",
@@ -2516,7 +2645,7 @@
       <section class="card ai-chat-card" style="margin-top:20px">
         <div class="card-header"><div><h3 class="card-title">AI bilan suhbat</h3><p class="card-description">AI siz yozgan tilda javob beradi.</p></div><button class="card-action" type="button" data-action="clear-ai-chat">Suhbatni tozalash</button></div>
         <div class="ai-quick-prompts"><button type="button" data-ai-prompt="${escapeHTML(quick.today)}">Bugungi rejam</button><button type="button" data-ai-prompt="${escapeHTML(quick.routine)}">Kun tartibim</button><button type="button" data-ai-prompt="${escapeHTML(quick.tasks)}">Vazifalarim</button><button type="button" data-ai-prompt="${escapeHTML(quick.motivation)}">Motivatsiya</button></div>
-        <div class="ai-chat" id="ai-chat" aria-live="polite">${messages.map(item=>'<div class="ai-message '+(item.role==="user"?"user":"")+'">'+escapeHTML(item.content)+'</div>').join("")}</div>
+        <div class="ai-chat" id="ai-chat" aria-live="polite">${messages.map(item=>'<div class="ai-message '+(item.role==="user"?"user":"")+'">'+(item.role==="user"?escapeHTML(item.content):formatAIMessage(item.content))+'</div>').join("")}</div>
         <form id="ai-form" class="ai-input-row" style="margin-top:18px"><input name="message" placeholder="Savolingizni yozing..." maxlength="500" required autocomplete="off"><button class="primary-button" type="submit" aria-label="Yuborish">${icon("send",16)}</button></form>
       </section>`;
   }
@@ -2558,7 +2687,7 @@
       aiConversation.push({ role: "assistant", content: answer });
       aiConversation = aiConversation.slice(-12);
       $("#ai-typing")?.remove();
-      chat.insertAdjacentHTML("beforeend", '<div class="ai-message">' + escapeHTML(answer) + '</div>');
+      chat.insertAdjacentHTML("beforeend", '<div class="ai-message">' + formatAIMessage(answer) + '</div>');
       trimChat();
     } catch (error) {
       $("#ai-typing")?.remove();
@@ -2595,7 +2724,7 @@
 
   async function generateAIPlan() {
     const output=$("#ai-plan-output"),button=document.querySelector("[data-action='generate-ai-plan']");if(!output)return;if(button)button.disabled=true;output.textContent=settings.language==="ru"?"AI анализирует ваши цели и задачи...":settings.language==="en"?"AI is analyzing your goals and tasks...":"AI maqsadlaringiz va vazifalaringizni tahlil qilmoqda...";
-    try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"plan",language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI reja tuza olmadi.");output.textContent=result.answer;}
+    try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"plan",language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI reja tuza olmadi.");output.innerHTML=formatAIMessage(result.answer);}
     catch(error){output.textContent=error.message||"AI reja tuzishda xatolik yuz berdi.";}
     finally{if(button)button.disabled=false;}
   }
@@ -3431,6 +3560,12 @@
         break;
       case "generate-routine":
         generateRoutine();
+        break;
+      case "routine-status":
+        setRoutineStatus(id, actionElement.dataset.status);
+        break;
+      case "generate-routine-advice":
+        generateRoutineAdvice();
         break;
       case "clear-ai-chat":
         aiConversation = [];
