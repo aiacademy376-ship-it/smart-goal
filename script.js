@@ -1171,6 +1171,20 @@
           <label class="field-label">Qaysi kuni bajariladi?</label>
           <input class="field-input" type="date" name="date" required value="${escapeHTML(task?.date || today())}">
         </div>
+        <div class="form-field">
+          <label class="field-label">Taxminiy bajarish vaqti</label>
+          <select class="field-select" name="estimatedMinutes">
+            ${[[15,"15 daqiqa"],[30,"30 daqiqa"],[45,"45 daqiqa"],[60,"1 soat"],[90,"1,5 soat"],[120,"2 soat"],[180,"3 soat"],[240,"4 soat"],[360,"6 soat"]].map(([value,label])=>`<option value="${value}" ${Number(task?.estimatedMinutes||30)===value?"selected":""}>${label}</option>`).join("")}
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Ustuvorlik</label>
+          <select class="field-select" name="priority">
+            <option value="low" ${task?.priority==="low"?"selected":""}>Past</option>
+            <option value="medium" ${!task||task.priority==="medium"?"selected":""}>O‘rta</option>
+            <option value="high" ${task?.priority==="high"?"selected":""}>Yuqori</option>
+          </select>
+        </div>
         <details class="form-field full-width task-extra-settings">
           <summary>Qo‘shimcha sozlama (ixtiyoriy)</summary>
           <label class="field-label" for="task-goal">Qaysi maqsadga tegishli?</label>
@@ -1195,17 +1209,17 @@
       title,
       description: String(fd.get("description") || "").trim().slice(0, 500),
       date: String(fd.get("date") || today()),
-      priority: "medium",
-      estimatedMinutes: 30,
+      priority: ["low","medium","high"].includes(String(fd.get("priority")||"medium")) ? String(fd.get("priority")||"medium") : "medium",
+      estimatedMinutes: Math.max(5,Math.min(480,Number(fd.get("estimatedMinutes")||30)||30)),
       goalId: String(fd.get("goalId") || "")
     };
 
     if (id) {
       const task = data.tasks.find(item => item.id === id);
       if (!task) return;
-      const textChanged = task.title !== values.title || task.description !== values.description;
+      const scoreChanged = task.title !== values.title || task.description !== values.description || task.date !== values.date || task.priority !== values.priority || Number(task.estimatedMinutes||30) !== values.estimatedMinutes;
       Object.assign(task, values);
-      if (textChanged && Number(task.xpEarned || 0) === 0) {
+      if (scoreChanged && Number(task.xpEarned || 0) === 0) {
         task.completed = false;
         task.completedAt = null;
         task.xpAwarded = false;
@@ -1676,8 +1690,9 @@
       <section class="card daily-coach-card">
         <div class="daily-coach-icon">${icon("sparkles",22)}</div>
         <div><span class="eyebrow">SMARTGOAL MASLAHATI</span><h3>${escapeHTML(getDailyCoachTip().title)}</h3><p>${escapeHTML(getDailyCoachTip().text)}</p></div>
-        <button class="secondary-button" type="button" data-page="ai">AI bilan maslahatlashish ${icon("arrow-right",14)}</button>
+        <div class="daily-coach-actions"><button class="secondary-button" type="button" data-action="generate-daily-advice">${icon("sparkles",14)} AI’dan shaxsiy maslahat</button><button class="card-action" type="button" data-page="ai">AI bilan suhbat ${icon("arrow-right",14)}</button></div>
       </section>
+      <section class="card daily-ai-advice-output hidden" id="daily-ai-advice-card" aria-live="polite"><div class="card-header"><h3 class="card-title">AI tavsiyasi</h3><button class="card-action" type="button" data-action="close-daily-advice">Yopish</button></div><div id="daily-ai-advice-output" class="card-description"></div></section>
 
       <div class="dashboard-grid">
         <div class="dashboard-column">
@@ -2313,6 +2328,26 @@
     catch(error){$("#ai-typing")?.remove();const msg=error.message||"AI hozircha javob bera olmadi.";if(aiConversation.at(-1)?.role==="user"&&aiConversation.at(-1)?.content===message)aiConversation.pop();chat.insertAdjacentHTML("beforeend",'<div class="ai-message">'+escapeHTML(msg)+'</div>');}
     finally{if(submit)submit.disabled=false;chat.scrollTop=chat.scrollHeight;}
   }
+  async function generateDailyAdvice() {
+    const card=$("#daily-ai-advice-card"),output=$("#daily-ai-advice-output"),button=document.querySelector("[data-action='generate-daily-advice']");
+    if(!card||!output)return;
+    card.classList.remove("hidden");
+    output.textContent=settings.language==="ru"?"Анализирую ваши цели и задачи...":settings.language==="en"?"Reviewing your goals and tasks...":"Maqsad va vazifalaringiz tahlil qilinmoqda...";
+    if(button)button.disabled=true;
+    const prompts={
+      uz:"Bugungi maqsadlarim, vazifalarim, kun tartibim va oxirgi natijalarimni tahlil qil. Menga aynan hozir foydali bo‘ladigan 3 ta aniq, real va ustuvor maslahat ber. Har bir maslahat nima uchun kerakligini qisqa tushuntir. Ma’lumot yetishmasa, taxmin qilma.",
+      ru:"Проанализируй мои цели, задачи, распорядок дня и последние результаты. Дай 3 конкретных, реалистичных и приоритетных совета, полезных именно сейчас. Кратко объясни каждый совет. Не выдумывай недостающие данные.",
+      en:"Analyze my goals, tasks, daily routine and recent progress. Give me 3 specific, realistic, prioritized recommendations that are useful right now. Briefly explain each one. Do not invent missing information."
+    };
+    try{
+      const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message:prompts[settings.language]||prompts.uz,language:settings.language,history:[]})});
+      const result=await response.json().catch(()=>({}));
+      if(!response.ok||!result.success)throw new Error(result.message||"AI maslahat bera olmadi.");
+      output.textContent=result.answer;
+    }catch(error){output.textContent=error.message||"AI bilan aloqa uzildi.";}
+    finally{if(button)button.disabled=false;}
+  }
+
   async function generateAIPlan() {
     const output=$("#ai-plan-output"),button=document.querySelector("[data-action='generate-ai-plan']");if(!output)return;if(button)button.disabled=true;output.textContent="AI maqsadlaringiz va vazifalaringizni tahlil qilmoqda...";
     try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"plan",language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI reja tuza olmadi.");output.textContent=result.answer;}
@@ -2826,22 +2861,30 @@
     "Ocean mavzusi":"Ocean theme","Emerald mavzusi":"Emerald theme","Sunset mavzusi":"Sunset theme","Rose mavzusi":"Rose theme","Sky mavzusi":"Sky theme","Midnight fon":"Midnight background","Galaxy fon":"Galaxy background","Royal fon":"Royal background","Sakura profil foni":"Sakura profile background","Nebula profil foni":"Nebula profile background","Focus badge":"Focus badge","Diamond badge":"Diamond badge","Builder belgisi":"Builder badge","Oltin avatar ramkasi":"Gold avatar frame","Premium avatar ramkasi":"Premium avatar frame","Profilingiz va interfeysingiz uchun sokin ko‘k rang.":"A calm blue look for your profile and interface.","Yashil va nafis ko‘rinish.":"An elegant green theme.","Iliq ranglardagi maxsus interfeys.":"A special warm-colored interface.","Nafis pushti ranglar uyg‘unligi.":"An elegant blend of pink tones.","Profil uchun qoramtir, maxsus fon.":"A special dark profile background.","Maxsus kosmik profil foni.":"A special cosmic profile background.","Noyob premium profil dizayni.":"A unique premium profile design.","Diqqat va intizom ramzi.":"A symbol of focus and discipline.","Maxsus premium belgi.":"A special premium badge.","Profil rasmingiz uchun oltin bezak.":"A gold decoration for your profile photo.","Profil rasmingiz uchun maxsus ramka.":"A special frame for your profile photo.","Qo‘lga kiritilgan":"Unlocked","Hali ochilmagan":"Not unlocked yet","Oddiy":"Normal","Muhim":"Important","Juda muhim":"Very important","Past":"Low","O‘rta":"Medium","Yuqori":"High","Bajarish sanasi":"Due date","Taxminiy bajarish vaqti":"Estimated time","Qo‘shimcha sozlama (ixtiyoriy)":"Additional settings (optional)"
   });
 
+  const translationOriginalText = new WeakMap();
+  const translationOriginalAttributes = new WeakMap();
+
   function translateVisibleUI(root = document.body) {
-    const dictionary = UI_TRANSLATIONS[settings.language];
-    if (!dictionary || !root) return;
+    if (!root) return;
+    const dictionary = UI_TRANSLATIONS[settings.language] || {};
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     let node;
     while ((node = walker.nextNode())) {
       const parent = node.parentElement;
       if (!parent || parent.closest("script,style,textarea,input,select,option,[contenteditable='true']")) continue;
-      const original = node.nodeValue || "", trimmed = original.trim();
-      if (!trimmed || !dictionary[trimmed]) continue;
-      node.nodeValue = original.replace(trimmed, dictionary[trimmed]);
+      if (!translationOriginalText.has(node)) translationOriginalText.set(node, node.nodeValue || "");
+      const original = translationOriginalText.get(node), trimmed = original.trim();
+      if (!trimmed) continue;
+      node.nodeValue = original.replace(trimmed, dictionary[trimmed] || trimmed);
     }
     root.querySelectorAll("input[placeholder],textarea[placeholder],button[aria-label],button[title]").forEach(element => {
+      let originals = translationOriginalAttributes.get(element);
+      if (!originals) { originals = {}; translationOriginalAttributes.set(element, originals); }
       ["placeholder","aria-label","title"].forEach(attribute => {
-        const value = element.getAttribute(attribute);
-        if (value && dictionary[value]) element.setAttribute(attribute, dictionary[value]);
+        if (!element.hasAttribute(attribute)) return;
+        if (!(attribute in originals)) originals[attribute] = element.getAttribute(attribute) || "";
+        const original = originals[attribute];
+        element.setAttribute(attribute, dictionary[original] || original);
       });
     });
   }
@@ -2969,6 +3012,12 @@
         break;
       case "generate-ai-plan":
         generateAIPlan();
+        break;
+      case "generate-daily-advice":
+        generateDailyAdvice();
+        break;
+      case "close-daily-advice":
+        $("#daily-ai-advice-card")?.classList.add("hidden");
         break;
       case "add-routine":
         openRoutineForm();
