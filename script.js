@@ -2393,6 +2393,14 @@
             <strong>${formatNumber(data.xp)}</strong>
           </div>
           <div class="setting-row">
+            <div class="setting-info"><strong>Jami ishlab topilgan XP</strong><small>Do‘konda sarflangan XP ham qo‘shilgan</small></div>
+            <strong>${formatNumber(Number(data.xp||0)+Number(data.spentXP||0))}</strong>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><strong>Sarflangan XP</strong></div>
+            <strong>${formatNumber(data.spentXP||0)}</strong>
+          </div>
+          <div class="setting-row">
             <div class="setting-info"><strong>Bajarilgan vazifalar</strong></div>
             <strong>${completedTasks}</strong>
           </div>
