@@ -311,7 +311,15 @@ async function handleAI(request,env,user){
   const language=["uz","ru","en"].includes(String(body.language))?body.language:"uz",lang={uz:"o‘zbek tilida",ru:"на русском языке",en:"in English"}[language];
   const ageNote=user.age_band==="adult"?"Foydalanuvchi voyaga yetgan.":"Foydalanuvchi 18 yoshdan kichik bo‘lishi mumkin: faqat yoshga mos va xavfsiz tavsiyalar ber.";
   const system=["Sen SmartGoal ilovasining shaxsiy AI murabbiyisan. Aniq, amaliy va mehribon yordam ber. Maqsadlarni mayda bosqichlarga ajrat, real reja tuz, tanaffuslarni hisobga ol. Tibbiy, moliyaviy yoki huquqiy mutaxassis sifatida ko‘rinma.",ageNote,"Javob tili: "+lang].join(" ");
-  const context=JSON.stringify({profile:{name:profile.name||"",ageBand:user.age_band},goals:goals.map(g=>({title:String(g.title||"").slice(0,100),description:String(g.description||"").slice(0,240),deadline:String(g.deadline||""),priority:String(g.priority||"medium"),progress:Number(g.progress||0)})),tasks:tasks.map(t=>({title:String(t.title||"").slice(0,100),date:String(t.date||""),completed:Boolean(t.completed),estimatedMinutes:Number(t.estimatedMinutes||0)}))});
+  const goalTitles=new Map(goals.map(goal=>[String(goal.id||""),String(goal.title||"").slice(0,100)]));
+  const todayParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const todayLocal=todayParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-");
+  const context=JSON.stringify({
+    today:todayLocal,
+    profile:{name:String(profile.name||"").slice(0,60),ageBand:user.age_band},
+    goals:goals.map(g=>({title:String(g.title||"").slice(0,100),description:String(g.description||"").slice(0,240),deadline:String(g.deadline||""),priority:String(g.priority||"medium"),progress:Number(g.progress||0)})),
+    tasks:tasks.map(t=>({title:String(t.title||"").slice(0,100),goalTitle:goalTitles.get(String(t.goalId||""))||"",date:String(t.date||""),completed:Boolean(t.completed),priority:String(t.priority||"medium"),estimatedMinutes:Number(t.estimatedMinutes||0),completedAt:String(t.completedAt||"")}))
+  });
   let messages;
   if(action==="plan")messages=[{role:"system",content:system+" Faqat berilgan ma’lumotlarga asoslan. Kunlik reja real va bajariladigan bo‘lsin."},{role:"user",content:"Maqsad va vazifalarimni tahlil qilib bugungi va yaqin kunlar uchun ustuvor kun tartibi tuz. Vaqt taxmini, tanaffuslar va tavsiyalarni yoz. Ma’lumotlar: "+context}];
   else{
