@@ -2281,9 +2281,24 @@ remove planner task block      <section class="card" style="margin-top:20px">
       const cleaned = items.slice(0,14).filter(item => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(item.time || "")) && String(item.title || "").trim().length >= 2 && !usedTimes.has(item.time) && usedTimes.add(item.time)).map(item => ({id:uid(),time:item.time,title:String(item.title).slice(0,90),description:String(item.description || "").slice(0,180),estimatedMinutes:Math.max(5,Math.min(480,Number(item.estimatedMinutes||30)||30))}));
       if (!cleaned.length) throw new Error("AI yaratgan vaqtlar noto‘g‘ri formatda.");
       const existing = Array.isArray(data.dailyRoutine) ? data.dailyRoutine : [];
-      const occupiedTimes = new Set(existing.map(item => String(item.time || "")));
-      const additions = cleaned.filter(item => !occupiedTimes.has(item.time));
-      if (!additions.length) throw new Error("Mavjud kun tartibingiz saqlandi. AI takliflari mavjud vaqtlar bilan to‘qnashdi; boshqa vaqt oralig‘ini so‘rang.");
+      const minuteOf = value => {
+        const parts = String(value || "").split(":").map(Number);
+        return parts.length === 2 && parts.every(Number.isFinite) ? parts[0] * 60 + parts[1] : -1;
+      };
+      const durationOf = item => Math.max(5, Math.min(480, Number(item.estimatedMinutes || 30) || 30));
+      const overlaps = (first, second) => {
+        const firstStart = minuteOf(first.time), secondStart = minuteOf(second.time);
+        if (firstStart < 0 || secondStart < 0) return true;
+        const firstEnd = firstStart + durationOf(first), secondEnd = secondStart + durationOf(second);
+        return firstStart < secondEnd && secondStart < firstEnd;
+      };
+      const additions = [];
+      for (const candidate of cleaned) {
+        if (candidate.time && minuteOf(candidate.time) + durationOf(candidate) > 1440) continue;
+        if (existing.some(item => overlaps(candidate, item)) || additions.some(item => overlaps(candidate, item))) continue;
+        additions.push(candidate);
+      }
+      if (!additions.length) throw new Error("AI takliflari mavjud mashg‘ulotlar bilan vaqt jihatidan to‘qnashdi. Boshqa vaqt oralig‘ini kiriting.");
       data.dailyRoutine = [...existing, ...additions].sort((a,b) => a.time.localeCompare(b.time));
       saveData(); render(); showToast("Mavjud bandlaringiz saqlandi, AI yangi mashg‘ulotlarni qo‘shdi.");
     } catch (error) { showToast(error.message || "AI xatolik berdi.", "error"); }
