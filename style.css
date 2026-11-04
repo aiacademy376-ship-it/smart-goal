@@ -6038,3 +6038,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     transition-duration: .01ms !important;
   }
 }
+
+.community-leaderboard-card { overflow:hidden; }
+.leaderboard-row { display:grid; grid-template-columns:42px minmax(0,1fr) auto; align-items:center; gap:12px; padding:12px 3px; border-top:1px solid var(--border); }
+.leaderboard-rank { width:32px; height:32px; display:grid; place-items:center; border-radius:10px; background:var(--surface-2); color:var(--primary); font-size:12px; font-weight:900; }
+.leaderboard-user { min-width:0; display:grid; gap:4px; }
+.leaderboard-user small { color:var(--text-muted); font-size:10px; overflow-wrap:anywhere; }
+.leaderboard-xp { color:var(--primary); font-size:12px; white-space:nowrap; }
+@media(max-width:420px) { .leaderboard-row { grid-template-columns:34px minmax(0,1fr); } .leaderboard-xp { grid-column:2; justify-self:start; } }
