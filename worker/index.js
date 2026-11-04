@@ -361,10 +361,24 @@ async function handleTaskCompletion(request,env,user){
   const difficulty=Math.round(rawDifficulty);
   const tashkentDateParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
   const todayLocal=tashkentDateParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-"),onTime=todayLocal<=dueDate,suggestedXP=Math.min(15,difficulty*2+(onTime?5:0)),now=new Date().toISOString();
-  const inserted=await env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) SELECT ?,?,?,MIN(?,MAX(0,45-COALESCE((SELECT SUM(xp) FROM xp_ledger WHERE user_id=? AND award_date=?),0))),?,?,? WHERE NOT EXISTS (SELECT 1 FROM xp_ledger WHERE user_id=? AND task_id=?) RETURNING xp").bind(crypto.randomUUID(),user.id,taskId,suggestedXP,user.id,todayLocal,todayLocal,("Task: "+title).slice(0,140),now,user.id,taskId).first();
-  if(!inserted){const b=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();return json({success:true,awarded:0,alreadyAwarded:true,xpBalance:Number(b?.xp_balance||0)});}
-  const awarded=Number(inserted.xp||0);if(awarded>0)await env.DB.prepare("UPDATE users SET xp_balance=xp_balance+?,updated_at=? WHERE id=?").bind(awarded,now,user.id).run();
-  const balance=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();
+  // Insert the XP ledger row and update the cached balance in one D1 batch.
+  // D1 batches are transactional, so a failed balance update cannot leave an orphaned award.
+  const ledgerId=crypto.randomUUID();
+  const batch=await env.DB.batch([
+    env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) SELECT ?,?,?,MIN(?,MAX(0,45-COALESCE((SELECT SUM(xp) FROM xp_ledger WHERE user_id=? AND award_date=?),0))),?,?,? WHERE NOT EXISTS (SELECT 1 FROM xp_ledger WHERE user_id=? AND task_id=?)")
+      .bind(ledgerId,user.id,taskId,suggestedXP,user.id,todayLocal,todayLocal,("Task: "+title).slice(0,140),now,user.id,taskId),
+    env.DB.prepare("UPDATE users SET xp_balance=xp_balance+(SELECT xp FROM xp_ledger WHERE id=?),updated_at=? WHERE id=? AND EXISTS (SELECT 1 FROM xp_ledger WHERE id=? AND xp>0)")
+      .bind(ledgerId,now,user.id,ledgerId),
+    env.DB.prepare("SELECT xp FROM xp_ledger WHERE id=?").bind(ledgerId),
+    env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id)
+  ]);
+  const inserted=batch[2]?.results?.[0];
+  const balance=batch[3]?.results?.[0];
+  if(!inserted){
+    const duplicate=await env.DB.prepare("SELECT xp FROM xp_ledger WHERE user_id=? AND task_id=?").bind(user.id,taskId).first();
+    return json({success:true,awarded:0,alreadyAwarded:Boolean(duplicate),dailyLimitReached:!duplicate,xpBalance:Number(balance?.xp_balance||0)});
+  }
+  const awarded=Number(inserted.xp||0);
   return json({success:true,awarded,xpBalance:Number(balance?.xp_balance||0),difficulty,onTime,dailyLimitReached:awarded===0,reason:String(evaluation.reason||"AI baholadi.").slice(0,180)});
 }
 async function handleSpendXP(request,env,user){
