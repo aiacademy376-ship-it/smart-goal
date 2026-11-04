@@ -3549,6 +3549,8 @@
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success) throw new Error(result.message || "Amal bajarilmadi.");
       showToast(result.message || "So‘rov yangilandi.");
+      const profileRequestButton=document.querySelector("#modal-body [data-request-id]");
+      if(profileRequestButton && profileRequestButton.dataset.requestId===requestId){profileRequestButton.disabled=true;profileRequestButton.textContent=decision==="accept"?"Do‘stingiz":"So‘rov rad etildi";}
       await loadCommunityRelations();
     } catch (error) {
       showToast(error.message || "Amal bajarilmadi.", "error");
