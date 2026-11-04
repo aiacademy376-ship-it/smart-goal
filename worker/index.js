@@ -440,51 +440,64 @@ async function handleTaskCompletion(request,env,user){
     return json({success:false,message:"Vazifa hozir baholanmadi. Keyinroq qayta urinib ko‘ring."},503);
   }
   if(typeof evaluation?.meaningful==="string"){
-    const flag=evaluation.meaningful.trim().toLowerCase();
+    const flag=evaluation.meaningful.trim().toLowerCase().replace(/[^\\p{L}]/gu,"");
     if(["true","yes","1","ha","да"].includes(flag))evaluation.meaningful=true;
-    else if(["false","no","0","yo‘q","нет"].includes(flag))evaluation.meaningful=false;
+    else if(["false","no","0","yoq","нет"].includes(flag))evaluation.meaningful=false;
   }else if(evaluation?.meaningful===1)evaluation.meaningful=true;
   else if(evaluation?.meaningful===0)evaluation.meaningful=false;
+  const scoreValue=value=>{
+    const direct=Number(value);
+    if(Number.isFinite(direct))return direct;
+    const match=String(value??"").match(/-?\\d+(?:[.,]\\d+)?/);
+    return match?Number(match[0].replace(",", ".")):NaN;
+  };
   const rawDifficulty=Number(evaluation?.difficulty),rawEffort=Number(evaluation?.effort),rawRelevance=Number(evaluation?.goalRelevance);
   if(!Number.isFinite(rawDifficulty)||rawDifficulty<1||rawDifficulty>5||!Number.isFinite(rawEffort)||rawEffort<1||rawEffort>5||!Number.isFinite(rawRelevance)||rawRelevance<1||rawRelevance>5||typeof evaluation?.meaningful!=="boolean"){
     console.error("SmartGoal XP evaluation returned invalid fields.");
     return json({success:false,message:"Vazifa bahosi noto‘g‘ri qaytdi. Qayta urinib ko‘ring."},503);
   }
   const difficulty=Math.round(rawDifficulty),effort=Math.round(rawEffort),goalRelevance=Math.round(rawRelevance);
-  const titleLetters=title.replace(/[^\p{L}]/gu,"");
-  const combinedText=title+" "+description;
-  const combinedLetters=combinedText.replace(/[^\p{L}]/gu,"");
-  const usesVowelBasedScript=/[A-Za-zА-Яа-яЁё]/.test(combinedText);
-  const hasVowel=/[aeiouyáéíóúаеёиоуыэюя]/i.test(combinedText);
-  const looksLikeRandomLatin=usesVowelBasedScript && combinedLetters.length>=5 && !hasVowel;
-  const meaningful=evaluation.meaningful && titleLetters.length>=3 && !looksLikeRandomLatin;
+  const combinedText=(title+" "+description).normalize("NFKC").toLocaleLowerCase();
+  const normalizedTask=combinedText.replace(/[^\\p{L}\\p{N}]/gu,"");
+  const taskCharacters=Array.from(normalizedTask);
+  const distinctRatio=taskCharacters.length?new Set(taskCharacters).size/taskCharacters.length:0;
+  const keyboardMash=/^(?:asdf|asdfgh|asdfghjkl|qwerty|qwertyuiop|zxcv|йцук|йцукен|фыва|фывапролдж|ячсм|тест|test|xxx+|abc+|123+|qazwsx)$/iu.test(normalizedTask);
+  const repeatedText=/(.)\\1{4,}/u.test(normalizedTask);
+  const lowVariety=taskCharacters.length>=9&&distinctRatio<0.32;
+  const meaningful=evaluation.meaningful&&taskCharacters.length>=3&&!keyboardMash&&!repeatedText&&!lowVariety;
   const onTime=completedLocal<=dueDate;
   const priorityBonus=priority==="high"?1:priority==="low"?0:0.5;
+  const durationBonus=minutes>=180&&difficulty>=4&&effort>=4?1.5:minutes>=90&&difficulty>=3&&effort>=3?0.75:0;
   const suggestedXP=meaningful
-    ? Math.min(15,Math.max(1,Math.round(difficulty*1.5+effort*0.8+(goalRelevance>=4?1:0)+priorityBonus+(onTime?1.5:0))))
+    ? Math.min(15,Math.max(1,Math.round(difficulty*1.2+effort*1.4+durationBonus+(goalRelevance>=4?0.5:0)+priorityBonus+(onTime?1.5:0))))
     : 0;
   const now=new Date().toISOString();
   // Insert the XP ledger row and update the cached balance in one D1 batch.
   // D1 batches are transactional, so a failed balance update cannot leave an orphaned award.
   let awarded=0;
-  if(duplicate && Number(duplicate.xp)===0){
-    const update=await env.DB.batch([
-      env.DB.prepare("UPDATE xp_ledger SET xp=?,award_date=?,reason=?,created_at=? WHERE id=? AND xp=0")
-        .bind(suggestedXP,completedLocal,("Task: "+title).slice(0,140),now,duplicate.id),
-      env.DB.prepare("UPDATE users SET xp_balance=xp_balance+?,updated_at=? WHERE id=? AND changes()>0")
-        .bind(suggestedXP,now,user.id)
-    ]);
-    awarded=Number(update[0]?.meta?.changes||0)>0?suggestedXP:0;
-  }else{
-    const ledgerId=crypto.randomUUID();
-    const batch=await env.DB.batch([
-      env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) VALUES (?,?,?,?,?,?,?) ON CONFLICT(user_id,task_id) DO NOTHING")
-        .bind(ledgerId,user.id,taskId,suggestedXP,completedLocal,("Task: "+title).slice(0,140),now),
-      env.DB.prepare("UPDATE users SET xp_balance=xp_balance+(SELECT xp FROM xp_ledger WHERE id=?),updated_at=? WHERE id=? AND EXISTS (SELECT 1 FROM xp_ledger WHERE id=? AND xp>0)")
-        .bind(ledgerId,now,user.id,ledgerId),
-      env.DB.prepare("SELECT xp FROM xp_ledger WHERE id=?").bind(ledgerId)
-    ]);
-    awarded=Number(batch[2]?.results?.[0]?.xp||0);
+  try{
+    if(duplicate && Number(duplicate.xp)===0){
+      const update=await env.DB.batch([
+        env.DB.prepare("UPDATE xp_ledger SET xp=?,award_date=?,reason=?,created_at=? WHERE id=? AND xp=0")
+          .bind(suggestedXP,completedLocal,("Task: "+title).slice(0,140),now,duplicate.id),
+        env.DB.prepare("UPDATE users SET xp_balance=xp_balance+?,updated_at=? WHERE id=? AND changes()>0")
+          .bind(suggestedXP,now,user.id)
+      ]);
+      awarded=Number(update[0]?.meta?.changes||0)>0?suggestedXP:0;
+    }else{
+      const ledgerId=crypto.randomUUID();
+      const batch=await env.DB.batch([
+        env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) VALUES (?,?,?,?,?,?,?) ON CONFLICT(user_id,task_id) DO NOTHING")
+          .bind(ledgerId,user.id,taskId,suggestedXP,completedLocal,("Task: "+title).slice(0,140),now),
+        env.DB.prepare("UPDATE users SET xp_balance=xp_balance+(SELECT xp FROM xp_ledger WHERE id=?),updated_at=? WHERE id=? AND EXISTS (SELECT 1 FROM xp_ledger WHERE id=? AND xp>0)")
+          .bind(ledgerId,now,user.id,ledgerId),
+        env.DB.prepare("SELECT xp FROM xp_ledger WHERE id=?").bind(ledgerId)
+      ]);
+      awarded=Number(batch[2]?.results?.[0]?.xp||0);
+    }
+  }catch(error){
+    console.error("SmartGoal XP database write error:",error);
+    return json({success:false,message:"AI vazifani baholadi, lekin XP balansga yozilmadi. Qayta urinib ko‘ring."},503);
   }
   const balance=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();
   if(duplicate && awarded===0 && meaningful)return json({success:true,awarded:0,alreadyAwarded:true,xpBalance:Number(balance?.xp_balance||0)});
