@@ -1164,7 +1164,7 @@
         </div>
         <div class="form-field full-width">
           <label class="field-label">Qisqa mazmuni</label>
-          <textarea class="field-textarea" name="description" rows="3" maxlength="500" placeholder="Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.">${escapeHTML(task?.description || "")}</textarea>
+          <textarea class="field-textarea" name="description" rows="3" maxlength="500" required placeholder="Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.">${escapeHTML(task?.description || "")}</textarea>
           <small>Qisqa va aniq izoh AI’ga ishning qiyinligi va mehnatini adolatli baholashga yordam beradi.</small>
         </div>
         <div class="form-field">
@@ -1199,15 +1199,20 @@
     const fd = new FormData(form);
     const id = String(fd.get("id") || "");
     const title = String(fd.get("title") || "").trim();
+    const description = String(fd.get("description") || "").trim().slice(0, 500);
 
     if (title.length < 2) {
       showToast("Vazifa nomini kiriting.", "error");
       return;
     }
+    if (description.length < 5) {
+      showToast("Vazifa nima haqida ekanini kamida bir jumla bilan yozing.", "error");
+      return;
+    }
 
     const values = {
       title,
-      description: String(fd.get("description") || "").trim().slice(0, 500),
+      description,
       date: String(fd.get("date") || today()),
       priority: ["low","medium","high"].includes(String(fd.get("priority")||"medium")) ? String(fd.get("priority")||"medium") : "medium",
       estimatedMinutes: Math.max(5,Math.min(480,Number(fd.get("estimatedMinutes")||30)||30)),
