@@ -535,6 +535,27 @@ export default {
         });
       }
 
+      if (request.method === "GET" && path === "/api/users/profile") {
+        const viewer = await authenticatedUser(request, env);
+        if (!viewer) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
+        const username = String(url.searchParams.get("username") || "").trim().toLowerCase().replace(/^@/, "");
+        if (!/^[a-z0-9_][a-z0-9_.]{2,19}$/.test(username)) return json({ success:false,message:"Username noto‘g‘ri." },400);
+        const rateKey = await clientKey(request, "community-profile");
+        if (!await enforceRateLimit(env, rateKey, 60, 60)) return json({success:false,message:"Juda ko‘p profil ochildi. Biroz kuting."},429);
+        const person = await env.DB.prepare("SELECT u.id,u.name,u.username,u.created_at,u.xp_balance,d.data_json FROM users u LEFT JOIN user_data d ON d.user_id=u.id WHERE u.username=? COLLATE NOCASE LIMIT 1").bind(username).first();
+        if (!person) return json({success:false,message:"Foydalanuvchi topilmadi."},404);
+        let profileData={}; try { const parsed=JSON.parse(person.data_json||"{}"); profileData=parsed.profile||{}; profileData._tasks=Array.isArray(parsed.tasks)?parsed.tasks:[]; profileData._goals=Array.isArray(parsed.goals)?parsed.goals:[]; profileData._achievements=Array.isArray(parsed.achievements)?parsed.achievements:[]; } catch {}
+        const birthdatePublic=profileData.birthdatePublic===true;
+        return json({success:true,profile:{
+          id:person.id,name:person.name,username:person.username,xp:Number(person.xp_balance||0),createdAt:person.created_at,
+          bio:String(profileData.bio||"").slice(0,240),avatar:String(profileData.avatar||"").slice(0,180000),
+          background:String(profileData.background||"default"),avatarFrame:String(profileData.avatarFrame||"default"),
+          birthdate:birthdatePublic?String(profileData.birthdate||""):null,
+          completedTasks:profileData._tasks.filter(item=>item&&item.completed).length,
+          goals:profileData._goals.length,achievements:profileData._achievements.length
+        }});
+      }
+
       if (request.method === "GET" && path === "/api/friends") {
         const user = await authenticatedUser(request, env);
         if (!user) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
