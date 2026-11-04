@@ -56,7 +56,7 @@
       description: "Profilingiz va interfeysingiz uchun sokin ko‘k rang.",
       type: "theme",
       value: "ocean",
-      price: 250,
+      price: 80,
       icon: "waves"
     },
     {
@@ -65,7 +65,7 @@
       description: "Yashil va nafis ko‘rinish.",
       type: "theme",
       value: "emerald",
-      price: 400,
+      price: 120,
       icon: "leaf"
     },
     {
@@ -74,7 +74,7 @@
       description: "Iliq ranglardagi maxsus interfeys.",
       type: "theme",
       value: "sunset",
-      price: 550,
+      price: 160,
       icon: "sunset"
     },
     {
@@ -83,7 +83,7 @@
       description: "Nafis pushti ranglar uyg‘unligi.",
       type: "theme",
       value: "rose",
-      price: 750,
+      price: 200,
       icon: "flower-2"
     },
     {
@@ -92,7 +92,7 @@
       description: "Profil uchun qoramtir, maxsus fon.",
       type: "background",
       value: "midnight",
-      price: 1200,
+      price: 250,
       icon: "moon-star"
     },
     {
@@ -101,7 +101,7 @@
       description: "Maxsus kosmik profil foni.",
       type: "background",
       value: "galaxy",
-      price: 2500,
+      price: 400,
       icon: "orbit"
     },
     {
@@ -110,7 +110,7 @@
       description: "Noyob premium profil dizayni.",
       type: "background",
       value: "royal",
-      price: 5000,
+      price: 650,
       icon: "crown"
     },
     {
@@ -119,7 +119,7 @@
       description: "Diqqat va intizom ramzi.",
       type: "badge",
       value: "focus",
-      price: 900,
+      price: 120,
       icon: "crosshair"
     },
     {
@@ -128,8 +128,53 @@
       description: "Maxsus premium belgi.",
       type: "badge",
       value: "diamond",
-      price: 3000,
+      price: 300,
       icon: "gem"
+    },
+    {
+      id: "theme-sky",
+      name: "Sky mavzusi",
+      description: "Yengil moviy ranglar va sokin ko‘rinish.",
+      type: "theme",
+      value: "ocean",
+      price: 90,
+      icon: "cloud-sun"
+    },
+    {
+      id: "background-sakura",
+      name: "Sakura profil foni",
+      description: "Profilingizga nozik va yorqin uslub.",
+      type: "background",
+      value: "sakura",
+      price: 220,
+      icon: "flower-2"
+    },
+    {
+      id: "background-nebula",
+      name: "Nebula profil foni",
+      description: "Yulduzli kosmik bezak.",
+      type: "background",
+      value: "nebula",
+      price: 360,
+      icon: "orbit"
+    },
+    {
+      id: "badge-builder",
+      name: "Builder belgisi",
+      description: "Har kuni o‘z ustida ishlaydiganlar uchun.",
+      type: "badge",
+      value: "builder",
+      price: 100,
+      icon: "hammer"
+    },
+    {
+      id: "avatar-frame-gold",
+      name: "Oltin avatar ramkasi",
+      description: "Profil rasmingiz uchun oltin bezak.",
+      type: "avatar",
+      value: "gold",
+      price: 260,
+      icon: "crown"
     },
     {
       id: "avatar-premium",
@@ -137,7 +182,7 @@
       description: "Profil rasmingiz uchun maxsus ramka.",
       type: "avatar",
       value: "premium",
-      price: 1800,
+      price: 180,
       icon: "frame"
     }
   ];
@@ -330,6 +375,7 @@
   let settings = loadSettings();
   let currentPage = "dashboard";
   let currentSettingsTab = "general";
+  let storeFilter = "all";
   let toastTimeout = null;
   let remoteAuthenticated = false;
   let remoteSyncTimer = null;
@@ -2095,62 +2141,24 @@
   /* -------------------- STORE PAGE -------------------- */
 
   function renderRewards() {
+    const visibleItems = STORE_ITEMS.filter(item => storeFilter === "all" || item.type === storeFilter);
+    const categories = [{id:"all",label:"Barchasi"},{id:"theme",label:"Mavzular"},{id:"background",label:"Profil fonlari"},{id:"badge",label:"Belgilar"},{id:"avatar",label:"Avatar ramkalari"}];
     return `
-      ${pageHeader(
-        "MAXSUS IMKONIYATLAR",
-        "Mukofotlar do‘koni",
-        "Yig‘ilgan XP bilan profilingiz uchun maxsus mahsulotlarni oching."
-      )}
-
-      <section class="welcome-banner" style="min-height:120px">
-        <div class="welcome-content">
-          <span class="eyebrow">SIZNING BALANSINGIZ</span>
-          <h2>${formatNumber(data.xp)} XP</h2>
-          <p>Har bir vazifa sizni yangi imkoniyatlarga yaqinlashtiradi.</p>
-        </div>
-        <div class="welcome-visual">${icon("shopping-bag", 65)}</div>
-      </section>
-
+      ${pageHeader("MAXSUS IMKONIYATLAR","Mukofotlar do‘koni","XP bilan profilingiz va SmartGoal ko‘rinishini o‘zingizga moslang.")}
+      <section class="welcome-banner" style="min-height:120px"><div class="welcome-content"><span class="eyebrow">SIZNING BALANSINGIZ</span><h2>${formatNumber(data.xp)} XP</h2><p>Har bir haqiqiy yutuq sizga yangi imkoniyatlarni ochadi.</p></div><div class="welcome-visual">${icon("shopping-bag",65)}</div></section>
+      <div class="store-categories" role="group" aria-label="Do‘kon kategoriyalari">
+        ${categories.map(item => `<button type="button" class="store-category ${storeFilter===item.id?"active":""}" data-store-filter="${item.id}">${item.label}</button>`).join("")}
+      </div>
       <div class="store-grid">
-        ${STORE_ITEMS.map(item => {
+        ${visibleItems.map(item => {
           const owned = data.inventory.some(product => product.id === item.id);
           const canAfford = Number(data.xp) >= item.price;
-          return `
-            <article class="store-item">
-              <div class="store-preview">
-                ${icon(item.icon, 45)}
-              </div>
-              <div class="store-content">
-                <h3>${escapeHTML(item.name)}</h3>
-                <p>${escapeHTML(item.description)}</p>
-                <div class="store-price">
-                  <strong>${formatNumber(item.price)} XP</strong>
-                  ${owned
-                    ? `<button class="secondary-button" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button>`
-                    : `<button class="primary-button" type="button" data-action="buy-item" data-id="${escapeHTML(item.id)}" ${canAfford ? "" : "disabled"}>${canAfford ? "Xarid" : "XP yetarli emas"}</button>`}
-                </div>
-              </div>
-            </article>
-          `;
-        }).join("")}
+          return `<article class="store-item"><div class="store-preview">${icon(item.icon,45)}</div><div class="store-content"><h3>${escapeHTML(item.name)}</h3><p>${escapeHTML(item.description)}</p><div class="store-price"><strong>${formatNumber(item.price)} XP</strong>${owned ? `<button class="secondary-button" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button>` : `<button class="primary-button" type="button" data-action="buy-item" data-id="${escapeHTML(item.id)}" ${canAfford?"":"disabled"}>${canAfford?"Xarid":"XP yetarli emas"}</button>`}</div></div></article>`;
+        }).join("") || emptyState("Bu kategoriyada mahsulot yo‘q","Boshqa kategoriyani tanlang.","package")}
       </div>
-
-      <section class="card" style="margin-top:22px">
-        <h3 class="card-title">Sizning kolleksiyangiz</h3>
-        <p class="card-description">Sotib olgan mahsulotlaringiz shu yerda saqlanadi.</p>
-        <div class="badge-grid" style="margin-top:16px">
-          ${data.inventory.length ? data.inventory.map(owned => {
-            const item = STORE_ITEMS.find(product => product.id === owned.id);
-            return item ? `
-              <div class="achievement-card">
-                <div class="achievement-icon">${icon(item.icon, 22)}</div>
-                <strong>${escapeHTML(item.name)}</strong>
-                <button class="card-action" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button>
-              </div>
-            ` : "";
-          }).join("") : emptyState("Kolleksiyangiz hozircha bo‘sh", "Do‘kondan birinchi mahsulotingizni xarid qiling.", "package")}
-        </div>
-      </section>
+      <section class="card" style="margin-top:22px"><h3 class="card-title">Sizning kolleksiyangiz</h3><p class="card-description">Sotib olgan mahsulotlaringiz shu yerda saqlanadi.</p><div class="badge-grid" style="margin-top:16px">
+        ${data.inventory.length ? data.inventory.map(owned => { const item=STORE_ITEMS.find(product=>product.id===owned.id); return item ? `<div class="achievement-card"><div class="achievement-icon">${icon(item.icon,22)}</div><strong>${escapeHTML(item.name)}</strong><button class="card-action" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button></div>` : ""; }).join("") : emptyState("Kolleksiyangiz hozircha bo‘sh","Do‘kondan birinchi mahsulotingizni xarid qiling.","package")}
+      </div></section>
     `;
   }
 
@@ -2770,6 +2778,9 @@
       switchAuthTab(authTab.dataset.authTab);
       return;
     }
+
+    const storeCategory = event.target.closest("[data-store-filter]");
+    if (storeCategory) { storeFilter = storeCategory.dataset.storeFilter || "all"; render(); return; }
 
     const settingsTab = event.target.closest("[data-settings-tab]");
     if (settingsTab) {
