@@ -558,17 +558,18 @@ export default {
         }
 
         const result = await env.DB.prepare(
-          "SELECT id, name, username FROM users " +
+          "SELECT id, name, username, xp_balance FROM users " +
           "WHERE username LIKE ? COLLATE NOCASE " +
-          "ORDER BY username COLLATE NOCASE LIMIT 10"
-        ).bind(username + "%").all();
+          "ORDER BY CASE WHEN username = ? COLLATE NOCASE THEN 0 ELSE 1 END, username COLLATE NOCASE LIMIT 10"
+        ).bind(username + "%", username).all();
 
         return json({
           success: true,
           users: (result.results || []).map(item => ({
             id: item.id,
             name: item.name,
-            username: item.username
+            username: item.username,
+            xp: Number(item.xp_balance || 0)
           }))
         });
       }
