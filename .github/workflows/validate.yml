@@ -56,11 +56,17 @@ jobs:
           assert "rawDifficulty=scoreValue" in worker, "Robust AI score parsing is missing"
           assert "Vazifa nomi va izohi o‘zbek, rus, ingliz yoki boshqa tilda" in worker, "Multilingual task evaluation is missing"
 
+          store_start = script.index("const STORE_ITEMS")
+          store_end = script.index("const ACHIEVEMENTS", store_start)
+          catalog_start = worker.index("const STORE_CATALOG")
+          catalog_end = worker.index("async function handleStorePurchase", catalog_start)
+          store_source = script[store_start:store_end]
+          server_catalog_source = worker[catalog_start:catalog_end]
           js_items = dict((item_id, int(price)) for item_id, price in re.findall(
-              r'id:\s*"([^"]+)"[\s\S]*?price:\s*(\d+)', script
+              r'id:\s*"([^"]+)"[\s\S]*?price:\s*(\d+)', store_source
           ))
           worker_catalog = dict((item_id, int(price)) for item_id, price in re.findall(
-              r'"([^"]+)":\{price:(\d+),type:', worker
+              r'"([^"]+)":\{price:(\d+),type:', server_catalog_source
           ))
           assert js_items, "Frontend reward catalog could not be read"
           assert js_items == worker_catalog, (
