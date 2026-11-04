@@ -644,6 +644,7 @@ export default {
           bio:String(profileData.bio||"").slice(0,240),avatar:String(profileData.avatar||"").slice(0,180000),
           background:String(profileData.background||"default"),avatarFrame:String(profileData.avatarFrame||"default"),activeBadge:String(profileData.activeBadge||"").slice(0,30),
           birthdate:birthdatePublic?String(profileData.birthdate||""):null,
+          customizationScore:[profileData.background&&profileData.background!=="default",profileData.avatarFrame&&profileData.avatarFrame!=="default",Boolean(profileData.activeBadge)].filter(Boolean).length,
           completedTasks:profileData._tasks.filter(item=>item&&item.completed).length,
           goals:profileData._goals.length,achievements:profileData._achievements.length
         }});
