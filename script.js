@@ -3397,6 +3397,7 @@
       }
       showApplication();
       checkAchievements();
+      checkRoutineReminders();
       openRequestedProfile();
     } catch {
       remoteAuthenticated = false;
