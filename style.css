@@ -6223,3 +6223,6 @@ button, .nav-link, .icon-button { touch-action:manipulation; }
   .dashboard-routine-row { grid-template-columns:48px minmax(0,1fr); }
   .dashboard-routine-row .routine-status-pill { grid-column:2; justify-self:start; }
 }
+
+.routine-progress-no-time { display:block; height:100%; background:#ef8b55; transition:width .2s ease; }
+.routine-legend-time { color:#d8793d; font-weight:700; }
