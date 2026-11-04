@@ -1,9 +1,6 @@
 name: SmartGoal validation
 
 on:
-  push:
-    branches:
-      - smartgoal/cloudflare-upgrade
   pull_request:
     branches:
       - main
@@ -23,8 +20,8 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check script.js
-          node --check worker/index.js
-          node --check "functions/api/[[path]].js"
+          node --input-type=module --check < worker/index.js
+          node --input-type=module --check < "functions/api/[[path]].js"
 
       - name: Set up Python
         uses: actions/setup-python@v5
