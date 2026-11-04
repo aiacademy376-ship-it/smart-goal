@@ -2842,6 +2842,13 @@
   const translationOriginalText = new WeakMap();
   const translationOriginalAttributes = new WeakMap();
 
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Masalan: 20 bet kitob o‘qish":"Например: прочитать 20 страниц книги","Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.":"Кратко опишите задачу. Например: прочитать 20 страниц и записать 3 главные мысли.","Qaysi maqsadga tegishli?":"К какой цели относится?","Maqsadsiz vazifa":"Без привязки к цели","Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"Например: просыпаюсь в 07:00, ухожу в школу в 08:30, возвращаюсь в 14:00. Вечером хочу учить английский."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Masalan: 20 bet kitob o‘qish":"Example: read 20 pages of a book","Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.":"Briefly describe what you will do. Example: read 20 pages and write down 3 key ideas.","Qaysi maqsadga tegishli?":"Which goal is this linked to?","Maqsadsiz vazifa":"No linked goal","Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"Example: I wake up at 7:00, leave for school at 8:30, return at 14:00, and want to study English in the evening."
+  });
+
   function translateVisibleUI(root = document.body) {
     if (!root) return;
     const dictionary = UI_TRANSLATIONS[settings.language] || {};
