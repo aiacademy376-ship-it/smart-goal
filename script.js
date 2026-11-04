@@ -3751,7 +3751,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     }
 
     if (target.matches("[data-delete-scope='all']")) {
-      $("#modal-body [data-delete-scope]").forEach(input => {
+      $("$modal-body [data-delete-scope]").forEach(input => {
         if (input !== target) input.checked = target.checked;
       });
       return;
@@ -3759,7 +3759,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
 
     if (target.matches("#modal-body [data-delete-scope]")) {
       const all = $("#modal-body [data-delete-scope='all']");
-      const options = $("#modal-body [data-delete-scope]:not([data-delete-scope='all'])");
+      const options = $("$modal-body [data-delete-scope]:not([data-delete-scope='all'])");
       const checked = options.filter(input => input.checked).length;
       if (all) {
         all.checked = checked === options.length;
