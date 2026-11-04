@@ -6056,3 +6056,5 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .public-profile-level { margin-left:0; margin-right:0; }
   .daily-coach-actions { width:100%; }
 }
+
+.profile-decoration-score { display:block; margin:4px 0 8px; color:var(--text-muted); font-size:10px; }
