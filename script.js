@@ -1232,7 +1232,7 @@
         task.completedAt = new Date().toISOString();
         render();
 
-        if (!task.xpAwarded) {
+        if (!task.xpAwarded || Number(task.xpEarned || 0) === 0) {
           try {
             const goal = data.goals.find(item => item.id === task.goalId);
             if (remoteAuthenticated && !await flushRemoteSync()) {
