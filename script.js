@@ -1281,7 +1281,7 @@
             } else if (result.alreadyAwarded) {
               showToast("Bu vazifa uchun XP avval berilgan.", "error");
             } else {
-              showToast("AI bahosi: +" + task.xpEarned + " XP · " + (result.reason || (result.difficulty + "/5")));
+              showToast("AI bahosi: +" + task.xpEarned + " XP · qiyinlik " + (result.difficulty || "—") + "/5 · mehnat " + (result.effort || "—") + "/5 · " + (result.onTime ? "muddatida" : "kechikkan"));
             }
           } catch (error) {
             task.completed = false;
