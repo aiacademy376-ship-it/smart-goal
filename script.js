@@ -1374,33 +1374,35 @@
     const item = STORE_ITEMS.find(product => product.id === id);
     if (!item) return;
     purchaseActionsInFlight.add(id);
-
+    const button = document.querySelector("[data-action='confirm-purchase']");
+    if (button) button.disabled = true;
     try {
       if (data.inventory.some(product => product.id === id)) {
-        showToast("Bu mahsulot sizda mavjud.", "error");
-        closeModal();
-        return;
+        showToast("Bu mahsulot sizda allaqachon mavjud.", "error"); closeModal(); return;
       }
-
-      const button = document.querySelector("[data-action='confirm-purchase']");
-      if (button) button.disabled = true;
-      if (!await spendXP(item.price)) return;
-
-      data.inventory.push({
-        id: item.id,
-        type: item.type,
-        value: item.value,
-        purchasedAt: new Date().toISOString()
-      });
-
-      saveData();
-      closeModal();
-      render();
+      let purchasedItem;
+      if (remoteAuthenticated) {
+        const response = await fetch("/api/store/purchase", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({itemId:id})});
+        const result = await response.json().catch(()=>({}));
+        if (!response.ok || !result.success) throw new Error(result.message || "Xaridni amalga oshirib bo‘lmadi.");
+        data.xp = Number(result.xpBalance || 0);
+        data.spentXP = (Number(data.spentXP)||0) + item.price;
+        purchasedItem = result.item;
+      } else {
+        if (Number(data.xp) < item.price) throw new Error("Bu xarid uchun XP yetarli emas.");
+        data.xp = Number(data.xp) - item.price;
+        data.spentXP = (Number(data.spentXP)||0) + item.price;
+        purchasedItem = {id:item.id,type:item.type,value:item.value,purchasedAt:new Date().toISOString()};
+      }
+      data.inventory.push(purchasedItem || {id:item.id,type:item.type,value:item.value,purchasedAt:new Date().toISOString()});
+      saveData(); closeModal(); render();
       showToast(`${item.name} muvaffaqiyatli xarid qilindi!`);
+    } catch (error) {
+      showToast(error.message || "Xarid vaqtida xatolik yuz berdi.", "error");
     } finally {
       purchaseActionsInFlight.delete(id);
-      const button = document.querySelector("[data-action='confirm-purchase']");
-      if (button) button.disabled = false;
+      const currentButton = document.querySelector("[data-action='confirm-purchase']");
+      if (currentButton) currentButton.disabled = false;
     }
   }
 
