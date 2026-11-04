@@ -612,7 +612,15 @@ const STORE_CATALOG = {
   "background-sunrise":{price:450,type:"background",value:"sunrise"},
   "badge-scholar":{price:240,type:"badge",value:"Scholar"},
   "badge-explorer":{price:280,type:"badge",value:"Explorer"},
-  "avatar-frame-neon":{price:420,type:"avatar",value:"neon"}
+  "avatar-frame-neon":{price:420,type:"avatar",value:"neon"},
+  "theme-lavender":{price:150,type:"theme",value:"lavender"},
+  "theme-mint":{price:180,type:"theme",value:"mint"},
+  "background-coral":{price:520,type:"background",value:"coral"},
+  "background-ember":{price:720,type:"background",value:"ember"},
+  "badge-streak":{price:360,type:"badge",value:"Streak"},
+  "badge-creator":{price:480,type:"badge",value:"Creator"},
+  "avatar-frame-crystal":{price:620,type:"avatar",value:"crystal"},
+  "avatar-frame-flame":{price:760,type:"avatar",value:"flame"}
 };
 
 async function handleStorePurchase(request,env,user){
@@ -743,7 +751,7 @@ export default {
           bio:String(profileData.bio||"").slice(0,240),avatar:String(profileData.avatar||"").slice(0,180000),
           background:String(profileData.background||"default"),avatarFrame:String(profileData.avatarFrame||"default"),activeBadge:String(profileData.activeBadge||"").slice(0,30),
           birthdate:birthdatePublic?String(profileData.birthdate||""):null,
-          customizationScore:[profileData.background&&profileData.background!=="default",profileData.avatarFrame&&profileData.avatarFrame!=="default",Boolean(profileData.activeBadge)].filter(Boolean).length,
+          customizationScore:[Boolean(profileData.avatar),Boolean(String(profileData.bio||"").trim()),profileData.background&&profileData.background!=="default",profileData.avatarFrame&&profileData.avatarFrame!=="default",Boolean(profileData.activeBadge)].filter(Boolean).length,
           completedTasks:profileData._tasks.filter(item=>item&&item.completed).length,
           goals:profileData._goals.length,achievements:profileData._achievements.length
         }});
