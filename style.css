@@ -1,3 +1,89 @@
+
+/* ---------- SMARTGOAL RESPONSIVE & ROUTINE EXTENSIONS ---------- */
+:root { --content-gutter: clamp(14px, 2.6vw, 35px); }
+html { scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+img, svg, video, canvas { max-width: 100%; }
+button, input, select, textarea { font: inherit; }
+button, .nav-link, .icon-button { touch-action: manipulation; }
+#content, .content-area, .card, .dashboard-grid > *, .stats-grid > *, .store-grid > * { min-width: 0; }
+.main-area { padding-left: var(--content-gutter); padding-right: var(--content-gutter); }
+.content-area { width: 100%; }
+.routine-card { overflow: hidden; }
+.routine-list { display: grid; gap: 0; }
+.routine-item { display: grid; grid-template-columns: 76px minmax(0,1fr) auto; align-items: center; gap: 14px; padding: 13px 4px; border-top: 1px solid var(--border); }
+.routine-item time { color: var(--primary); font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.routine-item-content { display: grid; gap: 4px; min-width: 0; }
+.routine-item-content strong { overflow-wrap: anywhere; }
+.routine-item-content small { color: var(--text-muted); line-height: 1.5; overflow-wrap: anywhere; }
+.routine-item-actions { display: flex; gap: 5px; }
+.routine-ai { display: grid; gap: 12px; margin-top: 18px; padding: 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); }
+.routine-ai > div { display: grid; gap: 4px; }
+.routine-ai > div strong { display: flex; align-items: center; gap: 7px; }
+.routine-ai > div small { color: var(--text-muted); line-height: 1.5; }
+.routine-ai textarea { width: 100%; min-width: 0; resize: vertical; }
+.routine-ai .primary-button { justify-self: start; }
+.ai-message, .card-description, .goal-item, .task-info { overflow-wrap: anywhere; }
+@media (min-width: 1600px) {
+  .content-area { max-width: 1600px; }
+}
+@media (max-width: 1180px) {
+  .main-area { padding-left: 22px; padding-right: 22px; }
+  .dashboard-grid { grid-template-columns: minmax(0,1fr); }
+  .store-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 900px) {
+  .main-area { margin-left: 0; padding: 0 18px; }
+  .sidebar { transform: translateX(-105%); width: min(var(--sidebar-width), 86vw); }
+  .sidebar.open { transform: translateX(0); box-shadow: 0 0 0 999px rgba(15,23,42,.42), 12px 0 40px rgba(15,23,42,.16); }
+  .content-area { padding-top: 20px; }
+  .topbar { gap: 10px; }
+  .topbar-left, .topbar-right { gap: 9px; }
+}
+@media (max-width: 640px) {
+  .main-area { padding-left: 13px; padding-right: 13px; }
+  .topbar { min-height: 64px; }
+  .page-date { display: none; }
+  .topbar-left, .topbar-right { min-width: 0; }
+  .content-area { min-height: calc(100vh - 100px); padding: 18px 0 28px; }
+  .stats-grid, .store-grid { grid-template-columns: minmax(0,1fr); gap: 11px; }
+  .dashboard-grid { gap: 13px; }
+  .card { padding: 16px; border-radius: 15px; }
+  .card-header { align-items: flex-start; flex-wrap: wrap; }
+  .page-heading, .page-header { gap: 10px; flex-wrap: wrap; }
+  .form-grid { grid-template-columns: minmax(0,1fr); }
+  .form-field.full-width { grid-column: auto; }
+  .modal-overlay { padding: 10px; align-items: flex-end; }
+  .modal { max-height: min(88dvh, 760px); border-radius: 18px 18px 12px 12px; }
+  .modal-body { overflow-y: auto; overscroll-behavior: contain; }
+  .profile-main-card { padding-left: 16px; padding-right: 16px; }
+  .profile-meta, .profile-actions { flex-wrap: wrap; }
+  .routine-item { grid-template-columns: 58px minmax(0,1fr); gap: 9px; }
+  .routine-item-actions { grid-column: 2; justify-self: end; }
+  .routine-ai .primary-button { width: 100%; }
+  .ai-input-row { gap: 8px; }
+  .ai-input-row input { min-width: 0; }
+  .app-footer { flex-wrap: wrap; }
+}
+@media (max-width: 380px) {
+  .main-area { padding-left: 9px; padding-right: 9px; }
+  .card { padding: 13px; }
+  .primary-button, .secondary-button { min-height: 43px; padding-left: 13px; padding-right: 13px; }
+  .stats-grid { grid-template-columns: minmax(0,1fr); }
+  .routine-item { grid-template-columns: 52px minmax(0,1fr); }
+}
+@media (max-height: 520px) and (orientation: landscape) {
+  .sidebar { overflow-y: auto; overscroll-behavior: contain; }
+  .modal { max-height: 94dvh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+@media (max-width: 640px), (prefers-reduced-motion: reduce) {
+  .store-item:hover, .primary-button:hover { transform: none; box-shadow: none; }
+}
+
 /* =========================================================
    SMARTGOAL — PREMIUM DESIGN SYSTEM
    Version 2.0
