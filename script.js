@@ -1851,7 +1851,7 @@
             <div class="card-header">
               <div>
                 <h3 class="card-title">Bugungi kun tartibim</h3>
-                <p class="card-description">${routineToday.completedPercent}% bajarildi · ${completedToday}/${todayTasks.length} ta band</p>
+                <p class="card-description">${routineToday.completedPercent}% bajarildi · ${routineToday.missedPercent}% bajarilmadi · ${completedToday}/${todayTasks.length} ta band</p>
               </div>
               <button class="card-action" type="button" data-page="planner">Batafsil</button>
             </div>
@@ -2054,8 +2054,16 @@
     if (autoMarked) saveData();
     const total = items.length;
     const completed = items.filter(item => item.status === "done").length;
-    const missed = items.filter(item => item.status === "missed" || item.status === "no-time").length;
-    return { items, total, completed, missed, completedPercent: total ? Math.round(completed / total * 100) : 0, missedPercent: total ? Math.round(missed / total * 100) : 0 };
+    const skipped = items.filter(item => item.status === "missed").length;
+    const noTime = items.filter(item => item.status === "no-time").length;
+    const missed = skipped + noTime;
+    return {
+      items, total, completed, skipped, noTime, missed,
+      completedPercent: total ? Math.round(completed / total * 100) : 0,
+      skippedPercent: total ? Math.round(skipped / total * 100) : 0,
+      noTimePercent: total ? Math.round(noTime / total * 100) : 0,
+      missedPercent: total ? Math.round(missed / total * 100) : 0
+    };
   }
 
   async function setRoutineStatus(id, status) {
@@ -2115,8 +2123,8 @@
         </div>
         <div class="routine-progress-summary">
           <div class="routine-progress-head"><strong>Bugungi bajarilish</strong><span>${routineProgress.completedPercent}% bajarildi</span></div>
-          <div class="routine-progress-track"><span class="routine-progress-done" style="width:${routineProgress.completedPercent}%"></span><span class="routine-progress-missed" style="width:${routineProgress.missedPercent}%"></span></div>
-          <div class="routine-progress-legend"><span class="routine-legend-done">${routineProgress.completed} bajarildi</span><span class="routine-legend-missed">${routineProgress.missed} bajarilmadi</span><span>${Math.max(0,routineProgress.total-routineProgress.completed-routineProgress.missed)} kutilmoqda</span></div>
+          <div class="routine-progress-track"><span class="routine-progress-done" style="width:${routineProgress.completedPercent}%"></span><span class="routine-progress-missed" style="width:${routineProgress.skippedPercent}%"></span><span class="routine-progress-no-time" style="width:${routineProgress.noTimePercent}%"></span></div>
+          <div class="routine-progress-legend"><span class="routine-legend-done">${routineProgress.completed} ta · ${routineProgress.completedPercent}% bajarildi</span><span class="routine-legend-missed">${routineProgress.skipped} ta · ${routineProgress.skippedPercent}% o‘tkazildi</span><span class="routine-legend-time">${routineProgress.noTime} ta · ${routineProgress.noTimePercent}% vaqt yetmadi</span><span>${Math.max(0,routineProgress.total-routineProgress.completed-routineProgress.missed)} kutilmoqda</span></div>
         </div>
         <div class="routine-list">
           ${routineProgress.items.length ? routineProgress.items.map(item => {
