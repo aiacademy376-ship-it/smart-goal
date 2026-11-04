@@ -405,6 +405,25 @@ async function handleAI(request,env,user){
   try{return json({success:true,answer:await runSmartAI(env,messages,{max_tokens:action==="plan"||action==="routine"?1100:650})});}
   catch(error){console.error("SmartGoal AI error:",{name:error?.name||"Error",message:String(error?.message||error||"Unknown AI error").slice(0,500),cause:error?.cause?String(error.cause).slice(0,300):undefined});return json({success:false,message:error?.message||"AI bilan bog‘lanib bo‘lmadi."},503);}
 }
+function extractFirstJsonObject(value){
+  const source=String(value||"");
+  let start=-1,depth=0,inString=false,escaped=false;
+  for(let i=0;i<source.length;i++){
+    const char=source[i];
+    if(start<0){if(char==="{"){start=i;depth=1;}continue;}
+    if(inString){
+      if(escaped){escaped=false;continue;}
+      if(char==="\\"){escaped=true;continue;}
+      if(char==='"')inString=false;
+      continue;
+    }
+    if(char==='"'){inString=true;continue;}
+    if(char==="{")depth++;
+    else if(char==="}"&&--depth===0)return source.slice(start,i+1);
+  }
+  return "";
+}
+
 async function handleTaskCompletion(request,env,user){
   if(!env.AI)return json({success:false,message:"AI baholash xizmati ulanmagan."},503);
   const body=await readJson(request),requestedTask=body.task||{},taskId=String(requestedTask.id||"").trim();
@@ -477,7 +496,7 @@ async function handleTaskCompletion(request,env,user){
     const raw=await runSmartAI(env,[
       {role:"system",content:"Sen SmartGoal adolatli XP baholovchisan. Maqsad foydalanuvchini rag‘batlantirish, lekin oson va soxta vazifalar bilan ball yig‘ishga yo‘l qo‘ymaslik. Faqat so‘ralgan JSONni qaytar."},
       {role:"user",content:prompt}
-    ],{max_tokens:240,temperature:0.05});
+    ],{max_tokens:320,temperature:0.05});
     const match=raw.match(/\{[\s\S]*\}/);
     if(!match)throw new Error("AI baholash formati noto‘g‘ri.");
     evaluation=JSON.parse(match[0]);
@@ -524,22 +543,27 @@ async function handleTaskCompletion(request,env,user){
   try{
     if(duplicate && Number(duplicate.xp)===0){
       const update=await env.DB.batch([
-        env.DB.prepare("UPDATE xp_ledger SET xp=?,award_date=?,reason=?,created_at=? WHERE id=? AND xp=0")
+        env.DB.prepare("UPDATE xp_ledger SET xp=?,award_date=?,reason=?,created_at=? WHERE id=? AND xp=0 RETURNING xp,created_at")
           .bind(suggestedXP,completedLocal,("Task: "+title).slice(0,140),now,duplicate.id),
-        env.DB.prepare("UPDATE users SET xp_balance=xp_balance+?,updated_at=? WHERE id=? AND changes()>0")
-          .bind(suggestedXP,now,user.id)
+        env.DB.prepare("UPDATE users SET xp_balance=xp_balance+(SELECT xp FROM xp_ledger WHERE id=? AND created_at=? AND xp>0),updated_at=? WHERE id=? AND EXISTS(SELECT 1 FROM xp_ledger WHERE id=? AND created_at=? AND xp>0) RETURNING xp_balance")
+          .bind(duplicate.id,now,now,user.id,duplicate.id,now)
       ]);
-      awarded=Number(update[0]?.meta?.changes||0)>0?suggestedXP:0;
+      const updatedLedger=update[0]?.results?.[0];
+      const updatedBalance=update[1]?.results?.[0];
+      awarded=updatedLedger&&updatedBalance?Number(updatedLedger.xp||0):0;
+      if(updatedLedger&&Number(updatedLedger.xp||0)>0&&!updatedBalance)throw new Error("XP balansi yangilanmadi.");
     }else{
       const ledgerId=crypto.randomUUID();
       const batch=await env.DB.batch([
-        env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) VALUES (?,?,?,?,?,?,?) ON CONFLICT(user_id,task_id) DO NOTHING")
+        env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) VALUES (?,?,?,?,?,?,?) ON CONFLICT(user_id,task_id) DO NOTHING RETURNING xp,created_at")
           .bind(ledgerId,user.id,taskId,suggestedXP,completedLocal,("Task: "+title).slice(0,140),now),
-        env.DB.prepare("UPDATE users SET xp_balance=xp_balance+(SELECT xp FROM xp_ledger WHERE id=?),updated_at=? WHERE id=? AND EXISTS (SELECT 1 FROM xp_ledger WHERE id=? AND xp>0)")
-          .bind(ledgerId,now,user.id,ledgerId),
-        env.DB.prepare("SELECT xp FROM xp_ledger WHERE id=?").bind(ledgerId)
+        env.DB.prepare("UPDATE users SET xp_balance=xp_balance+(SELECT xp FROM xp_ledger WHERE id=? AND created_at=? AND xp>0),updated_at=? WHERE id=? AND EXISTS(SELECT 1 FROM xp_ledger WHERE id=? AND created_at=? AND xp>0) RETURNING xp_balance")
+          .bind(ledgerId,now,now,user.id,ledgerId,now)
       ]);
-      awarded=Number(batch[2]?.results?.[0]?.xp||0);
+      const insertedLedger=batch[0]?.results?.[0];
+      const updatedBalance=batch[1]?.results?.[0];
+      awarded=insertedLedger&&updatedBalance?Number(insertedLedger.xp||0):0;
+      if(insertedLedger&&Number(insertedLedger.xp||0)>0&&!updatedBalance)throw new Error("XP balansi yangilanmadi.");
     }
   }catch(error){
     console.error("SmartGoal XP database write error:",error);
