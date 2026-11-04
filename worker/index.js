@@ -684,17 +684,17 @@ export default {
         const user = await authenticatedUser(request, env);
         if (!user) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
         const incoming = await env.DB.prepare(
-          "SELECT fr.id, u.name, u.username, fr.created_at AS createdAt " +
+          "SELECT fr.id, u.id AS userId, u.name, u.username, fr.created_at AS createdAt " +
           "FROM friend_requests fr JOIN users u ON u.id = fr.sender_id " +
           "WHERE fr.receiver_id = ? AND fr.status = 'pending' ORDER BY fr.created_at DESC LIMIT 100"
         ).bind(user.id).all();
         const outgoing = await env.DB.prepare(
-          "SELECT fr.id, u.name, u.username, fr.created_at AS createdAt " +
+          "SELECT fr.id, u.id AS userId, u.name, u.username, fr.created_at AS createdAt " +
           "FROM friend_requests fr JOIN users u ON u.id = fr.receiver_id " +
           "WHERE fr.sender_id = ? AND fr.status = 'pending' ORDER BY fr.created_at DESC LIMIT 100"
         ).bind(user.id).all();
         const friends = await env.DB.prepare(
-          "SELECT u.name, u.username, fr.updated_at AS since " +
+          "SELECT u.id, u.name, u.username, fr.updated_at AS since " +
           "FROM friend_requests fr JOIN users u ON u.id = CASE WHEN fr.sender_id = ? THEN fr.receiver_id ELSE fr.sender_id END " +
           "WHERE (fr.sender_id = ? OR fr.receiver_id = ?) AND fr.status = 'accepted' " +
           "ORDER BY fr.updated_at DESC LIMIT 200"
