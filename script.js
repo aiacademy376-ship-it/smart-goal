@@ -1530,7 +1530,7 @@
 
   function getActivityStreak() {
     const activeDays=new Set();
-    for(const item of (data.activity||[]))if(/^\\d{4}-\\d{2}-\\d{2}$/.test(String(item.date||"")))activeDays.add(String(item.date));
+    for(const item of (data.activity||[]))if(/^\d{4}-\d{2}-\d{2}$/.test(String(item.date||"")))activeDays.add(String(item.date));
     for(const task of (data.tasks||[])){
       if(!task.completed||!task.completedAt)continue;
       const date=new Date(task.completedAt);
