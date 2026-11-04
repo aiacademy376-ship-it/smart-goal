@@ -6046,3 +6046,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .leaderboard-user small { color:var(--text-muted); font-size:10px; overflow-wrap:anywhere; }
 .leaderboard-xp { color:var(--primary); font-size:12px; white-space:nowrap; }
 @media(max-width:420px) { .leaderboard-row { grid-template-columns:34px minmax(0,1fr); } .leaderboard-xp { grid-column:2; justify-self:start; } }
+
+/* Expanded profile customization and level progress */
+.avatar-frame-neon { outline:3px solid #67e8f9; outline-offset:3px; box-shadow:0 0 0 6px rgba(103,232,249,.16),0 0 22px rgba(103,232,249,.35); }
+.public-profile-level { display:grid; gap:8px; margin:16px auto 8px; max-width:460px; text-align:left; }
+.public-profile-level-head { display:flex; align-items:center; justify-content:space-between; gap:12px; color:var(--text-secondary); font-size:12px; }
+.public-profile-level > small { color:var(--text-muted); font-size:11px; }
+@media(max-width:520px) {
+  .public-profile-level { margin-left:0; margin-right:0; }
+  .daily-coach-actions { width:100%; }
+}
