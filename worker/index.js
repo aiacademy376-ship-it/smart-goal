@@ -354,7 +354,10 @@ async function handleAI(request,env,user){
       {role:"system",content:"Sen foydalanuvchiga real, sog‘lom va bajariladigan kun tartibi tuzadigan murabbiysan. Foydalanuvchi qaysi tilda yozsa, o‘sha tilda javob ber. Uyg‘onish, gigiyena, ovqatlanish, o‘qish/ish, tanaffus, harakat va uyquni muvozanatla. Vaqtlar 24 soat HH:MM formatida bo‘lsin, bandlar bir-biriga ustma-ust tushmasin. Faqat JSON massiv qaytar: [{\"time\":\"07:00\",\"title\":\"Uyg‘onish\",\"description\":\"Suv ichish va kunni boshlash\"}]. 5–14 ta band."},
       {role:"user",content:"Mening odatlarim va xohishlarim: "+requestText+"\nSmartGoal maqsadlari va vazifalari: "+routineContext}
     ];
-  }else if(action==="plan")messages=[{role:"system",content:system+" Faqat berilgan ma’lumotlarga asoslan. Kunlik reja real va bajariladigan bo‘lsin."},{role:"user",content:"Maqsadlarim, vazifalarim va mavjud kun tartibimni tahlil qilib bugungi va yaqin kunlar uchun ustuvor reja tuz. Vaqt taxmini, tanaffuslar va tavsiyalarni yoz; mavjud tartibim bilan to‘qnashuv bo‘lmasin. Ma’lumotlar: "+context}];
+  }else if(action==="plan"){
+    const planLanguage={uz:"Rejani o‘zbek tilida, lotin yozuvida yoz.",ru:"Составь план полностью на русском языке.",en:"Write the plan entirely in English."}[language];
+    messages=[{role:"system",content:system+" Faqat berilgan ma’lumotlarga asoslan. Kunlik reja real va bajariladigan bo‘lsin. "+planLanguage+" Har bir band uchun aniq vaqt yoki davomiylik, ustuvorlik va qisqa sabab ko‘rsat."},{role:"user",content:"Maqsadlarim, vazifalarim va mavjud kun tartibimni tahlil qilib bugungi va yaqin kunlar uchun ustuvor reja tuz. Vaqt taxmini, tanaffuslar va tavsiyalarni yoz; mavjud tartibim bilan to‘qnashuv bo‘lmasin. Ma’lumotlar: "+context}];
+  }
   else{
     const message=String(body.message||"").trim();if(!message||message.length>500)return json({success:false,message:"Xabar 1–500 belgi bo‘lishi kerak."},400);
     messages=[{role:"system",content:system+" Foydalanuvchining SmartGoal konteksti: "+context}];
