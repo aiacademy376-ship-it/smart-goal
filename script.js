@@ -657,6 +657,7 @@
     overlay.classList.remove("hidden");
     document.body.style.overflow = "hidden";
     refreshIcons();
+    translateVisibleUI($("#modal-overlay"));
   }
 
   function closeModal() {
@@ -2680,6 +2681,37 @@
 
   /* -------------------- NAVIGATION -------------------- */
 
+  const UI_TRANSLATIONS = {
+    ru: {
+      "Bosh sahifa":"Главная","Maqsadlarim":"Мои цели","Vazifalar":"Задачи","Rejalashtiruvchi":"Планировщик","Statistika":"Статистика","Yutuqlarim":"Мои достижения","Mukofotlar do‘koni":"Магазин наград","Hamjamiyat":"Сообщество","Smart AI":"Smart AI","Bildirishnomalar":"Уведомления","Sozlamalar":"Настройки","Mening profilim":"Мой профиль",
+      "Maqsad qo‘shish":"Добавить цель","Yangi maqsad":"Новая цель","Vazifa qo‘shish":"Добавить задачу","Yangi vazifa":"Новая задача","Saqlash":"Сохранить","Bekor qilish":"Отмена","O‘chirish":"Удалить","Tahrirlash":"Изменить","Bugungi vazifalar":"Задачи на сегодня","Barcha vazifalar":"Все задачи","Maqsadlar":"Цели","Faol maqsadlar":"Активные цели","Yakunlangan":"Завершено","O‘rtacha progress":"Средний прогресс","Jami XP":"Всего XP","Bu haftadagi XP":"XP за неделю","Bajarilgan vazifalar":"Выполненные задачи","Bajarilish foizi":"Процент выполнения","Kun tartibim":"Мой распорядок дня","Band qo‘shish":"Добавить пункт","Menga kun tartibi tuz":"Составить распорядок","Vaqtida eslatib tur":"Напоминать вовремя","Yutuq qo‘shish":"Добавить достижение","Shaxsiy xotiralar":"Личные воспоминания","Xarid":"Купить","Qo‘llash":"Применить","XP yetarli emas":"Недостаточно XP","Yorug‘":"Светлая","Qorong‘i":"Тёмная","Qurilma bo‘yicha":"Как на устройстве","Umumiy sozlamalar":"Общие настройки","Interfeys tili":"Язык интерфейса","Profilni tahrirlash":"Редактировать профиль","Username":"Имя пользователя","Tug‘ilgan sana":"Дата рождения","Qisqa mazmuni":"Краткое описание","Vazifa nomi":"Название задачи","Qaysi kuni bajariladi?":"Когда выполнить?","Vaqt":"Время","Nima qilasiz?":"Что будете делать?","Do‘st bo‘lish":"Добавить в друзья","Do‘stlar":"Друзья","Foydalanuvchilar":"Пользователи","Qidirilmoqda...":"Поиск...","Foydalanuvchi topilmadi":"Пользователь не найден","Kunlik reja":"План на день","AI reja tuzsin":"Пусть AI составит план","Maqsadlar asosida tavsiyalar":"Рекомендации по целям","Shaxsiy yordamchi":"Личный помощник","AI bilan suhbat":"Чат с AI","Profil statistikasi":"Статистика профиля","Sizning darajangiz":"Ваш уровень","Kolleksiyangiz hozircha bo‘sh":"Коллекция пока пуста"
+    },
+    en: {
+      "Bosh sahifa":"Home","Maqsadlarim":"My goals","Vazifalar":"Tasks","Rejalashtiruvchi":"Planner","Statistika":"Statistics","Yutuqlarim":"My achievements","Mukofotlar do‘koni":"Rewards shop","Hamjamiyat":"Community","Smart AI":"Smart AI","Bildirishnomalar":"Notifications","Sozlamalar":"Settings","Mening profilim":"My profile",
+      "Maqsad qo‘shish":"Add goal","Yangi maqsad":"New goal","Vazifa qo‘shish":"Add task","Yangi vazifa":"New task","Saqlash":"Save","Bekor qilish":"Cancel","O‘chirish":"Delete","Tahrirlash":"Edit","Bugungi vazifalar":"Today's tasks","Barcha vazifalar":"All tasks","Maqsadlar":"Goals","Faol maqsadlar":"Active goals","Yakunlangan":"Completed","O‘rtacha progress":"Average progress","Jami XP":"Total XP","Bu haftadagi XP":"XP this week","Bajarilgan vazifalar":"Completed tasks","Bajarilish foizi":"Completion rate","Kun tartibim":"My daily routine","Band qo‘shish":"Add item","Menga kun tartibi tuz":"Build my routine","Vaqtida eslatib tur":"Remind me on time","Yutuq qo‘shish":"Add achievement","Shaxsiy xotiralar":"Personal memories","Xarid":"Buy","Qo‘llash":"Apply","XP yetarli emas":"Not enough XP","Yorug‘":"Light","Qorong‘i":"Dark","Qurilma bo‘yicha":"System default","Umumiy sozlamalar":"General settings","Interfeys tili":"Interface language","Profilni tahrirlash":"Edit profile","Username":"Username","Tug‘ilgan sana":"Birthday","Qisqa mazmuni":"Short description","Vazifa nomi":"Task title","Qaysi kuni bajariladi?":"Due date","Vaqt":"Time","Nima qilasiz?":"What will you do?","Do‘st bo‘lish":"Add friend","Do‘stlar":"Friends","Foydalanuvchilar":"Users","Qidirilmoqda...":"Searching...","Foydalanuvchi topilmadi":"User not found","Kunlik reja":"Daily plan","AI reja tuzsin":"Generate AI plan","Maqsadlar asosida tavsiyalar":"Goal-based suggestions","Shaxsiy yordamchi":"Personal assistant","AI bilan suhbat":"Chat with AI","Profil statistikasi":"Profile statistics","Sizning darajangiz":"Your level","Kolleksiyangiz hozircha bo‘sh":"Your collection is empty"
+    }
+  };
+
+  function translateVisibleUI(root = document.body) {
+    const dictionary = UI_TRANSLATIONS[settings.language];
+    if (!dictionary || !root) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const parent = node.parentElement;
+      if (!parent || parent.closest("script,style,textarea,input,select,option,[contenteditable='true']")) continue;
+      const original = node.nodeValue || "", trimmed = original.trim();
+      if (!trimmed || !dictionary[trimmed]) continue;
+      node.nodeValue = original.replace(trimmed, dictionary[trimmed]);
+    }
+    root.querySelectorAll("input[placeholder],textarea[placeholder],button[aria-label],button[title]").forEach(element => {
+      ["placeholder","aria-label","title"].forEach(attribute => {
+        const value = element.getAttribute(attribute);
+        if (value && dictionary[value]) element.setAttribute(attribute, dictionary[value]);
+      });
+    });
+  }
+
   function navigate(page) {
     if (!PAGE_TITLES[page]) return;
 
@@ -2718,6 +2750,7 @@
     };
 
     content.innerHTML = (pages[currentPage] || renderDashboard)();
+    translateVisibleUI(document.body);
 
     updateProfileDisplay();
     updateSidebarPoints();
