@@ -109,11 +109,11 @@ async function enforceRateLimit(env, key, limit, windowSeconds) {
   const row = await env.DB.prepare(
     "INSERT INTO rate_limits (rate_key, window_start, hits) VALUES (?, ?, 1) " +
     "ON CONFLICT(rate_key) DO UPDATE SET " +
-    "hits = CASE WHEN rate_limits.window_start = excluded.window_start THEN rate_limits.hits + 1 ELSE 1 END, " +
-    "window_start = excluded.window_start " +
-    "WHERE rate_limits.window_start <> excluded.window_start OR rate_limits.hits < ? " +
+    "hits = CASE WHEN rate_limits.window_start + ? <= ? THEN 1 ELSE rate_limits.hits + 1 END, " +
+    "window_start = CASE WHEN rate_limits.window_start + ? <= ? THEN excluded.window_start ELSE rate_limits.window_start END " +
+    "WHERE rate_limits.window_start + ? <= ? OR rate_limits.hits < ? " +
     "RETURNING hits"
-  ).bind(key, windowStart, limit).first();
+  ).bind(key, windowStart, windowSeconds, now, windowSeconds, now, windowSeconds, now, limit).first();
   return Boolean(row);
 }
 
@@ -374,7 +374,7 @@ function detectMessageLanguage(value, fallback = "uz") {
   }
   const words = source.toLocaleLowerCase().match(/[a-z']+/g) || [];
   const uzWords = new Set(["salom","assalomu","alaykum","kim","nima","haqida","malumot","ma'lumot","qanday","qachon","qayerda","nega","uchun","men","sen","siz","biz","bu","shu","va","ham","bor","yo'q","emas","ayt","tushuntir","yordam","rahmat","iltimos","kun","tartib","maqsad","vazifa","yaxshilash"]);
-  const enWords = new Set(["the","who","what","where","when","why","how","is","are","was","were","tell","explain","about","please","thanks","hello","hi","can","could","would","should","help","information","airplanes","aircraft","history"]);
+  const enWords = new Set(["the","who","what","where","when","why","how","is","are","was","were","tell","me","about","please","thanks","hello","hi","can","could","would","should","help","information","airplanes","airplane","aircraft","history","biography","explain","describe","facts","known","born","founder","company","person","people","world","earth","technology","today","tomorrow","my","your","we","they","this","that","good","best","and","or","of","for","in","on","to","with","from","a","an","it","he","she","his","her","their","has","have","do","does","did","isn't","wasn't"]);
   const uzScore = words.filter(word => uzWords.has(word)).length;
   const enScore = words.filter(word => enWords.has(word)).length;
   if (uzScore > 0 && uzScore >= enScore) return "uz";
