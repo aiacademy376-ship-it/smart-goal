@@ -264,6 +264,11 @@ async function handleData(request, env, user) {
     try { data = row ? JSON.parse(row.data_json) : {}; } catch { data = {}; }
     const balance = await env.DB.prepare("SELECT xp_balance FROM users WHERE id = ?").bind(user.id).first();
     data.xp = Number(balance?.xp_balance || 0);
+    if(!Number(data.spentXP)&&Array.isArray(data.inventory)&&data.inventory.length){
+      const legacyPrices={"theme-ocean":250,"theme-emerald":400,"theme-sunset":550,"theme-rose":750,"background-midnight":1200,"background-galaxy":2500,"background-royal":5000,"badge-focus":900,"badge-diamond":3000,"avatar-premium":1800};
+      data.spentXP=data.inventory.reduce((sum,item)=>sum+(legacyPrices[item?.id]||0),0);
+      if(row)await env.DB.prepare("UPDATE user_data SET data_json=json_set(data_json,'$.spentXP',?) WHERE user_id=?").bind(data.spentXP,user.id).run();
+    }
     const ledgerRows = await env.DB.prepare("SELECT id,award_date,xp,reason,created_at FROM xp_ledger WHERE user_id=? AND xp>0 ORDER BY created_at DESC LIMIT 180").bind(user.id).all();
     const localActivity = (Array.isArray(data.activity)?data.activity:[]).filter(item=>!/^AI baholadi:|^Task:/i.test(String(item?.reason||"")));
     const ledgerActivity = (ledgerRows.results||[]).map(item=>({id:item.id,date:item.award_date,xp:Number(item.xp||0),reason:item.reason,createdAt:item.created_at}));
@@ -292,11 +297,11 @@ async function handleData(request, env, user) {
     const ownsDecoration=(type,value)=>inventory.some(item=>item&&item.type===type&&item.value===value);
     const profile={...(body.data.profile||{})};
     profile.name=user.name; profile.username=user.username; profile.email=user.email; profile.birthdate=user.birthdate||"";
-    if(profile.background!=="default"&&!ownsDecoration("background",profile.background))profile.background=existingData.profile?.background||"default";
-    if(profile.avatarFrame!=="default"&&!ownsDecoration("avatar",profile.avatarFrame))profile.avatarFrame=existingData.profile?.avatarFrame||"default";
-    if(profile.activeBadge&&!ownsDecoration("badge",profile.activeBadge))profile.activeBadge=existingData.profile?.activeBadge||"";
+    if(profile.background!=="default"&&!ownsDecoration("background",profile.background))profile.background=ownsDecoration("background",existingData.profile?.background)?existingData.profile.background:"default";
+    if(profile.avatarFrame!=="default"&&!ownsDecoration("avatar",profile.avatarFrame))profile.avatarFrame=ownsDecoration("avatar",existingData.profile?.avatarFrame)?existingData.profile.avatarFrame:"default";
+    if(profile.activeBadge&&!ownsDecoration("badge",profile.activeBadge))profile.activeBadge=ownsDecoration("badge",existingData.profile?.activeBadge)?existingData.profile.activeBadge:"";
     const preferences={...(body.data.preferences||{})};
-    if(preferences.colorTheme&&preferences.colorTheme!=="violet"&&!ownsDecoration("theme",preferences.colorTheme))preferences.colorTheme=existingData.preferences?.colorTheme||"violet";
+    if(preferences.colorTheme&&preferences.colorTheme!=="violet"&&!ownsDecoration("theme",preferences.colorTheme))preferences.colorTheme=ownsDecoration("theme",existingData.preferences?.colorTheme)?existingData.preferences.colorTheme:"violet";
     const previousTasks=Array.isArray(existingData.tasks)?existingData.tasks:[];
     const incomingTasks=Array.isArray(body.data.tasks)?body.data.tasks:[];
     const now = new Date().toISOString();
@@ -310,7 +315,7 @@ async function handleData(request, env, user) {
       let completed=Boolean(task.completed),completedAt=null;
       const createdAt=previous?String(previous.createdAt||now):now;
       if(!previous){completedAt=completed?now:null;}
-      else if(changed){completed=false;completedAt=null;}
+      else if(changed && Number(previous.xpEarned||0)===0){completed=false;completedAt=null;}
       else if(completed){completedAt=previous.completed===true&&previous.completedAt?previous.completedAt:now;}
       return {...task,title,description,date,createdAt,completed,completedAt};
     });
