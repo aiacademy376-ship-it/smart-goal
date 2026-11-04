@@ -5911,3 +5911,14 @@ svg {
 .task-extra-settings[open] summary { margin-bottom:12px; }
 .profile-loading { padding:30px 12px; text-align:center; color:var(--text-muted); }
 @media(max-width:640px) { .goal-progress-detail { flex-direction:column; gap:3px; } .ai-quick-prompts { gap:6px; } .ai-quick-prompts button { max-width:100%; } }
+
+html[data-font-size="small"] { zoom: .96; }
+html[data-font-size="large"] { zoom: 1.06; }
+@supports not (zoom: 1) {
+  html[data-font-size="small"] { font-size: 15px; }
+  html[data-font-size="large"] { font-size: 18px; }
+}
+@supports(padding: env(safe-area-inset-left)) {
+  .main-area { padding-left: max(var(--content-gutter), env(safe-area-inset-left)); padding-right: max(var(--content-gutter), env(safe-area-inset-right)); }
+  .modal-overlay { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+}
