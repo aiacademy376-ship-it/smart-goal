@@ -2881,6 +2881,13 @@
     "Masalan: 20 bet kitob o‘qish":"Example: read 20 pages of a book","Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.":"Briefly describe what you will do. Example: read 20 pages and write down 3 key ideas.","Qaysi maqsadga tegishli?":"Which goal is this linked to?","Maqsadsiz vazifa":"No linked goal","Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"Example: I wake up at 7:00, leave for school at 8:30, return at 14:00, and want to study English in the evening."
   });
 
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Eng faol foydalanuvchilar":"Самые активные пользователи","Jami ishlab topilgan XP bo‘yicha reyting.":"Рейтинг по общему количеству заработанных XP.","Reyting hozircha bo‘sh":"Рейтинг пока пуст","Birinchi XP yig‘gan foydalanuvchi bo‘ling.":"Станьте первым, кто заработает XP."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Eng faol foydalanuvchilar":"Top active users","Jami ishlab topilgan XP bo‘yicha reyting.":"Ranked by total XP earned.","Reyting hozircha bo‘sh":"The leaderboard is empty","Birinchi XP yig‘gan foydalanuvchi bo‘ling.":"Be the first to earn XP."
+  });
+
   function translateVisibleUI(root = document.body) {
     if (!root) return;
     const dictionary = UI_TRANSLATIONS[settings.language] || {};
