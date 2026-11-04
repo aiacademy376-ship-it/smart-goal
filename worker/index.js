@@ -121,11 +121,15 @@ function clientKey(request, value) {
 async function createSession(env, userId) {
   const token = randomToken();
   const tokenHash = await sha256(token);
-  const expiresAt = new Date(Date.now() + SESSION_TTL_SECONDS * 1000).toISOString();
+  const now = new Date();
+  const createdAt = now.toISOString();
+  const expiresAt = new Date(now.getTime() + SESSION_TTL_SECONDS * 1000).toISOString();
 
+  // Remove expired session records during authentication to keep the table bounded.
+  await env.DB.prepare("DELETE FROM sessions WHERE expires_at <= ?").bind(createdAt).run();
   await env.DB.prepare(
     "INSERT INTO sessions (token_hash, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)"
-  ).bind(tokenHash, userId, expiresAt, new Date().toISOString()).run();
+  ).bind(tokenHash, userId, expiresAt, createdAt).run();
 
   return token;
 }
@@ -260,6 +264,10 @@ async function handleData(request, env, user) {
   }
 
   if (request.method === "PUT") {
+    const syncRateKey = await clientKey(request, "data-sync:" + user.id);
+    if (!await enforceRateLimit(env, syncRateKey, 120, 60)) {
+      return json({ success: false, message: "Ma’lumotlar juda tez-tez saqlanmoqda. Biroz kuting." }, 429);
+    }
     const body = await readJson(request);
     if (!body.data || typeof body.data !== "object" || Array.isArray(body.data)) {
       return json({ success: false, message: "Ma’lumot formati noto‘g‘ri." }, 400);
@@ -490,6 +498,10 @@ export default {
       if (request.method === "POST" && path === "/api/friends/request") {
         const user = await authenticatedUser(request, env);
         if (!user) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
+        const requestRateKey = await clientKey(request, "friend-request:" + user.id);
+        if (!await enforceRateLimit(env, requestRateKey, 20, 3600)) {
+          return json({ success: false, message: "Do‘stlik so‘rovlari limiti tugadi. Keyinroq urinib ko‘ring." }, 429);
+        }
         const body = await readJson(request);
         const targetId = String(body.userId || "");
         if (!targetId || targetId === user.id) return json({ success: false, message: "O‘zingizga so‘rov yubora olmaysiz." }, 400);
@@ -519,6 +531,10 @@ export default {
       if (request.method === "POST" && path === "/api/friends/respond") {
         const user = await authenticatedUser(request, env);
         if (!user) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
+        const responseRateKey = await clientKey(request, "friend-response:" + user.id);
+        if (!await enforceRateLimit(env, responseRateKey, 60, 3600)) {
+          return json({ success: false, message: "So‘rovlarni boshqarish limiti tugadi. Keyinroq urinib ko‘ring." }, 429);
+        }
         const body = await readJson(request);
         const requestId = String(body.requestId || "");
         const decision = String(body.decision || "");
