@@ -442,7 +442,7 @@ async function handleTaskCompletion(request,env,user){
     return json({success:false,message:"Vazifa hozir baholanmadi. Keyinroq qayta urinib ko‘ring."},503);
   }
   if(typeof evaluation?.meaningful==="string"){
-    const flag=evaluation.meaningful.trim().toLowerCase().replace(/[^\\p{L}]/gu,"");
+    const flag=evaluation.meaningful.trim().toLowerCase().replace(/[^\p{L}]/gu,"");
     if(["true","yes","1","ha","да"].includes(flag))evaluation.meaningful=true;
     else if(["false","no","0","yoq","нет"].includes(flag))evaluation.meaningful=false;
   }else if(evaluation?.meaningful===1)evaluation.meaningful=true;
@@ -450,21 +450,21 @@ async function handleTaskCompletion(request,env,user){
   const scoreValue=value=>{
     const direct=Number(value);
     if(Number.isFinite(direct))return direct;
-    const match=String(value??"").match(/-?\\d+(?:[.,]\\d+)?/);
+    const match=String(value??"").match(/-?\d+(?:[.,]\d+)?/);
     return match?Number(match[0].replace(",", ".")):NaN;
   };
-  const rawDifficulty=Number(evaluation?.difficulty),rawEffort=Number(evaluation?.effort),rawRelevance=Number(evaluation?.goalRelevance);
+  const rawDifficulty=scoreValue(evaluation?.difficulty),rawEffort=scoreValue(evaluation?.effort),rawRelevance=scoreValue(evaluation?.goalRelevance);
   if(!Number.isFinite(rawDifficulty)||rawDifficulty<1||rawDifficulty>5||!Number.isFinite(rawEffort)||rawEffort<1||rawEffort>5||!Number.isFinite(rawRelevance)||rawRelevance<1||rawRelevance>5||typeof evaluation?.meaningful!=="boolean"){
     console.error("SmartGoal XP evaluation returned invalid fields.");
     return json({success:false,message:"Vazifa bahosi noto‘g‘ri qaytdi. Qayta urinib ko‘ring."},503);
   }
   const difficulty=Math.round(rawDifficulty),effort=Math.round(rawEffort),goalRelevance=Math.round(rawRelevance);
   const combinedText=(title+" "+description).normalize("NFKC").toLocaleLowerCase();
-  const normalizedTask=combinedText.replace(/[^\\p{L}\\p{N}]/gu,"");
+  const normalizedTask=combinedText.replace(/[^\p{L}\p{N}]/gu,"");
   const taskCharacters=Array.from(normalizedTask);
   const distinctRatio=taskCharacters.length?new Set(taskCharacters).size/taskCharacters.length:0;
   const keyboardMash=/^(?:asdf|asdfgh|asdfghjkl|qwerty|qwertyuiop|zxcv|йцук|йцукен|фыва|фывапролдж|ячсм|тест|test|xxx+|abc+|123+|qazwsx)$/iu.test(normalizedTask);
-  const repeatedText=/(.)\\1{4,}/u.test(normalizedTask);
+  const repeatedText=/(.)\1{4,}/u.test(normalizedTask);
   const lowVariety=taskCharacters.length>=9&&distinctRatio<0.32;
   const meaningful=evaluation.meaningful&&taskCharacters.length>=3&&!keyboardMash&&!repeatedText&&!lowVariety;
   const onTime=completedLocal<=dueDate;
