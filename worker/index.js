@@ -367,13 +367,14 @@ async function runSmartAI(env,messages,options={}){
   if(!answer.trim())throw new Error("AI javobi bo‘sh qaytdi. Cloudflare Workers AI response formatini tekshiring.");
   return answer.trim();
 }
-function detectMessageLanguage(value, fallback = "uz") {
+function detectMessageLanguage(value, fallback = "auto") {
   const source = String(value || "").trim();
   if (!source) return fallback;
   if (/[қғҳўҚҒҲЎ]/u.test(source)) return "uz";
   if (/[а-яёА-ЯЁ]/u.test(source)) {
     if (/(ким|нима|ҳақида|хакида|маълумот|қандай|кандай|учун|салом|илтимос|раҳмат|рахмат|мен|сен|бу|нимага)/iu.test(source)) return "uz";
-    return "ru";
+    if (/(кто|что|где|когда|почему|как|это|для|есть|был|была|быть|можно|нужно|расскажи|объясни|привет|спасибо|пожалуйста|самолет|самолеты|информация|который|которая|которое|его|они|я|ты|вы|мы)/iu.test(source)) return "ru";
+    return "auto";
   }
   const words = source.toLocaleLowerCase().match(/[a-z']+/g) || [];
   const uzWords = new Set(["salom","assalomu","alaykum","kim","nima","haqida","malumot","ma'lumot","qanday","qachon","qayerda","nega","uchun","men","sen","siz","biz","bu","shu","va","ham","bor","yo'q","emas","ayt","tushuntir","yordam","rahmat","iltimos","kun","tartib","maqsad","vazifa","yaxshilash"]);
@@ -382,7 +383,7 @@ function detectMessageLanguage(value, fallback = "uz") {
   const enScore = words.filter(word => enWords.has(word)).length;
   if (uzScore > 0 && uzScore >= enScore) return "uz";
   if (enScore > 0) return "en";
-  return fallback;
+  return "auto";
 }
 
 async function handleAI(request,env,user){
@@ -395,8 +396,8 @@ async function handleAI(request,env,user){
   let userData={};try{userData=row?JSON.parse(row.data_json):{};}catch{userData={};}
   const profile=userData.profile||{},goals=Array.isArray(userData.goals)?userData.goals.slice(0,12):[],tasks=Array.isArray(userData.tasks)?userData.tasks.filter(task=>!task?.isRoutineEntry).slice(0,30):[],dailyRoutine=Array.isArray(userData.dailyRoutine)?userData.dailyRoutine.slice(0,20):[];
   const interfaceLanguage=["uz","ru","en"].includes(String(body.language))?body.language:"uz";
-  const language=detectMessageLanguage(action==="routine"?body.prompt:body.message,interfaceLanguage);
-  const lang={uz:"o‘zbek tilida",ru:"на русском языке",en:"in English"}[language];
+  const language=action==="plan"?interfaceLanguage:detectMessageLanguage(action==="routine"?body.prompt:body.message,"auto");
+  const lang={uz:"o‘zbek tilida",ru:"на русском языке",en:"in English"}[language]||"the exact language used in the user's latest message; identify it yourself";
   const ageNote=user.age_band==="adult"?"Foydalanuvchi voyaga yetgan.":"Foydalanuvchi 18 yoshdan kichik bo‘lishi mumkin: faqat yoshga mos va xavfsiz tavsiyalar ber.";
   const system=[
     "Sen SmartGoal ichidagi aqlli yordamchisan. Har qanday oddiy savolga ham foydali, tabiiy va tushunarli javob ber: salomlashish, bilim, kundalik hayot, o‘qish, yozish va boshqa umumiy mavzular.",
