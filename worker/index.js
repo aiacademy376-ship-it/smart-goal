@@ -421,12 +421,14 @@ async function handleTaskCompletion(request,env,user){
     return json({success:false,message:"Vazifa bahosi noto‘g‘ri qaytdi. Qayta urinib ko‘ring."},503);
   }
   const difficulty=Math.round(rawDifficulty),effort=Math.round(rawEffort),goalRelevance=Math.round(rawRelevance);
-  const tashkentDateParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
-  const todayLocal=tashkentDateParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-");
-  const onTime=todayLocal<=dueDate;
+  const titleLetters=title.replace(/[^\p{L}]/gu,"");
+  const hasVowel=/[aeiouo‘’áéíóúаеёиоуыэюя]/i.test(title);
+  const meaningful= evaluation.meaningful && titleLetters.length>=5 && hasVowel;
+  const completedDateParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date(completedAt));
+  const completedLocal=completedDateParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-");
+  const onTime=completedLocal<=dueDate;
   const priorityBonus=priority==="high"?1:priority==="low"?0:0.5;
-  const meaningfulCap=evaluation.meaningful?15:1;
-  const suggestedXP=evaluation.meaningful
+  const suggestedXP=meaningful
     ? Math.min(15,Math.max(1,Math.round(difficulty*1.5+effort*0.8+(goalRelevance>=4?1:0)+priorityBonus+(onTime?1.5:0))))
     : 1;
   const now=new Date().toISOString();
