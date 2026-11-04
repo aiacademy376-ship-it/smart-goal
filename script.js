@@ -333,6 +333,7 @@
   let remoteSyncRunning = false;
   let remoteSyncQueued = false;
   let aiConversation = [];
+  let communityRelations = { incoming: [], outgoing: [], friends: [] };
 
   function saveData() {
     try {
@@ -2874,6 +2875,8 @@
       }
 
       const users = Array.isArray(result.users) ? result.users : [];
+      await loadCommunityRelations();
+      if (sequence !== communitySearchSequence) return;
       if (!users.length) {
         results.innerHTML = emptyState("Foydalanuvchi topilmadi", "Bu username bilan boshlanadigan foydalanuvchi yo‘q.", "user-search");
         return;
@@ -2888,11 +2891,19 @@
           </div>
           ${user.username === data.profile.username
             ? `<span class="user-rank">Siz</span>`
-            : `<button class="card-action" type="button" data-action="send-friend-request" data-user-id="${escapeHTML(user.id)}">Do‘st bo‘lish</button>`}
+            : communityRelations.friends.some(item => item.username === user.username)
+              ? `<span class="user-rank">Do‘st</span>`
+              : communityRelations.outgoing.some(item => item.username === user.username)
+                ? `<span class="user-rank">So‘rov yuborilgan</span>`
+                : (() => {
+                    const incoming = communityRelations.incoming.find(item => item.username === user.username);
+                    return incoming
+                      ? `<button class="card-action" type="button" data-action="respond-friend" data-request-id="${escapeHTML(incoming.id)}" data-decision="accept">So‘rovni qabul qilish</button>`
+                      : `<button class="card-action" type="button" data-action="send-friend-request" data-user-id="${escapeHTML(user.id)}">Do‘st bo‘lish</button>`;
+                  })()}
         </div>
       `).join("");
       refreshIcons();
-      loadCommunityRelations();
     } catch (error) {
       if (sequence !== communitySearchSequence) return;
       results.innerHTML = emptyState("Qidiruv ishlamadi", escapeHTML(error.message || "Server bilan bog‘lanib bo‘lmadi."), "alert-circle");
@@ -2909,6 +2920,7 @@
       const incoming = Array.isArray(result.incoming) ? result.incoming : [];
       const outgoing = Array.isArray(result.outgoing) ? result.outgoing : [];
       const friends = Array.isArray(result.friends) ? result.friends : [];
+      communityRelations = { incoming, outgoing, friends };
       const section = (title, rows, renderRow, empty) => `
         <div style="margin-top:14px">
           <h4>${escapeHTML(title)}</h4>
@@ -2926,6 +2938,7 @@
         section("Do‘stlaringiz", friends, item => `
           <div class="user-item"><div class="user-item-info"><strong>${escapeHTML(item.name)}</strong><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Do‘st</span></div>`, "Hali do‘stlar yo‘q.");
     } catch (error) {
+      communityRelations = { incoming: [], outgoing: [], friends: [] };
       container.innerHTML = emptyState("Do‘stlar yuklanmadi", error.message || "Server bilan aloqa uzildi.", "alert-circle");
     }
     refreshIcons();
