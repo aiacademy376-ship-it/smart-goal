@@ -3235,7 +3235,7 @@
           <span class="avatar avatar-medium">${icon("user-round")}</span>
           <div class="user-item-info">
             <button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username || "")}"><strong>${escapeHTML(user.name || "Foydalanuvchi")}</strong></button>
-            <small>@${escapeHTML(user.username || "")}${user.username === data.profile.username ? " · Sizning profilingiz" : ""}</small>
+            <small>@${escapeHTML(user.username || "")} · Level ${getRank(Number(user.xp||0)).level} · ${formatNumber(user.xp||0)} XP${user.username === data.profile.username ? " · Sizning profilingiz" : ""}</small>
           </div>
           ${user.username === data.profile.username
             ? `<span class="user-rank">Siz</span>`
