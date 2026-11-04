@@ -643,6 +643,15 @@ export default {
         });
       }
 
+      if (request.method === "GET" && path === "/api/users/leaderboard") {
+        const viewer=await authenticatedUser(request,env);
+        if(!viewer)return json({success:false,message:"Avtorizatsiya talab qilinadi."},401);
+        const rateKey=await clientKey(request,"community-leaderboard");
+        if(!await enforceRateLimit(env,rateKey,20,60))return json({success:false,message:"Reyting tez-tez yangilanmoqda. Biroz kuting."},429);
+        const result=await env.DB.prepare("SELECT u.id,u.name,u.username,u.xp_balance,COALESCE(CAST(json_extract(d.data_json,'$.spentXP') AS INTEGER),0) AS spent_xp FROM users u LEFT JOIN user_data d ON d.user_id=u.id ORDER BY (u.xp_balance+COALESCE(CAST(json_extract(d.data_json,'$.spentXP') AS INTEGER),0)) DESC,u.created_at ASC LIMIT 10").all();
+        return json({success:true,users:(result.results||[]).map((item,index)=>({id:item.id,name:item.name,username:item.username,xp:Number(item.xp_balance||0),totalEarnedXP:Number(item.xp_balance||0)+Number(item.spent_xp||0),rank:index+1}))});
+      }
+
       if (request.method === "GET" && path === "/api/users/profile") {
         const viewer = await authenticatedUser(request, env);
         if (!viewer) return json({ success: false, message: "Avtorizatsiya talab qilinadi." }, 401);
