@@ -2839,6 +2839,31 @@
     "Ocean mavzusi":"Ocean theme","Emerald mavzusi":"Emerald theme","Sunset mavzusi":"Sunset theme","Rose mavzusi":"Rose theme","Sky mavzusi":"Sky theme","Midnight fon":"Midnight background","Galaxy fon":"Galaxy background","Royal fon":"Royal background","Sakura profil foni":"Sakura profile background","Nebula profil foni":"Nebula profile background","Focus badge":"Focus badge","Diamond badge":"Diamond badge","Builder belgisi":"Builder badge","Oltin avatar ramkasi":"Gold avatar frame","Premium avatar ramkasi":"Premium avatar frame","Profilingiz va interfeysingiz uchun sokin ko‘k rang.":"A calm blue look for your profile and interface.","Yashil va nafis ko‘rinish.":"An elegant green theme.","Iliq ranglardagi maxsus interfeys.":"A special warm-colored interface.","Nafis pushti ranglar uyg‘unligi.":"An elegant blend of pink tones.","Profil uchun qoramtir, maxsus fon.":"A special dark profile background.","Maxsus kosmik profil foni.":"A special cosmic profile background.","Noyob premium profil dizayni.":"A unique premium profile design.","Diqqat va intizom ramzi.":"A symbol of focus and discipline.","Maxsus premium belgi.":"A special premium badge.","Profil rasmingiz uchun oltin bezak.":"A gold decoration for your profile photo.","Profil rasmingiz uchun maxsus ramka.":"A special frame for your profile photo.","Qo‘lga kiritilgan":"Unlocked","Hali ochilmagan":"Not unlocked yet","Oddiy":"Normal","Muhim":"Important","Juda muhim":"Very important","Past":"Low","O‘rta":"Medium","Yuqori":"High","Bajarish sanasi":"Due date","Taxminiy bajarish vaqti":"Estimated time","Qo‘shimcha sozlama (ixtiyoriy)":"Additional settings (optional)"
   });
 
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Taxminiy bajarish vaqti":"Примерная длительность",
+    "15 daqiqa":"15 минут","30 daqiqa":"30 минут","45 daqiqa":"45 минут","1 soat":"1 час","1,5 soat":"1,5 часа","2 soat":"2 часа","3 soat":"3 часа","4 soat":"4 часа","6 soat":"6 часов",
+    "Ustuvorlik":"Приоритет","AI’dan shaxsiy maslahat":"Персональный совет от AI","AI tavsiyasi":"Совет AI","AI bilan suhbat":"Чат с AI",
+    "Kun tartibim":"Мой распорядок дня","Menga kun tartibi tuz":"Составить мой распорядок","Band qo‘shish":"Добавить пункт распорядка",
+    "Profilni tahrirlash":"Редактировать профиль","Biografiya":"Биография","O‘zingiz haqingizda qisqacha...":"Кратко о себе...",
+    "Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.":"Задача сохранена на устройстве. Войдите в аккаунт, чтобы получать XP от AI.",
+    "AI bu vazifani aniq ish deb baholamadi. Nomini yoki qisqa mazmunini aniqroq yozing.":"AI не смог определить конкретную задачу. Уточните название или описание.",
+    "Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.":"Задача снова открыта. Ранее начисленные XP не возвращаются.",
+    "Suhbatni tozalash":"Очистить чат","Bugungi rejam":"Мой план на сегодня","Vazifalarim":"Мои задачи","Motivatsiya":"Мотивация",
+    "Bajarish sanasi":"Дата выполнения","Qaysi kuni bajariladi?":"На какой день запланировано?","Qisqa mazmuni":"Краткое описание"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Taxminiy bajarish vaqti":"Estimated duration",
+    "15 daqiqa":"15 minutes","30 daqiqa":"30 minutes","45 daqiqa":"45 minutes","1 soat":"1 hour","1,5 soat":"1.5 hours","2 soat":"2 hours","3 soat":"3 hours","4 soat":"4 hours","6 soat":"6 hours",
+    "Ustuvorlik":"Priority","AI’dan shaxsiy maslahat":"Get a personal AI tip","AI tavsiyasi":"AI recommendation","AI bilan suhbat":"Chat with AI",
+    "Kun tartim":"My daily routine","Menga kun tartibi tuz":"Build my daily routine","Band qo‘shish":"Add routine item",
+    "Profilni tahrirlash":"Edit profile","Biografiya":"Bio","O‘zingiz haqingizda qisqacha...":"A little about yourself...",
+    "Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.":"Task saved on this device. Sign in to earn AI-awarded XP.",
+    "AI bu vazifani aniq ish deb baholamadi. Nomini yoki qisqa mazmunini aniqroq yozing.":"AI could not identify a clear task. Please clarify its title or description.",
+    "Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.":"Task reopened. Previously earned XP is not refunded.",
+    "Suhbatni tozalash":"Clear chat","Bugungi rejam":"My plan for today","Vazifalarim":"My tasks","Motivatsiya":"Motivation",
+    "Bajarish sanasi":"Due date","Qaysi kuni bajariladi?":"Which day should it be done?","Qisqa mazmuni":"Short description"
+  });
+
   const translationOriginalText = new WeakMap();
   const translationOriginalAttributes = new WeakMap();
 
