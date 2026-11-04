@@ -2796,6 +2796,9 @@
     const id = actionElement.dataset.id;
 
     switch (action) {
+      case "view-profile":
+        openPublicProfile(actionElement.dataset.username);
+        break;
       case "send-friend-request":
         sendFriendRequest(actionElement.dataset.userId);
         break;
@@ -3065,6 +3068,25 @@
   let communitySearchSequence = 0;
   let communitySearchTimer = null;
 
+  async function openPublicProfile(username) {
+    if (!username) return;
+    openModal("Foydalanuvchi profili", '<div class="profile-loading">Profil yuklanmoqda...</div>', '<button class="secondary-button" type="button" data-action="close-modal">Yopish</button>');
+    try {
+      const response = await fetch("/api/users/profile?username=" + encodeURIComponent(username), {credentials:"same-origin"});
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success || !result.profile) throw new Error(result.message || "Profilni yuklab bo‘lmadi.");
+      const p = result.profile, rank = getRank(Number(p.xp || 0));
+      const covers = {default:"linear-gradient(120deg,#5145cf,#9282f6)",midnight:"linear-gradient(120deg,#101827,#283958)",galaxy:"radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",royal:"linear-gradient(120deg,#7c4a20,#d3a24b)",sakura:"linear-gradient(120deg,#e7a5bd,#8b6bba)",nebula:"radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)"};
+      const avatar = p.avatar ? '<img src="'+escapeHTML(p.avatar)+'" alt="Profil rasmi">' : icon("user-round",40);
+      const birthday = p.birthdate ? '<div class="profile-public-stat">'+icon("cake")+" "+escapeHTML(formatDate(p.birthdate))+'</div>' : "";
+      const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p><p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div><div><strong>'+formatNumber(p.completedTasks)+'</strong><small>Vazifa</small></div><div><strong>'+formatNumber(p.goals)+'</strong><small>Maqsad</small></div></div>'+birthday+'<p class="card-description">SmartGoal’da '+formatNumber(p.achievements)+' ta yutuq</p></div>';
+      const body = $("#modal-body"); if (body) body.innerHTML = html;
+      refreshIcons();
+    } catch (error) {
+      const body = $("#modal-body"); if (body) body.innerHTML = '<div class="empty-state">'+escapeHTML(error.message||"Profilni ochib bo‘lmadi.")+'</div>';
+    }
+  }
+
   async function searchCommunityUsers(value) {
     const query = normalizedUsername(value);
     const results = $("#community-results");
@@ -3106,7 +3128,7 @@
         <div class="user-item">
           <span class="avatar avatar-medium">${icon("user-round")}</span>
           <div class="user-item-info">
-            <strong>${escapeHTML(user.name || "Foydalanuvchi")}</strong>
+            <button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username || "")}"><strong>${escapeHTML(user.name || "Foydalanuvchi")}</strong></button>
             <small>@${escapeHTML(user.username || "")}${user.username === data.profile.username ? " · Sizning profilingiz" : ""}</small>
           </div>
           ${user.username === data.profile.username
@@ -3149,14 +3171,14 @@
       container.innerHTML =
         section("Kelgan so‘rovlar", incoming, item => `
           <div class="user-item">
-            <div class="user-item-info"><strong>${escapeHTML(item.name)}</strong><small>@${escapeHTML(item.username)}</small></div>
+            <div class="user-item-info"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(item.username)}"><strong>${escapeHTML(item.name)}</strong></button><small>@${escapeHTML(item.username)}</small></div>
             <button class="card-action" data-action="respond-friend" data-request-id="${escapeHTML(item.id)}" data-decision="accept">Qabul qilish</button>
             <button class="card-action" data-action="respond-friend" data-request-id="${escapeHTML(item.id)}" data-decision="decline">Rad etish</button>
           </div>`, "Hozircha kelgan so‘rov yo‘q.") +
         section("Yuborilgan so‘rovlar", outgoing, item => `
-          <div class="user-item"><div class="user-item-info"><strong>${escapeHTML(item.name)}</strong><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Kutilmoqda</span></div>`, "Yuborilgan so‘rov yo‘q.") +
+          <div class="user-item"><div class="user-item-info"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(item.username)}"><strong>${escapeHTML(item.name)}</strong></button><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Kutilmoqda</span></div>`, "Yuborilgan so‘rov yo‘q.") +
         section("Do‘stlaringiz", friends, item => `
-          <div class="user-item"><div class="user-item-info"><strong>${escapeHTML(item.name)}</strong><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Do‘st</span></div>`, "Hali do‘stlar yo‘q.");
+          <div class="user-item"><div class="user-item-info"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(item.username)}"><strong>${escapeHTML(item.name)}</strong></button><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Do‘st</span></div>`, "Hali do‘stlar yo‘q.");
     } catch (error) {
       communityRelations = { incoming: [], outgoing: [], friends: [] };
       container.innerHTML = emptyState("Do‘stlar yuklanmadi", error.message || "Server bilan aloqa uzildi.", "alert-circle");
