@@ -1886,7 +1886,7 @@
       const response = await fetch("/api/ai", { method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"routine",prompt,language:settings.language}) });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success) throw new Error(result.message || "AI kun tartibini tuza olmadi.");
-      const match = String(result.answer || "").match(/\[[\s\\S]*\]/);
+      const match = String(result.answer || "").match(/\[[\s\S]*\]/);
       if (!match) throw new Error("AI reja formatini tushunib bo‘lmadi. Qayta urinib ko‘ring.");
       const items = JSON.parse(match[0]);
       if (!Array.isArray(items) || !items.length) throw new Error("AI bo‘sh kun tartibi qaytardi.");
