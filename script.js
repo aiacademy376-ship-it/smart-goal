@@ -1314,7 +1314,7 @@
           if (!remoteAuthenticated) {
             task.xpAwarded = false;
             task.xpEarned = 0;
-            showToast("Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.", "error");
+            showToast(settings.language==="ru"?"Задача сохранена на устройстве. Войдите в аккаунт, чтобы получать XP от AI.":settings.language==="en"?"Task saved on this device. Sign in to earn AI-awarded XP.":"Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.", "error");
           } else {
             try {
               if (!await flushRemoteSync()) throw new Error("Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.");
@@ -1334,7 +1334,7 @@
               }
               if (result.notMeaningful) showToast(settings.language==="ru"?"AI не смог определить конкретную задачу. Уточните название или описание.":settings.language==="en"?"AI could not identify a clear task. Please clarify its title or description.":"AI bu vazifani aniq ish deb baholamadi. Nomini yoki qisqa mazmunini aniqroq yozing.", "error");
               else if (result.duplicateTask) showToast(result.reason || "Bugun shu mazmundagi vazifa uchun XP avval berilgan.", "error");
-              else if (result.alreadyAwarded) showToast("Bu vazifa uchun XP avval berilgan.", "error");
+              else if (result.alreadyAwarded) showToast(settings.language==="ru"?"За эту задачу XP уже начислялись.":settings.language==="en"?"XP has already been awarded for this task.":"Bu vazifa uchun XP avval berilgan.", "error");
               else if (task.xpEarned > 0) showToast(settings.language==="ru"?"Оценка AI: +"+task.xpEarned+" XP · сложность "+(result.difficulty||"—")+"/5 · усилия "+(result.effort||"—")+"/5 · "+(result.onTime?"в срок":"с опозданием"):settings.language==="en"?"AI score: +"+task.xpEarned+" XP · difficulty "+(result.difficulty||"—")+"/5 · effort "+(result.effort||"—")+"/5 · "+(result.onTime?"on time":"late"):"AI bahosi: +" + task.xpEarned + " XP · qiyinlik " + (result.difficulty || "—") + "/5 · mehnat " + (result.effort || "—") + "/5 · " + (result.onTime ? "muddatida" : "kechikkan"));
               else showToast(result.reason || "AI vazifani tekshirdi, lekin bu safar XP ajratilmadi.", "error");
             } catch (error) {
