@@ -57,10 +57,10 @@ jobs:
           assert "Vazifa nomi va izohi o‘zbek, rus, ingliz yoki boshqa tilda" in worker, "Multilingual task evaluation is missing"
 
           js_items = dict((item_id, int(price)) for item_id, price in re.findall(
-              r'id:\\s*"([^"]+)"[\\s\\S]*?price:\\s*(\\d+)', script
+              r'id:\s*"([^"]+)"[\s\S]*?price:\s*(\d+)', script
           ))
           worker_catalog = dict((item_id, int(price)) for item_id, price in re.findall(
-              r'"([^"]+)":\\{price:(\\d+),type:', worker
+              r'"([^"]+)":\{price:(\d+),type:', worker
           ))
           assert js_items, "Frontend reward catalog could not be read"
           assert js_items == worker_catalog, (
