@@ -1,0 +1,24 @@
+name: Validate SmartGoal
+
+on:
+  push:
+    branches:
+      - smartgoal/cloudflare-upgrade
+  pull_request:
+    branches:
+      - smartgoal/cloudflare-upgrade
+
+jobs:
+  javascript-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate frontend and Worker syntax
+        run: |
+          node --check script.js
+          node --check worker/index.js
