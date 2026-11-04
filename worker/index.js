@@ -443,10 +443,17 @@ async function handleAI(request,env,user){
   else{
     const message=String(body.message||"").trim();if(!message||message.length>500)return json({success:false,message:"Xabar 1–500 belgi bo‘lishi kerak."},400);
     const planningIntent=/(bugun|bugungi|kunlik).{0,50}(reja|plan|jadval)|(reja|plan|jadval).{0,50}(bugun|bugungi|kun)/iu.test(message);
-    const chatRules=planningIntent?" BU XABAR BUGUNGI REJA SO‘ROVI. Faqat bugungi sana "+todayLocal+" va hozirgi Toshkent vaqti "+currentLocalTime+" dan keyingi vaqtlarni rejalashtir. Bugun bajarilgan vazifalarni qayta topshiriq qilma: ular faqat bajarilgan natija sifatida tilga olinishi mumkin. Bugungi bajarilmagan vazifalar ro‘yxatidan tashqarida yangi majburiy vazifa o‘ylab topma. Kun tartibidagi hozirgi vaqtdan oldingi bandlar o‘tib ketgan; ularni qayta rejalashtirma va foydalanuvchini ayblama. Agar bugungi barcha vazifalar tugagan bo‘lsa, bugun uchun yangi o‘qish/sport topshirig‘i bermagin; dam olish va ertangi kunga yengil tayyorgarlikni taklif qil. Maktabga borish yoki uyg‘onish bajarilmagan deb taxmin qilma: routineProgress va vaqtni hisobga ol; holati noma’lum bo‘lsa, bajarilmadi demagin. Faqat kontekstda mavjud bo‘lgan maqsad/vazifa nomlari va muddatlardan foydalan. Vaqt aniq bo‘lmasa, aniq soat uydirma. Ohang muloyim, ayblovsiz bo‘lsin. Javobni 3–5 qisqa band bilan chekla.":" ";
-    messages=[{role:"system",content:system+chatRules+" Foydalanuvchining SmartGoal konteksti: "+context}];
-    for(const item of (Array.isArray(body.history)?body.history.slice(-8):[])){if(!item||!["user","assistant"].includes(item.role))continue;const content=String(item.content||"").trim().slice(0,500);if(content)messages.push({role:item.role,content});}
-    messages.push({role:"user",content:message});
+    if(planningIntent){
+      const planLanguage={uz:"Faqat o‘zbek lotin yozuvida javob ber.",ru:"Отвечай только на русском языке.",en:"Reply only in English."}[language];
+      messages=[
+        {role:"system",content:system+" BU SO‘ROV BUGUNNING QOLGAN QISMI UCHUN REJA TUZISH HAQIDA. Bugungi sana "+todayLocal+", Toshkentdagi hozirgi vaqt "+currentLocalTime+". "+planLanguage+" Faqat shu kontekstdagi faktlardan foydalan. Avval hozirgi vaqtni hisobga ol: hozirgi vaqtdan oldingi har qanday soat bugun uchun o‘tib ketgan, ularni qayta rejalashtirma. 24 soatlik formatdan foydalan va faqat kontekstda mavjud bo‘lgan kelajakdagi routine vaqtlarini ko‘rsat. Bugun bajarilgan vazifalarni qayta tavsiya qilma. Faqat todayPendingTasks ichidagi vazifalarni bugun uchun ustuvorlashtir; boshqa yangi vazifa, maktab jadvali, kitob betlari, sport yoki o‘qish topshirig‘ini o‘ylab topma. Agar todayPendingTasks bo‘sh bo‘lsa, bugun yangi majburiy vazifa yo‘q deb ayt; dam olish yoki ertangi kunga tayyorgarlik kabi ixtiyoriy yengil tavsiyalardan oshma. Routine bandi bajarilganligi noma’lum bo‘lsa, bajarilmadi deb yozma. Foydalanuvchini ayblama. 3–5 qisqa band, ixcham va tabiiy javob ber. Markdown matnidan foydalan, HTML entity yoki kod belgilarini chiqarmagin."},
+        {role:"user",content:"Bugunning qolgan qismi uchun aniq, real reja tuz. Quyidagi kontekst asosida javob ber: "+context}
+      ];
+    }else{
+      messages=[{role:"system",content:system+" Foydalanuvchining SmartGoal konteksti: "+context}];
+      for(const item of (Array.isArray(body.history)?body.history.slice(-8):[])){if(!item||!["user","assistant"].includes(item.role))continue;const content=String(item.content||"").trim().slice(0,500);if(content)messages.push({role:item.role,content});}
+      messages.push({role:"user",content:message});
+    }
   }
   try{return json({success:true,answer:await runSmartAI(env,messages,{max_tokens:action==="plan"||action==="routine"?1100:650})});}
   catch(error){console.error("SmartGoal AI error:",{name:error?.name||"Error",message:String(error?.message||error||"Unknown AI error").slice(0,500),cause:error?.cause?String(error.cause).slice(0,300):undefined});return json({success:false,message:error?.message||"AI bilan bog‘lanib bo‘lmadi."},503);}
