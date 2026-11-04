@@ -1924,11 +1924,18 @@
 
   function checkDueTaskNotifications() {
     const day=today();
+    let added=0;
     for (const task of (data.tasks||[]).filter(item=>!item.completed && item.date===day).slice(0,80)) {
       const key="smartgoal_task_due_"+day+"_"+task.id;
-      if(localStorage.getItem(key)) continue;
+      if (localStorage.getItem(key)) continue;
       localStorage.setItem(key,"1");
-      addNotification("Bugungi vazifa",task.title+" — bugun bajarish rejalashtirilgan.");
+      data.notifications.unshift({id:uid(),title:"Bugungi vazifa",message:task.title+" — bugun bajarish rejalashtirilgan.",date:new Date().toISOString(),read:false});
+      added++;
+    }
+    if (added) {
+      data.notifications=data.notifications.slice(0,60);
+      saveData(); updateNotificationIndicators();
+      if (currentPage==="notifications") render();
     }
   }
 
