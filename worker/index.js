@@ -588,7 +588,7 @@ export default {
         return json({success:true,profile:{
           id:person.id,name:person.name,username:person.username,xp:Number(person.xp_balance||0),spentXP:Number(profileData._spentXP||0),totalEarnedXP:Number(person.xp_balance||0)+Number(profileData._spentXP||0),createdAt:person.created_at,
           bio:String(profileData.bio||"").slice(0,240),avatar:String(profileData.avatar||"").slice(0,180000),
-          background:String(profileData.background||"default"),avatarFrame:String(profileData.avatarFrame||"default"),
+          background:String(profileData.background||"default"),avatarFrame:String(profileData.avatarFrame||"default"),activeBadge:String(profileData.activeBadge||"").slice(0,30),
           birthdate:birthdatePublic?String(profileData.birthdate||""):null,
           completedTasks:profileData._tasks.filter(item=>item&&item.completed).length,
           goals:profileData._goals.length,achievements:profileData._achievements.length
