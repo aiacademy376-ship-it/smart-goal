@@ -31,6 +31,43 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Validate responsive UI, multilingual AI and reward catalog
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+
+          script = Path("script.js").read_text(encoding="utf-8")
+          worker = Path("worker/index.js").read_text(encoding="utf-8")
+          css = Path("style.css").read_text(encoding="utf-8")
+          html = Path("index.html").read_text(encoding="utf-8")
+
+          assert css.count("{") == css.count("}"), "CSS braces are unbalanced"
+          for breakpoint in ("max-width: 1100px", "max-width: 760px", "max-width: 430px", "max-width: 340px"):
+              assert breakpoint in css, f"Missing responsive breakpoint: {breakpoint}"
+          assert "prefers-reduced-motion: reduce" in css, "Reduced-motion support is missing"
+          assert "viewport-fit=cover" in html, "Mobile safe-area viewport support is missing"
+
+          assert "translationOriginalText = new WeakMap()" in script, "Language switching source-text cache is missing"
+          assert 'name="estimatedMinutes"' in script and 'name="priority"' in script, "AI task-scoring inputs are missing"
+          assert "async function generateDailyAdvice()" in script, "Personal AI coaching action is missing"
+          assert "async function generateRoutine()" in script, "AI routine builder is missing"
+          assert "45 XP" not in script and "45-COALESCE" not in worker, "A daily XP cap is still present"
+          assert "rawDifficulty=scoreValue" in worker, "Robust AI score parsing is missing"
+          assert "Vazifa nomi va izohi o‘zbek, rus, ingliz yoki boshqa tilda" in worker, "Multilingual task evaluation is missing"
+
+          js_items = dict((item_id, int(price)) for item_id, price in re.findall(
+              r'id:\\s*"([^"]+)"[\\s\\S]*?price:\\s*(\\d+)', script
+          ))
+          worker_catalog = dict((item_id, int(price)) for item_id, price in re.findall(
+              r'"([^"]+)":\\{price:(\\d+),type:', worker
+          ))
+          assert js_items, "Frontend reward catalog could not be read"
+          assert js_items == worker_catalog, (
+              f"Frontend/server reward catalogs differ: frontend={js_items}, server={worker_catalog}"
+          )
+          print("Responsive UI, multilingual AI and reward catalog checks passed.")
+          PY
       - name: Validate all D1 migrations and XP safeguards
         run: |
           python - <<'PY'
