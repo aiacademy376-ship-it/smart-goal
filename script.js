@@ -1562,6 +1562,17 @@
 
   /* -------------------- DASHBOARD PAGE -------------------- */
 
+  function getDailyCoachTip() {
+    const overdue=data.tasks.filter(task=>!task.completed&&task.date&&task.date<today()).length;
+    const todayPending=data.tasks.filter(task=>!task.completed&&task.date===today()).length;
+    const active=data.goals.filter(goal=>!goal.completed);
+    if(overdue) return {title:"Avval kechikkan ishlarni yengillashtiring",text:`${overdue} ta vazifa muddati o‘tgan. Hammasini birdan bajarishga urinmang: eng muhim bittasini tanlab, 20–25 daqiqa ishlang.`};
+    if(todayPending>4) return {title:"Bugun ustuvorlikni tanlang",text:`Bugun ${todayPending} ta vazifa bor. Eng muhim 3 tasini tanlang, ular orasida qisqa tanaffus qiling.`};
+    if(!active.length) return {title:"Yangi maqsad sari qadam qo‘ying",text:"Keyingi 30 kun ichida erishmoqchi bo‘lgan bitta aniq natijani belgilang."};
+    if(!(data.dailyRoutine||[]).length) return {title:"Kun tartibini shakllantiring",text:"Uyg‘onish, o‘qish yoki ish va dam olish vaqtlarini belgilang. Barqaror tartib maqsadlarga erishishni osonlashtiradi."};
+    return {title:"Kichik, muntazam qadamlar katta natija beradi",text:"Bugun faol maqsadlaringizdan bittasiga tegishli vazifani bajaring. Kechqurun natijani ko‘rib, ertangi kunni rejalashtiring."};
+  }
+
   function renderDashboard() {
     const completed = data.tasks.filter(task => task.completed).length;
     const activeGoals = data.goals.filter(goal => !goal.completed).length;
@@ -1656,6 +1667,12 @@
           <span class="stat-change">Qo‘lga kiritilgan</span>
         </div>
       </div>
+
+      <section class="card daily-coach-card">
+        <div class="daily-coach-icon">${icon("sparkles",22)}</div>
+        <div><span class="eyebrow">SMARTGOAL MASLAHATI</span><h3>${escapeHTML(getDailyCoachTip().title)}</h3><p>${escapeHTML(getDailyCoachTip().text)}</p></div>
+        <button class="secondary-button" type="button" data-page="ai">AI bilan maslahatlashish ${icon("arrow-right",14)}</button>
+      </section>
 
       <div class="dashboard-grid">
         <div class="dashboard-column">
