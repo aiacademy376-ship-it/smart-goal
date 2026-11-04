@@ -345,7 +345,7 @@ async function handleAI(request,env,user){
   if(action==="routine"){
     const requestText=String(body.prompt||"").trim().slice(0,700);
     if(!requestText)return json({success:false,message:"Kun tartibi uchun odatlaringiz va uyg‘onish vaqtingizni yozing."},400);
-    const routineContext=JSON.stringify({today:todayLocal,goals:goals.map(g=>({title:g.title,deadline:g.deadline,priority:g.priority})),tasks:tasks.filter(t=>!t.completed).slice(0,15).map(t=>({title:t.title,date:t.date,estimatedMinutes:t.estimatedMinutes}))});
+    const routineContext=JSON.stringify({today:todayLocal,existingRoutine:dailyRoutine,goals:goals.map(g=>({title:g.title,deadline:g.deadline,priority:g.priority})),tasks:tasks.filter(t=>!t.completed).slice(0,15).map(t=>({title:t.title,date:t.date,estimatedMinutes:t.estimatedMinutes}))});
     messages=[
       {role:"system",content:"Sen foydalanuvchiga real, sog‘lom va bajariladigan kun tartibi tuzadigan murabbiysan. Foydalanuvchi qaysi tilda yozsa, o‘sha tilda javob ber. Uyg‘onish, gigiyena, ovqatlanish, o‘qish/ish, tanaffus, harakat va uyquni muvozanatla. Vaqtlar 24 soat HH:MM formatida bo‘lsin, bandlar bir-biriga ustma-ust tushmasin. Faqat JSON massiv qaytar: [{\"time\":\"07:00\",\"title\":\"Uyg‘onish\",\"description\":\"Suv ichish va kunni boshlash\"}]. 5–14 ta band."},
       {role:"user",content:"Mening odatlarim va xohishlarim: "+requestText+"\nSmartGoal maqsadlari va vazifalari: "+routineContext}
