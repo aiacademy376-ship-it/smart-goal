@@ -407,14 +407,18 @@ async function handleAI(request,env,user){
     "Oddiy odam tushunadigan sodda, tabiiy va mazmunli til ishlat. Savolga to‘g‘ridan-to‘g‘ri javob ber; umumiy bilim savolini SmartGoal’ga majburan bog‘lama. Faktlarni to‘qima, shubhali ma’lumotni aniq fakt sifatida aytma.",
     "Javobni o‘qishga qulay formatla: kerak bo‘lsa qisqa sarlavha, 1. 2. 3. raqamlangan ro‘yxat, qisqa paragraflar va faqat mazmunga mos 1–3 emoji ishlat. Har bir gapni qalin qilma, yulduzcha yoki qavslarni ortiqcha ishlatma. Markdown belgilari ko‘rinib qolmasin. Bir xil kirish va yakun jumlalarini takrorlama.",
     "SmartGoal’ga oid savollarda foydalanuvchining maqsadlari, kun tartibi, bajarilgan bandlari va cheklovlarini hisobga ol. Aniq, bajariladigan tavsiyalar ber; vazifa va kun tartibini chalkashtirma. Tibbiy, moliyaviy yoki huquqiy mutaxassis sifatida ko‘rinma.",
+    "Bugungi reja so‘ralganda kontekstdagi bugungi sana va hozirgi vaqtga qat’iy amal qil. Hozirgi vaqtdan oldingi kun tartibi vaqtlarini bugun uchun kelajakdagi reja qilib ko‘rsatma; ular o‘tib ketganini qisqa qayd et, faqat kelajakdagi vaqtlarni rejalashtir. Bajarilgan vazifalarni qayta tavsiya qilma. Avval bajarilmagan va bugun tegishli vazifalarni ustuvorlashtir. Agar barcha vazifalar bajarilgan bo‘lsa, buni aniq ayt va dam olish, natijani qayd etish yoki ertangi kunga tayyorgarlik kabi yengil tavsiyalar bilangina cheklan; foydalanuvchi kiritmagan yangi majburiy vazifa, bet soni yoki vaqtni o‘ylab topma. Maqsadlar va vazifalar nomini kontekstdagidek saqla.",
+    "Rejada aniq vaqt faqat kontekstda mavjud bo‘lsa ishlat; aks holda davomiylikni taxmin ekanini bildir. O‘tgan vaqtga band qo‘shma, jadvaldagi bandlarni ikki marta takrorlama, mavjud bandlar bilan to‘qnashma. Javobda HTML entity (`&#...;`), kod ko‘rinishidagi escape yoki ortiqcha backslash ishlatma. Raqamlangan ro‘yxatni 1, 2, 3 tarzida uzluksiz yoz.",
     ageNote,
     "Javob tili: "+lang+". Oxirgi foydalanuvchi xabarining haqiqiy tilida javob ber; interfeys tili undan farq qilsa, foydalanuvchi tilini tanla. O‘zbekcha bo‘lsa foydalanuvchi ishlatgan lotin yoki kirill yozuvini saqla."
   ].join(" ");
   const goalTitles=new Map(goals.map(goal=>[String(goal.id||""),String(goal.title||"").slice(0,100)]));
   const todayParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
   const todayLocal=todayParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-");
+  const currentLocalTime=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Tashkent",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).format(new Date());
   const context=JSON.stringify({
     today:todayLocal,
+    currentTime:currentLocalTime,
     profile:{name:String(profile.name||"").slice(0,60),ageBand:user.age_band},
     goals:goals.map(g=>({title:String(g.title||"").slice(0,100),description:String(g.description||"").slice(0,400),deadline:String(g.deadline||""),priority:String(g.priority||"medium"),progress:Number(g.progress||0)})),
     tasks:tasks.map(t=>({title:String(t.title||"").slice(0,100),description:String(t.description||"").slice(0,300),goalTitle:goalTitles.get(String(t.goalId||""))||"",date:String(t.date||""),completed:Boolean(t.completed),priority:String(t.priority||"medium"),estimatedMinutes:Number(t.estimatedMinutes||0),createdAt:String(t.createdAt||""),completedAt:String(t.completedAt||"")})),
@@ -432,7 +436,7 @@ async function handleAI(request,env,user){
     ];
   }else if(action==="plan"){
     const planLanguage={uz:"Rejani o‘zbek tilida, lotin yozuvida yoz.",ru:"Составь план полностью на русском языке.",en:"Write the plan entirely in English."}[language];
-    messages=[{role:"system",content:system+" Faqat berilgan ma’lumotlarga asoslan. Kunlik reja real va bajariladigan bo‘lsin. "+planLanguage+" Har bir band uchun aniq vaqt yoki davomiylik, ustuvorlik va qisqa sabab ko‘rsat."},{role:"user",content:"Maqsadlarim, vazifalarim va mavjud kun tartibimni tahlil qilib bugungi va yaqin kunlar uchun ustuvor reja tuz. Vaqt taxmini, tanaffuslar va tavsiyalarni yoz; mavjud tartibim bilan to‘qnashuv bo‘lmasin. Ma’lumotlar: "+context}];
+    messages=[{role:"system",content:system+" Faqat berilgan ma’lumotlarga asoslan. Kunlik reja real va bajariladigan bo‘lsin. "+planLanguage+" Hozirgi vaqt: "+currentLocalTime+". Bugungi sanadan oldingi yoki hozirgi vaqtdan o‘tgan bandlarni kelajak rejasi sifatida taklif qilma. Bajarilgan vazifalarni qayta rejalashtirma. Barcha vazifalar bajarilgan bo‘lsa, yangi majburiy ish to‘qima; dam olish yoki ertangi kunga tayyorgarlikni tavsiya qil. Foydalanuvchi kiritmagan sahifa/bet soni yoki topshiriqni qo‘shma. HTML entity va keraksiz escape belgilarisiz toza Markdown yoz."},{role:"user",content:"Maqsadlarim, bugungi bajarilgan va bajarilmagan vazifalarim hamda mavjud kun tartibimni tahlil qilib, aynan hozirgi vaqtdan boshlab bugunning qolgan qismi uchun ustuvor reja tuz. O‘tgan bandlarni alohida qayd et, kelajakdagi vaqtlar bilan to‘qnashma. Ma’lumotlar: "+context}];
   }
   else{
     const message=String(body.message||"").trim();if(!message||message.length>500)return json({success:false,message:"Xabar 1–500 belgi bo‘lishi kerak."},400);
