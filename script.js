@@ -684,6 +684,7 @@
     }
 
     messageElement.textContent = message;
+    translateVisibleUI(toast);
     toast.classList.remove("hidden", "toast-error");
 
     const toastIcon = $(".toast-icon", toast);
@@ -2097,7 +2098,7 @@
     const input = $("#routine-ai-prompt"), prompt = String(input?.value || "").trim();
     if (!prompt) { showToast("Avval kuningiz haqida qisqacha yozing.", "error"); return; }
     const button = document.querySelector("[data-action='generate-routine']");
-    if (button) { button.disabled = true; button.textContent = "AI reja tuzmoqda..."; }
+    if (button) { button.disabled = true; button.textContent = settings.language==="ru"?"AI составляет распорядок...":settings.language==="en"?"AI is building your routine...":"AI reja tuzmoqda..."; }
     try {
       const response = await fetch("/api/ai", { method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"routine",prompt,language:settings.language}) });
       const result = await response.json().catch(() => ({}));
@@ -2112,7 +2113,7 @@
       data.dailyRoutine = cleaned.sort((a,b) => a.time.localeCompare(b.time));
       saveData(); render(); showToast("AI kun tartibingizni tayyorladi. Xohlasangiz, bandlarni tahrirlang.");
     } catch (error) { showToast(error.message || "AI xatolik berdi.", "error"); }
-    finally { if (button) { button.disabled = false; button.innerHTML = icon("sparkles",15) + " Menga kun tartibi tuz"; refreshIcons(); } }
+    finally { if (button) { button.disabled = false; button.innerHTML = icon("sparkles",15) + " Menga kun tartibi tuz"; translateVisibleUI(button); refreshIcons(); } }
   }
 
   /* -------------------- ANALYTICS PAGE -------------------- */
@@ -2426,7 +2427,7 @@
 
   async function sendAIMessage(form) {
     const input=form.elements.message,message=String(input.value||"").trim();if(!message)return;const chat=$("#ai-chat");if(!chat)return;
-    aiConversation.push({role:"user",content:message});aiConversation=aiConversation.slice(-12);chat.insertAdjacentHTML("beforeend",'<div class="ai-message user">'+escapeHTML(message)+'</div><div class="ai-message" id="ai-typing">AI javob yozmoqda...</div>');
+    aiConversation.push({role:"user",content:message});aiConversation=aiConversation.slice(-12);const typingText=settings.language==="ru"?"AI печатает...":settings.language==="en"?"AI is typing...":"AI javob yozmoqda...";chat.insertAdjacentHTML("beforeend",'<div class="ai-message user">'+escapeHTML(message)+'</div><div class="ai-message" id="ai-typing">'+escapeHTML(typingText)+'</div>');
     input.value="";const submit=form.querySelector("button[type='submit']");if(submit)submit.disabled=true;chat.scrollTop=chat.scrollHeight;
     try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message,history:aiConversation.slice(0,-1),language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI bilan bog‘lanib bo‘lmadi.");aiConversation.push({role:"assistant",content:result.answer});aiConversation=aiConversation.slice(-12);$("#ai-typing")?.remove();chat.insertAdjacentHTML("beforeend",'<div class="ai-message">'+escapeHTML(result.answer)+'</div>');}
     catch(error){$("#ai-typing")?.remove();const msg=error.message||"AI hozircha javob bera olmadi.";if(aiConversation.at(-1)?.role==="user"&&aiConversation.at(-1)?.content===message)aiConversation.pop();chat.insertAdjacentHTML("beforeend",'<div class="ai-message">'+escapeHTML(msg)+'</div>');}
@@ -2453,7 +2454,7 @@
   }
 
   async function generateAIPlan() {
-    const output=$("#ai-plan-output"),button=document.querySelector("[data-action='generate-ai-plan']");if(!output)return;if(button)button.disabled=true;output.textContent="AI maqsadlaringiz va vazifalaringizni tahlil qilmoqda...";
+    const output=$("#ai-plan-output"),button=document.querySelector("[data-action='generate-ai-plan']");if(!output)return;if(button)button.disabled=true;output.textContent=settings.language==="ru"?"AI анализирует ваши цели и задачи...":settings.language==="en"?"AI is analyzing your goals and tasks...":"AI maqsadlaringiz va vazifalaringizni tahlil qilmoqda...";
     try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"plan",language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI reja tuza olmadi.");output.textContent=result.answer;}
     catch(error){output.textContent=error.message||"AI reja tuzishda xatolik yuz berdi.";}
     finally{if(button)button.disabled=false;}
