@@ -1,4 +1,5 @@
 
+
 /* ---------- SMARTGOAL RESPONSIVE & ROUTINE EXTENSIONS ---------- */
 :root { --content-gutter: clamp(14px, 2.6vw, 35px); }
 html { scroll-behavior: smooth; }
