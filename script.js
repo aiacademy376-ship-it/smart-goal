@@ -1302,6 +1302,7 @@
       } else {
         task.completed = false;
         task.completedAt = null;
+        refreshGoalProgress();
         showToast("Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.");
       }
 
