@@ -386,6 +386,7 @@
       goals: [],
       tasks: [],
       dailyRoutine: [],
+      routineLogs: {},
       activity: [],
       achievements: [],
       inventory: [],
@@ -417,6 +418,7 @@
       goals: Array.isArray(saved.goals) ? saved.goals : [],
       tasks: Array.isArray(saved.tasks) ? saved.tasks : [],
       dailyRoutine: Array.isArray(saved.dailyRoutine) ? saved.dailyRoutine : [],
+      routineLogs: saved.routineLogs && typeof saved.routineLogs === "object" ? saved.routineLogs : {},
       activity: Array.isArray(saved.activity) ? saved.activity : [],
       achievements: Array.isArray(saved.achievements) ? saved.achievements : [],
       inventory: Array.isArray(saved.inventory) ? saved.inventory : [],
@@ -432,7 +434,10 @@
 
   function loadSettings() {
     const saved = safeJSON(localStorage.getItem(SETTINGS_KEY), {});
-    return { ...DEFAULT_SETTINGS, ...(saved || {}) };
+    const loaded = { ...DEFAULT_SETTINGS, ...(saved || {}) };
+    if (loaded.difficulty === "adult") loaded.difficulty = "senior";
+    if (!["auto","junior","senior"].includes(loaded.difficulty)) loaded.difficulty = "auto";
+    return loaded;
   }
 
   let data = loadData();
@@ -450,6 +455,7 @@
   let remoteSyncQueued = false;
   let aiConversation = [];
   let aiRequestInFlight = false;
+  let registerRetryTimer = null;
   let lastTranslatedLanguage = null;
   let communityRelations = { incoming: [], outgoing: [], friends: [] };
   let communityLeaderboard = [];
@@ -563,14 +569,13 @@
   }
 
   function getDifficulty() {
-    if (settings.difficulty !== "auto") return settings.difficulty;
+    if (settings.difficulty !== "auto") return settings.difficulty === "adult" ? "senior" : settings.difficulty;
 
     const age = data.profile.age;
 
-    if (age === null || age === undefined) return "adult";
+    if (age === null || age === undefined) return "senior";
     if (age <= 11) return "junior";
-    if (age <= 17) return "senior";
-    return "adult";
+    return "senior";
   }
 
   const UI_TEXT = {
@@ -590,19 +595,11 @@
       emptyTasks: "Hozircha vazifalar mavjud emas.",
       emptyGoals: "Hozircha maqsadlar mavjud emas."
     },
-    adult: {
-      welcome: "Rivojlanishingizni boshqarishni davom ettiring",
-      description: "Ustuvor vazifalarni belgilang, jarayonni kuzating va natijaga erishing.",
-      addTask: "Vazifa yaratish",
-      addGoal: "Maqsad yaratish",
-      emptyTasks: "Rejalashtirilgan vazifalar mavjud emas.",
-      emptyGoals: "Hozircha faol maqsadlar mavjud emas."
-    }
   };
 
   function textForUser(key) {
     const level = getDifficulty();
-    return UI_TEXT[level]?.[key] || UI_TEXT.adult[key] || "";
+    return UI_TEXT[level]?.[key] || UI_TEXT.senior[key] || "";
   }
 
   /* -------------------- XP AND RANKS -------------------- */
@@ -989,6 +986,38 @@
     $("#app-shell")?.classList.add("hidden");
   }
 
+  function showRegistrationRetry(seconds) {
+    const form = $("#register-form");
+    if (!form) return;
+    if (registerRetryTimer) clearInterval(registerRetryTimer);
+    let status = $("#register-retry-status");
+    if (!status) {
+      status = document.createElement("p");
+      status.id = "register-retry-status";
+      status.className = "auth-retry-status";
+      const submit = form.querySelector(".auth-submit");
+      if (submit) submit.insertAdjacentElement("afterend", status);
+      else form.append(status);
+    }
+    let remaining = Math.max(1, Math.ceil(Number(seconds) || 300));
+    const renderTimer = () => {
+      const minutes = Math.floor(remaining / 60);
+      const secs = String(remaining % 60).padStart(2, "0");
+      status.textContent = remaining > 0
+        ? "Xavfsizlik uchun kutish: " + minutes + ":" + secs + ". Vaqt tugagach qayta urinishingiz mumkin."
+        : "Qayta urinib ko‘rishingiz mumkin.";
+    };
+    renderTimer();
+    registerRetryTimer = setInterval(() => {
+      remaining = Math.max(0, remaining - 1);
+      renderTimer();
+      if (!remaining) {
+        clearInterval(registerRetryTimer);
+        registerRetryTimer = null;
+      }
+    }, 1000);
+  }
+
   async function registerRemote(form) {
     const formData = new FormData(form);
     const name = String(formData.get("name") || "").trim();
@@ -1022,7 +1051,11 @@
         body: JSON.stringify({ name, username, email, birthdate, password, termsAccepted: true })
       });
       const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.success) throw new Error(result.message || "Ro‘yxatdan o‘tishda xatolik yuz berdi.");
+      if (!response.ok || !result.success) {
+        const error = new Error(result.message || "Ro‘yxatdan o‘tishda xatolik yuz berdi.");
+        error.retryAfter = Number(result.retryAfter || response.headers.get("Retry-After") || 0);
+        throw error;
+      }
 
       remoteAuthenticated = true;
       localStorage.removeItem(SESSION_KEY);
@@ -1039,6 +1072,7 @@
       showToast("SmartGoal’ga xush kelibsiz!");
     } catch (error) {
       showToast(error.message || "Server bilan bog‘lanib bo‘lmadi.", "error");
+      if (error.retryAfter > 0) showRegistrationRetry(error.retryAfter);
     } finally {
       if (button) { button.disabled = false; button.textContent = originalText || "Hisob yaratish"; }
     }
@@ -2828,12 +2862,7 @@
             <input type="radio" name="difficulty" value="senior" ${settings.difficulty === "senior" ? "checked" : ""}>
           </div>
 
-          <div class="setting-row">
-            <div class="setting-info"><strong>Kattalar uchun</strong><small>Professional va batafsil interfeys.</small></div>
-            <input type="radio" name="difficulty" value="adult" ${settings.difficulty === "adult" ? "checked" : ""}>
-          </div>
-
-          <p style="margin-top:15px">Hozirgi tanlov: <strong>${escapeHTML(difficulty)}</strong></p>
+          <p style="margin-top:15px">Hozirgi tanlov: <strong>${escapeHTML(difficulty === "adult" ? "senior" : difficulty)}</strong></p>
         </div>
       `;
     }
@@ -2861,7 +2890,7 @@
       return `
         <div class="settings-section">
           <h3>Ma’lumotlaringiz</h3>
-          <p>Ma’lumotlarni zaxiralash yoki qayta tiklash.</p>
+          <p>Kerakli bo‘limlarni alohida tozalang. XP balansi va do‘kondan xarid qilingan buyumlar himoyalangan.</p>
 
           <div class="setting-row">
             <div class="setting-info"><strong>Ma’lumotlarni eksport qilish</strong><small>Profil, vazifalar va maqsadlarni JSON faylga saqlash.</small></div>
@@ -2874,7 +2903,7 @@
           </div>
 
           <div class="setting-row">
-            <div class="setting-info"><strong>Ma’lumotlarni tozalash</strong><small>Mahalliy demo ma’lumotlarini o‘chirish.</small></div>
+            <div class="setting-info"><strong>Ma’lumotlarni o‘chirish</strong><small>Vazifa, maqsad, kun tartibi va boshqa bo‘limlarni tanlab o‘chirish.</small></div>
             <button class="secondary-button" type="button" data-action="reset-data">${icon("trash-2")} Tozalash</button>
           </div>
         </div>
@@ -3002,13 +3031,50 @@
 
   function resetData() {
     openModal(
-      "Ma’lumotlarni tozalash",
-      "<p>Barcha mahalliy ma’lumotlar, XP, vazifalar va maqsadlar o‘chiriladi. Bu amalni ortga qaytarib bo‘lmaydi.</p>",
+      "Qaysi ma’lumotlarni o‘chirmoqchisiz?",
+      `
+        <p>O‘chiriladigan bo‘limlarni tanlang. XP balansi, daraja uchun yig‘ilgan XP va do‘kondan sotib olingan barcha buyumlar hech qachon o‘chirilmaydi.</p>
+        <div class="data-delete-options">
+          <label><input type="checkbox" data-delete-scope="all" value="all"> <strong>Barchasi</strong></label>
+          <label><input type="checkbox" data-delete-scope value="tasks"> Vazifalar</label>
+          <label><input type="checkbox" data-delete-scope value="goals"> Maqsadlar</label>
+          <label><input type="checkbox" data-delete-scope value="dailyRoutine"> Kun tartibi va bajarilish tarixi</label>
+          <label><input type="checkbox" data-delete-scope value="plans"> Rejalar</label>
+          <label><input type="checkbox" data-delete-scope value="achievements"> Yutuqlar</label>
+          <label><input type="checkbox" data-delete-scope value="memories"> Saqlangan eslatmalar</label>
+          <label><input type="checkbox" data-delete-scope value="notifications"> Bildirishnomalar</label>
+          <label><input type="checkbox" data-delete-scope value="activity"> Faollik tarixi</label>
+        </div>
+      `,
       `
         <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
-        <button class="primary-button" type="button" data-action="confirm-reset">Barchasini o‘chirish</button>
+        <button class="primary-button" type="button" data-action="confirm-clear-selected">Tanlanganlarni o‘chirish</button>
       `
     );
+  }
+
+  function clearSelectedData() {
+    const selected = new Set($("#modal-body [data-delete-scope]:checked").map(input => input.value));
+    const clearAll = selected.has("all");
+    if (!selected.size) { showToast("Avval o‘chiriladigan bo‘limni tanlang.", "error"); return; }
+    const scopes = clearAll
+      ? ["tasks","goals","dailyRoutine","plans","achievements","memories","notifications","activity"]
+      : [...selected];
+    if (scopes.includes("tasks")) data.tasks = [];
+    if (scopes.includes("goals")) data.goals = [];
+    if (scopes.includes("dailyRoutine")) { data.dailyRoutine = []; data.routineLogs = {}; }
+    if (scopes.includes("plans")) { data.plans = []; data.aiPlans = []; }
+    if (scopes.includes("achievements")) data.achievements = [];
+    if (scopes.includes("memories")) data.memories = [];
+    if (scopes.includes("notifications")) data.notifications = [];
+    if (scopes.includes("activity")) data.activity = [];
+    data.xp = Number(data.xp || 0);
+    data.spentXP = Number(data.spentXP || 0);
+    data.inventory = Array.isArray(data.inventory) ? data.inventory : [];
+    saveData();
+    closeModal();
+    render();
+    showToast("Tanlangan ma’lumotlar o‘chirildi. XP va xaridlaringiz saqlandi.");
   }
 
   /* -------------------- SEARCH -------------------- */
@@ -3484,12 +3550,8 @@
       case "reset-data":
         resetData();
         break;
-      case "confirm-reset":
-        data = createInitialData();
-        saveData();
-        closeModal();
-        render();
-        showToast("Mahalliy ma’lumotlar tozalandi.");
+      case "confirm-clear-selected":
+        clearSelectedData();
         break;
 
       case "edit-birthdate":
@@ -3560,8 +3622,15 @@
       return;
     }
 
+    if (target.matches("[data-delete-scope='all']")) {
+      $("#modal-body [data-delete-scope]").forEach(input => {
+        if (input !== target) input.checked = target.checked;
+      });
+      return;
+    }
+
     if (target.matches("input[name='difficulty']")) {
-      settings.difficulty = target.value;
+      settings.difficulty = target.value === "adult" ? "senior" : target.value;
       saveSettings();
       render();
       showToast("Interfeys murakkabligi yangilandi.");
