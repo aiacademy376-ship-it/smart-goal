@@ -1136,6 +1136,7 @@
     ["language","theme","colorTheme","fontSize","sound","reducedMotion","routineReminders","difficulty"].forEach(key => {
       if (Object.prototype.hasOwnProperty.call(remotePreferences,key) && remotePreferences[key] !== undefined) settings[key] = remotePreferences[key];
     });
+    if (settings.difficulty === "adult") settings.difficulty = "senior";
     data.preferences = { ...remotePreferences, ...settings };
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     applySettings();
@@ -2048,11 +2049,18 @@
     const now = new Date();
     const currentTime = String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
     const savedLogs = data.routineLogs?.[date] || {};
+    let autoMarked = false;
     const items = routine.map(item => {
-      const saved = savedLogs[item.id];
-      const status = saved?.status || (String(item.time || "99:99") <= currentTime ? "missed" : "upcoming");
+      let saved = savedLogs[item.id];
+      if (!saved && String(item.time || "99:99") <= currentTime) {
+        if (!data.routineLogs[date]) data.routineLogs[date] = {};
+        saved = data.routineLogs[date][item.id] = { status: "missed", updatedAt: new Date().toISOString(), xpEarned: 0, automatic: true };
+        autoMarked = true;
+      }
+      const status = saved?.status || "upcoming";
       return { ...item, status, xpEarned: Number(saved?.xpEarned || 0) };
     });
+    if (autoMarked) saveData();
     const total = items.length;
     const completed = items.filter(item => item.status === "done").length;
     const missed = items.filter(item => item.status === "missed" || item.status === "no-time").length;
@@ -4139,6 +4147,10 @@
   function start() {
     attachEvents();
     initializeSmartGoal();
+    setInterval(() => {
+      if (currentPage === "planner") render();
+      checkRoutineReminders();
+    }, 60000);
   }
 
   if (document.readyState === "loading") {
