@@ -356,9 +356,10 @@
   }
 
   async function syncDataToServer() {
-    if (!remoteAuthenticated) return;
-    if (remoteSyncRunning) { remoteSyncQueued = true; return; }
+    if (!remoteAuthenticated) return false;
+    if (remoteSyncRunning) { remoteSyncQueued = true; return false; }
     remoteSyncRunning = true;
+    let synced = false;
     try {
       const response = await fetch("/api/data", {
         method: "PUT",
@@ -372,6 +373,8 @@
         showToast("Sessiya tugadi. Qayta kiring.", "error");
       } else if (!response.ok) {
         throw new Error("Ma’lumot serverga saqlanmadi.");
+      } else {
+        synced = true;
       }
     } catch (error) {
       console.error("SmartGoal sync error:", error);
@@ -382,6 +385,27 @@
         remoteSyncQueued = false;
         scheduleRemoteSync();
       }
+    }
+    return synced;
+  }
+
+  async function flushRemoteSync() {
+    if (!remoteAuthenticated) return false;
+    while (true) {
+      if (remoteSyncTimer) {
+        clearTimeout(remoteSyncTimer);
+        remoteSyncTimer = null;
+      }
+      while (remoteSyncRunning) {
+        await new Promise(resolve => setTimeout(resolve, 25));
+      }
+      if (remoteSyncTimer) {
+        clearTimeout(remoteSyncTimer);
+        remoteSyncTimer = null;
+      }
+      remoteSyncQueued = false;
+      if (!await syncDataToServer()) return false;
+      if (!remoteSyncRunning && !remoteSyncQueued && !remoteSyncTimer) return true;
     }
   }
 
@@ -1157,6 +1181,7 @@
       task.completed=true;task.completedAt=new Date().toISOString();render();
       if(!task.xpAwarded){try{
         const goal=data.goals.find(item=>item.id===task.goalId);
+        if(remoteAuthenticated && !await flushRemoteSync())throw new Error("Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.");
         const response=await fetch("/api/tasks/complete",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:{id:task.id,title:task.title,date:task.date||today(),estimatedMinutes:task.estimatedMinutes||30,goalTitle:goal?.title||""}})});
         const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI vazifani baholay olmadi.");
         data.xp=Number(result.xpBalance||0);task.xpAwarded=true;task.xpEarned=Number(result.awarded||0);
