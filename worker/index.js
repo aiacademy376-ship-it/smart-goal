@@ -426,7 +426,7 @@ async function handleTaskCompletion(request,env,user){
     const raw=await runSmartAI(env,[
       {role:"system",content:"Sen SmartGoal adolatli XP baholovchisan. Maqsad foydalanuvchini rag‘batlantirish, lekin oson va soxta vazifalar bilan ball yig‘ishga yo‘l qo‘ymaslik. Faqat so‘ralgan JSONni qaytar."},
       {role:"user",content:prompt}
-    ],{max_tokens:180,temperature:0.05});
+    ],{max_tokens:240,temperature:0.05});
     const match=raw.match(/\{[\s\S]*\}/);
     if(!match)throw new Error("AI baholash formati noto‘g‘ri.");
     evaluation=JSON.parse(match[0]);
@@ -434,6 +434,12 @@ async function handleTaskCompletion(request,env,user){
     console.error("SmartGoal XP evaluation error:",error);
     return json({success:false,message:"Vazifa hozir baholanmadi. Keyinroq qayta urinib ko‘ring."},503);
   }
+  if(typeof evaluation?.meaningful==="string"){
+    const flag=evaluation.meaningful.trim().toLowerCase();
+    if(["true","yes","1","ha","да"].includes(flag))evaluation.meaningful=true;
+    else if(["false","no","0","yo‘q","нет"].includes(flag))evaluation.meaningful=false;
+  }else if(evaluation?.meaningful===1)evaluation.meaningful=true;
+  else if(evaluation?.meaningful===0)evaluation.meaningful=false;
   const rawDifficulty=Number(evaluation?.difficulty),rawEffort=Number(evaluation?.effort),rawRelevance=Number(evaluation?.goalRelevance);
   if(!Number.isFinite(rawDifficulty)||rawDifficulty<1||rawDifficulty>5||!Number.isFinite(rawEffort)||rawEffort<1||rawEffort>5||!Number.isFinite(rawRelevance)||rawRelevance<1||rawRelevance>5||typeof evaluation?.meaningful!=="boolean"){
     console.error("SmartGoal XP evaluation returned invalid fields.");
