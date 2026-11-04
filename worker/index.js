@@ -264,6 +264,10 @@ async function handleData(request, env, user) {
     try { data = row ? JSON.parse(row.data_json) : {}; } catch { data = {}; }
     const balance = await env.DB.prepare("SELECT xp_balance FROM users WHERE id = ?").bind(user.id).first();
     data.xp = Number(balance?.xp_balance || 0);
+    const ledgerRows = await env.DB.prepare("SELECT id,award_date,xp,reason,created_at FROM xp_ledger WHERE user_id=? AND xp>0 ORDER BY created_at DESC LIMIT 180").bind(user.id).all();
+    const localActivity = (Array.isArray(data.activity)?data.activity:[]).filter(item=>!/^AI baholadi:|^Task:/i.test(String(item?.reason||"")));
+    const ledgerActivity = (ledgerRows.results||[]).map(item=>({id:item.id,date:item.award_date,xp:Number(item.xp||0),reason:item.reason,createdAt:item.created_at}));
+    data.activity = [...localActivity,...ledgerActivity].sort((a,b)=>String(a.date||"").localeCompare(String(b.date||""))||String(a.createdAt||"").localeCompare(String(b.createdAt||""))).slice(-180);
     return json({ success: true, data, updatedAt: row ? row.updated_at : null });
   }
 
