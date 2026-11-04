@@ -19,7 +19,8 @@
     difficulty: "auto",
     sound: false,
     reducedMotion: false,
-    routineReminders: false
+    routineReminders: false,
+    fontSize: "medium"
   };
 
   const PAGE_TITLES = {
@@ -706,6 +707,7 @@
 
     root.dataset.theme = theme;
     root.dataset.colorTheme = settings.colorTheme || "violet";
+    root.dataset.fontSize = ["small","medium","large"].includes(settings.fontSize) ? settings.fontSize : "medium";
 
     const language = settings.language || "uz";
     root.lang = language;
@@ -2449,6 +2451,14 @@
               <option value="system" ${settings.theme === "system" ? "selected" : ""}>Qurilma bo‘yicha</option>
             </select>
           </div>
+          <div class="setting-row">
+            <div class="setting-info"><strong>Matn o‘lchami</strong><small>O‘qish uchun qulay hajmni tanlang.</small></div>
+            <select class="field-select" style="max-width:150px" data-setting="fontSize">
+              <option value="small" ${settings.fontSize==="small"?"selected":""}>Kichik</option>
+              <option value="medium" ${!settings.fontSize||settings.fontSize==="medium"?"selected":""}>O‘rtacha</option>
+              <option value="large" ${settings.fontSize==="large"?"selected":""}>Katta</option>
+            </select>
+          </div>
 
           <div class="settings-section">
             <h3>Rang mavzusi</h3>
@@ -3066,7 +3076,7 @@
 
     if (target.matches("[data-setting]")) {
       const key = target.dataset.setting;
-      if (!["language", "theme"].includes(key)) return;
+      if (!["language", "theme", "fontSize"].includes(key)) return;
 
       settings[key] = target.value;
       saveSettings();
