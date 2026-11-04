@@ -466,7 +466,7 @@ async function handleTaskCompletion(request,env,user){
   const normalizedTask=combinedText.replace(/[^\p{L}\p{N}]/gu,"");
   const taskCharacters=Array.from(normalizedTask);
   const distinctRatio=taskCharacters.length?new Set(taskCharacters).size/taskCharacters.length:0;
-  const keyboardMash=/^(?:asdf|asdfgh|asdfghjkl|qwerty|qwertyuiop|zxcv|йцук|йцукен|фыва|фывапролдж|ячсм|тест|test|xxx+|abc+|123+|qazwsx)$/iu.test(normalizedTask);
+  const keyboardMash=/(?:asdf|qwerty|zxcv|йцук|фыва|ячсм)/iu.test(normalizedTask)||/^(?:тест|test|xxx+|abc+|123+|qazwsx)$/iu.test(normalizedTask);
   const repeatedText=/(.)\1{4,}/u.test(normalizedTask);
   const lowVariety=taskCharacters.length>=9&&distinctRatio<0.32;
   const meaningful=evaluation.meaningful&&taskCharacters.length>=3&&!keyboardMash&&!repeatedText&&!lowVariety;
