@@ -636,9 +636,9 @@ export default {
         }
 
         const result = await env.DB.prepare(
-          "SELECT id, name, username, xp_balance FROM users " +
-          "WHERE username LIKE ? COLLATE NOCASE " +
-          "ORDER BY CASE WHEN username = ? COLLATE NOCASE THEN 0 ELSE 1 END, username COLLATE NOCASE LIMIT 10"
+          "SELECT u.id, u.name, u.username, u.xp_balance, COALESCE(CAST(json_extract(d.data_json,'$.spentXP') AS INTEGER),0) AS spent_xp FROM users u LEFT JOIN user_data d ON d.user_id=u.id " +
+          "WHERE u.username LIKE ? COLLATE NOCASE " +
+          "ORDER BY CASE WHEN u.username = ? COLLATE NOCASE THEN 0 ELSE 1 END, u.username COLLATE NOCASE LIMIT 10"
         ).bind(username + "%", username).all();
 
         return json({
@@ -647,7 +647,8 @@ export default {
             id: item.id,
             name: item.name,
             username: item.username,
-            xp: Number(item.xp_balance || 0)
+            xp: Number(item.xp_balance || 0),
+            totalEarnedXP: Number(item.xp_balance || 0) + Number(item.spent_xp || 0)
           }))
         });
       }
