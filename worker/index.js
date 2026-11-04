@@ -418,7 +418,7 @@ async function handleAI(request,env,user){
     profile:{name:String(profile.name||"").slice(0,60),ageBand:user.age_band},
     goals:goals.map(g=>({title:String(g.title||"").slice(0,100),description:String(g.description||"").slice(0,400),deadline:String(g.deadline||""),priority:String(g.priority||"medium"),progress:Number(g.progress||0)})),
     tasks:tasks.map(t=>({title:String(t.title||"").slice(0,100),description:String(t.description||"").slice(0,300),goalTitle:goalTitles.get(String(t.goalId||""))||"",date:String(t.date||""),completed:Boolean(t.completed),priority:String(t.priority||"medium"),estimatedMinutes:Number(t.estimatedMinutes||0),createdAt:String(t.createdAt||""),completedAt:String(t.completedAt||"")})),
-    dailyRoutine:dailyRoutine.map(item=>({id:String(item.id||""),time:String(item.time||""),title:String(item.title||"").slice(0,90),description:String(item.description||"").slice(0,180)})),
+    dailyRoutine:dailyRoutine.map(item=>({id:String(item.id||""),time:String(item.time||""),title:String(item.title||"").slice(0,90),description:String(item.description||"").slice(0,180),estimatedMinutes:Math.max(5,Math.min(480,Number(item.estimatedMinutes||30)||30))})),
     routineProgress:userData.routineLogs&&userData.routineLogs[todayLocal]&&typeof userData.routineLogs[todayLocal]==="object"?userData.routineLogs[todayLocal]:{}
   });
   let messages;
