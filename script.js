@@ -1920,12 +1920,19 @@
   }
 
   async function enableRoutineReminders() {
-    if (!("Notification" in window)) { showToast("Bu qurilmada brauzer bildirishnomalari qo‘llab-quvvatlanmaydi.", "error"); return; }
-    if (Notification.permission === "denied") { showToast("Brauzer sozlamalarida SmartGoal bildirishnomalariga ruxsat bering.", "error"); return; }
+    if (!("Notification" in window)) {
+      settings.routineReminders=true; saveSettings(); render();
+      showToast("Ilova ichidagi kun tartibi eslatmalari yoqildi.");
+      return;
+    }
+    if (Notification.permission === "denied") {
+      settings.routineReminders=true; saveSettings(); render();
+      showToast("Ilova ichidagi eslatmalar yoqildi. Brauzer xabarlari bloklangan.");
+      return;
+    }
     const permission = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
-    if (permission !== "granted") { showToast("Bildirishnomalarga ruxsat berilmadi.", "error"); return; }
-    settings.routineReminders = true; saveSettings(); render();
-    showToast("Kun tartibi eslatmalari yoqildi. Sayt ochiq turganda eslatadi.");
+    settings.routineReminders=true; saveSettings(); render();
+    showToast(permission==="granted" ? "Kun tartibi eslatmalari yoqildi." : "Ilova ichidagi eslatmalar yoqildi. Brauzer xabarlariga ruxsat berilmadi.");
   }
 
   function checkDueTaskNotifications() {
