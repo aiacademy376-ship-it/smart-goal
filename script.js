@@ -2475,6 +2475,7 @@
 
         <div class="profile-name">${escapeHTML(profile.name || "Foydalanuvchi")}</div>
         <div class="profile-username">@${escapeHTML(profile.username || "username")}</div>
+        <small class="profile-decoration-score">Profil bezagi: ${[profile.background && profile.background!=="default",profile.avatarFrame && profile.avatarFrame!=="default",Boolean(profile.activeBadge)].filter(Boolean).length} / 3</small>
         ${profile.activeBadge ? `<span class="profile-active-badge">${icon("award",13)} ${escapeHTML(profile.activeBadge)}</span>` : ""}
 
         <p class="profile-bio">${escapeHTML(profile.bio || "Hali biografiya qo‘shilmagan.")}</p>
