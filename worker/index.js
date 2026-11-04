@@ -538,7 +538,13 @@ const STORE_CATALOG = {
   "background-nebula":{price:360,type:"background",value:"nebula"},
   "badge-builder":{price:100,type:"badge",value:"builder"},
   "avatar-frame-gold":{price:260,type:"avatar",value:"gold"},
-  "avatar-premium":{price:180,type:"avatar",value:"premium"}
+  "avatar-premium":{price:360,type:"avatar",value:"premium"},
+  "background-aurora":{price:520,type:"background",value:"aurora"},
+  "background-forest":{price:480,type:"background",value:"forest"},
+  "background-sunrise":{price:450,type:"background",value:"sunrise"},
+  "badge-scholar":{price:240,type:"badge",value:"Scholar"},
+  "badge-explorer":{price:280,type:"badge",value:"Explorer"},
+  "avatar-frame-neon":{price:420,type:"avatar",value:"neon"}
 };
 
 async function handleStorePurchase(request,env,user){
