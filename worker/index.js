@@ -314,7 +314,7 @@ async function runSmartAI(env,messages,options={}){
 async function handleAI(request,env,user){
   if(!env.AI)return json({success:false,message:"Smart AI binding sozlanmagan."},503);
   const body=await readJson(request),action=String(body.action||"chat");
-  if(!["chat","plan"].includes(action))return json({success:false,message:"AI amali noto‘g‘ri."},400);
+  if(!["chat","plan","routine"].includes(action))return json({success:false,message:"AI amali noto‘g‘ri."},400);
   const rateKey=await clientKey(request,"ai:"+user.id);
   if(!await enforceRateLimit(env,rateKey,20,60))return json({success:false,message:"AI so‘rovlari juda tez yuborildi. Bir daqiqa kuting."},429);
   const row=await env.DB.prepare("SELECT data_json FROM user_data WHERE user_id=?").bind(user.id).first();
@@ -329,7 +329,7 @@ async function handleAI(request,env,user){
     "Oddiy odam tushunadigan o‘zbekcha ishlat. Dasturchilik atamalarini izohlab ber yoki ishlatma. Javobni tartibli, qisqa va amaliy yoz.",
     "Maqsadlarni mayda bosqichlarga ajrat, dam olish va tanaffuslarni hisobga ol. Tibbiy, moliyaviy yoki huquqiy mutaxassis sifatida ko‘rinma.",
     ageNote,
-    "Javob tili: "+lang
+    "Interfeys tili: "+lang+". Suhbatda foydalanuvchi oxirgi xabarini qaysi tilda yozgan bo‘lsa, aynan o‘sha tilda javob ber; interfeys tili boshqa bo‘lsa ham foydalanuvchi tilini ustun qo‘y. O‘zbek tilida lotin yoki kirill yozuvini foydalanuvchi tanlagan shaklda davom ettir."
   ].join(" ");
   const goalTitles=new Map(goals.map(goal=>[String(goal.id||""),String(goal.title||"").slice(0,100)]));
   const todayParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
@@ -341,14 +341,22 @@ async function handleAI(request,env,user){
     tasks:tasks.map(t=>({title:String(t.title||"").slice(0,100),description:String(t.description||"").slice(0,300),goalTitle:goalTitles.get(String(t.goalId||""))||"",date:String(t.date||""),completed:Boolean(t.completed),priority:String(t.priority||"medium"),estimatedMinutes:Number(t.estimatedMinutes||0),createdAt:String(t.createdAt||""),completedAt:String(t.completedAt||"")}))
   });
   let messages;
-  if(action==="plan")messages=[{role:"system",content:system+" Faqat berilgan ma’lumotlarga asoslan. Kunlik reja real va bajariladigan bo‘lsin."},{role:"user",content:"Maqsad va vazifalarimni tahlil qilib bugungi va yaqin kunlar uchun ustuvor kun tartibi tuz. Vaqt taxmini, tanaffuslar va tavsiyalarni yoz. Ma’lumotlar: "+context}];
+  if(action==="routine"){
+    const requestText=String(body.prompt||"").trim().slice(0,700);
+    if(!requestText)return json({success:false,message:"Kun tartibi uchun odatlaringiz va uyg‘onish vaqtingizni yozing."},400);
+    const routineContext=JSON.stringify({today:todayLocal,goals:goals.map(g=>({title:g.title,deadline:g.deadline,priority:g.priority})),tasks:tasks.filter(t=>!t.completed).slice(0,15).map(t=>({title:t.title,date:t.date,estimatedMinutes:t.estimatedMinutes}))});
+    messages=[
+      {role:"system",content:"Sen foydalanuvchiga real, sog‘lom va bajariladigan kun tartibi tuzadigan murabbiysan. Foydalanuvchi qaysi tilda yozsa, o‘sha tilda javob ber. Uyg‘onish, gigiyena, ovqatlanish, o‘qish/ish, tanaffus, harakat va uyquni muvozanatla. Vaqtlar 24 soat HH:MM formatida bo‘lsin, bandlar bir-biriga ustma-ust tushmasin. Faqat JSON massiv qaytar: [{\"time\":\"07:00\",\"title\":\"Uyg‘onish\",\"description\":\"Suv ichish va kunni boshlash\"}]. 5–14 ta band."},
+      {role:"user",content:"Mening odatlarim va xohishlarim: "+requestText+"\nSmartGoal maqsadlari va vazifalari: "+routineContext}
+    ];
+  }else if(action==="plan")messages=[{role:"system",content:system+" Faqat berilgan ma’lumotlarga asoslan. Kunlik reja real va bajariladigan bo‘lsin."},{role:"user",content:"Maqsad va vazifalarimni tahlil qilib bugungi va yaqin kunlar uchun ustuvor kun tartibi tuz. Vaqt taxmini, tanaffuslar va tavsiyalarni yoz. Ma’lumotlar: "+context}];
   else{
     const message=String(body.message||"").trim();if(!message||message.length>500)return json({success:false,message:"Xabar 1–500 belgi bo‘lishi kerak."},400);
     messages=[{role:"system",content:system+" Foydalanuvchining SmartGoal konteksti: "+context}];
     for(const item of (Array.isArray(body.history)?body.history.slice(-8):[])){if(!item||!["user","assistant"].includes(item.role))continue;const content=String(item.content||"").trim().slice(0,500);if(content)messages.push({role:item.role,content});}
     messages.push({role:"user",content:message});
   }
-  try{return json({success:true,answer:await runSmartAI(env,messages,{max_tokens:action==="plan"?900:650})});}
+  try{return json({success:true,answer:await runSmartAI(env,messages,{max_tokens:action==="plan"||action==="routine"?1100:650})});}
   catch(error){console.error("SmartGoal AI error:",{name:error?.name||"Error",message:String(error?.message||error||"Unknown AI error").slice(0,500),cause:error?.cause?String(error.cause).slice(0,300):undefined});return json({success:false,message:error?.message||"AI bilan bog‘lanib bo‘lmadi."},503);}
 }
 async function handleTaskCompletion(request,env,user){
