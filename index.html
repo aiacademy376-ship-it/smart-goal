@@ -4,6 +4,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5" />
+  <script>
+    (function () {
+      var host = window.location.hostname;
+      var path = window.location.pathname;
+      if (host === "aiacademy376-ship-it.github.io" && (path === "/smart-goal" || path.indexOf("/smart-goal/") === 0)) {
+        window.location.replace("https://smart-goal.pages.dev/" + window.location.search + window.location.hash);
+      }
+    })();
+  </script>
   <meta name="theme-color" content="#101827" />
   <meta name="description" content="SmartGoal — maqsadlaringizni rejalashtiring, rivojlanishingizni kuzating va o'z imkoniyatingizni kashf eting." />
   <title>SmartGoal — Maqsadlaringiz sari</title>
