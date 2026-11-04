@@ -433,6 +433,7 @@
   let currentSettingsTab = "general";
   let storeFilter = "all";
   let taskListLimit = 50;
+  let goalListLimit = 40;
   let toastTimeout = null;
   let remoteAuthenticated = false;
   let remoteSyncTimer = null;
@@ -1814,6 +1815,9 @@
 
   function renderGoals() {
     const goals = data.goals;
+    const visibleGoals = goals.slice(0,goalListLimit);
+    const goalStats = new Map(goals.map(goal => [goal.id,getGoalProgress(goal)]));
+    const progressFor = goal => goalStats.get(goal.id) || getGoalProgress(goal);
 
     return `
       ${pageHeader(
@@ -1838,12 +1842,12 @@
         </div>
         <div class="stat-card">
           <p class="stat-label">O‘rtacha progress</p>
-          <div class="stat-value">${goals.length ? Math.round(goals.reduce((sum, goal) => sum + getGoalProgress(goal).progress, 0) / goals.length) : 0}%</div>
+          <div class="stat-value">${goals.length ? Math.round(goals.reduce((sum, goal) => sum + progressFor(goal).progress, 0) / goals.length) : 0}%</div>
         </div>
       </div>
 
       <div class="goal-list">
-        ${goals.length ? goals.map(goal => `
+        ${goals.length ? visibleGoals.map(goal => { const progress=progressFor(goal); return `
           <article class="goal-item">
             <div class="goal-item-header">
               <div>
@@ -1851,14 +1855,14 @@
                 <small>${escapeHTML(goal.description || "Maqsad tavsifi kiritilmagan")}</small>
                 <small>${goal.deadline ? `Muddat: ${escapeHTML(formatDate(goal.deadline))}` : "Muddat belgilanmagan"}</small>
               </div>
-              <span class="goal-percentage">${getGoalProgress(goal).progress}%</span>
+              <span class="goal-percentage">${progress.progress}%</span>
             </div>
 
             <div class="progress-track">
-              <div class="progress-fill" style="width:${getGoalProgress(goal).progress}%"></div>
+              <div class="progress-fill" style="width:${progress.progress}%"></div>
             </div>
 
-            <div class="goal-progress-detail"><span>${getGoalProgress(goal).total ? `${getGoalProgress(goal).completed}/${getGoalProgress(goal).total} vazifa bajarildi · yana ${getGoalProgress(goal).remaining} ta qoldi` : "Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating."}</span><span>${getGoalProgress(goal).daysLeft===null ? "Muddat yo‘q" : getGoalProgress(goal).daysLeft<0 ? "Muddat o‘tgan" : getGoalProgress(goal).daysLeft===0 ? "Bugun oxirgi kun" : `Yana ${getGoalProgress(goal).daysLeft} kun`}</span></div>
+            <div class="goal-progress-detail"><span>${progress.total ? `${progress.completed}/${progress.total} vazifa bajarildi · yana ${progress.remaining} ta qoldi` : "Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating."}</span><span>${progress.daysLeft===null ? "Muddat yo‘q" : progress.daysLeft<0 ? "Muddat o‘tgan" : progress.daysLeft===0 ? "Bugun oxirgi kun" : `Yana ${progress.daysLeft} kun`}</span></div>
             <div class="goal-footer">
               <span>${goal.completed ? "Yakunlangan" : `Ustuvorlik: ${escapeHTML(goal.priority || "medium")}`}</span>
               <span>
@@ -1867,7 +1871,8 @@
               </span>
             </div>
           </article>
-        `).join("") : emptyState("Maqsadlar mavjud emas", "Birinchi maqsadingizni yarating va unga qadam-baqadam yaqinlashing.", "target")}
+        `; }).join("") : emptyState("Maqsadlar mavjud emas", "Birinchi maqsadingizni yarating va unga qadam-baqadam yaqinlashing.", "target")}
+        ${goals.length > goalListLimit ? `<button class="secondary-button task-load-more" type="button" data-action="load-more-goals">Yana ${Math.min(40,goals.length-goalListLimit)} ta maqsadni ko‘rsatish</button>` : ""}
       </div>
     `;
   }
@@ -3165,6 +3170,10 @@
 
       case "load-more-tasks":
         taskListLimit += 50;
+        render();
+        break;
+      case "load-more-goals":
+        goalListLimit += 40;
         render();
         break;
       case "add-task":
