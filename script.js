@@ -434,6 +434,7 @@
   let storeFilter = "all";
   let taskListLimit = 50;
   let goalListLimit = 40;
+  let memoryListLimit = 30;
   let toastTimeout = null;
   let remoteAuthenticated = false;
   let remoteSyncTimer = null;
@@ -2145,6 +2146,8 @@
   /* -------------------- ACHIEVEMENTS PAGE -------------------- */
 
   function renderAchievements() {
+    const memories=Array.isArray(data.memories)?data.memories:[];
+    const visibleMemories=memories.slice(0,memoryListLimit);
     return `
       ${pageHeader(
         "SIZNING NATIJALARINGIZ",
@@ -2184,7 +2187,7 @@
           </div>
         </div>
 
-        ${data.memories.length ? data.memories.map(memory => `
+        ${memories.length ? visibleMemories.map(memory => `
           <article class="notification-item">
             <div class="achievement-icon">${icon(memory.type === "certificate" ? "file-badge" : "bookmark", 20)}</div>
             <div>
@@ -2196,6 +2199,7 @@
             <button class="icon-button" type="button" data-action="delete-memory" data-id="${escapeHTML(memory.id)}">${icon("trash-2", 14)}</button>
           </article>
         `).join("") : emptyState("Xotiralar hali yo‘q", "Birinchi yutug‘ingiz yoki esdalik kuningizni saqlang.", "bookmark")}
+        ${memories.length > memoryListLimit ? `<button class="secondary-button task-load-more" type="button" data-action="load-more-memories">Yana ${Math.min(30,memories.length-memoryListLimit)} ta xotirani ko‘rsatish</button>` : ""}
       </section>
     `;
   }
@@ -3174,6 +3178,10 @@
         break;
       case "load-more-goals":
         goalListLimit += 40;
+        render();
+        break;
+      case "load-more-memories":
+        memoryListLimit += 30;
         render();
         break;
       case "add-task":
