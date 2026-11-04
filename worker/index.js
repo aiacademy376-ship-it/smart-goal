@@ -383,8 +383,8 @@ async function handleTaskCompletion(request,env,user){
 
   const rateKey=await clientKey(request,"xp-task:"+user.id);
   if(!await enforceRateLimit(env,rateKey,30,3600))return json({success:false,message:"XP baholash limiti tugadi. Keyinroq urinib ko‘ring."},429);
-  const duplicate=await env.DB.prepare("SELECT xp FROM xp_ledger WHERE user_id=? AND task_id=?").bind(user.id,taskId).first();
-  if(duplicate){const b=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();return json({success:true,awarded:0,alreadyAwarded:true,xpBalance:Number(b?.xp_balance||0)});}
+  const duplicate=await env.DB.prepare("SELECT id,xp FROM xp_ledger WHERE user_id=? AND task_id=?").bind(user.id,taskId).first();
+  if(duplicate && Number(duplicate.xp)>0){const b=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();return json({success:true,awarded:0,alreadyAwarded:true,xpBalance:Number(b?.xp_balance||0)});}
   const prompt=[
     "Baholash vazifasi: mazmunini, haqiqiy mehnatini, taxminiy davomiyligini, muddatini, muhimligini va bog‘langan maqsadga foydasini birgalikda tekshir.",
     "1–5 oralig‘ida difficulty, effort, goalRelevance bahola. meaningful faqat aniq va mazmunli bajariladigan ish bo‘lsa true. 'salom', tasodifiy harflar, ASF, test, nuqta, bitta noaniq so‘z, sun’iy takroriy yoki mazmunsiz vazifa bo‘lsa meaningful=false va difficulty/effort 1 bo‘lsin.",
@@ -434,22 +434,28 @@ async function handleTaskCompletion(request,env,user){
   const now=new Date().toISOString();
   // Insert the XP ledger row and update the cached balance in one D1 batch.
   // D1 batches are transactional, so a failed balance update cannot leave an orphaned award.
-  const ledgerId=crypto.randomUUID();
-  const batch=await env.DB.batch([
-    env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) VALUES (?,?,?,?,?,?,?) ON CONFLICT(user_id,task_id) DO NOTHING")
-      .bind(ledgerId,user.id,taskId,suggestedXP,completedLocal,("Task: "+title).slice(0,140),now),
-    env.DB.prepare("UPDATE users SET xp_balance=xp_balance+(SELECT xp FROM xp_ledger WHERE id=?),updated_at=? WHERE id=? AND EXISTS (SELECT 1 FROM xp_ledger WHERE id=? AND xp>0)")
-      .bind(ledgerId,now,user.id,ledgerId),
-    env.DB.prepare("SELECT xp FROM xp_ledger WHERE id=?").bind(ledgerId),
-    env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id)
-  ]);
-  const inserted=batch[2]?.results?.[0];
-  const balance=batch[3]?.results?.[0];
-  if(!inserted){
-    const duplicate=await env.DB.prepare("SELECT xp FROM xp_ledger WHERE user_id=? AND task_id=?").bind(user.id,taskId).first();
-    return json({success:true,awarded:0,alreadyAwarded:Boolean(duplicate),xpBalance:Number(balance?.xp_balance||0)});
+  let awarded=0;
+  if(duplicate && Number(duplicate.xp)===0){
+    const update=await env.DB.batch([
+      env.DB.prepare("UPDATE xp_ledger SET xp=?,award_date=?,reason=?,created_at=? WHERE id=? AND xp=0")
+        .bind(suggestedXP,completedLocal,("Task: "+title).slice(0,140),now,duplicate.id),
+      env.DB.prepare("UPDATE users SET xp_balance=xp_balance+?,updated_at=? WHERE id=? AND changes()>0")
+        .bind(suggestedXP,now,user.id)
+    ]);
+    awarded=Number(update[0]?.meta?.changes||0)>0?suggestedXP:0;
+  }else{
+    const ledgerId=crypto.randomUUID();
+    const batch=await env.DB.batch([
+      env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) VALUES (?,?,?,?,?,?,?) ON CONFLICT(user_id,task_id) DO NOTHING")
+        .bind(ledgerId,user.id,taskId,suggestedXP,completedLocal,("Task: "+title).slice(0,140),now),
+      env.DB.prepare("UPDATE users SET xp_balance=xp_balance+(SELECT xp FROM xp_ledger WHERE id=?),updated_at=? WHERE id=? AND EXISTS (SELECT 1 FROM xp_ledger WHERE id=? AND xp>0)")
+        .bind(ledgerId,now,user.id,ledgerId),
+      env.DB.prepare("SELECT xp FROM xp_ledger WHERE id=?").bind(ledgerId)
+    ]);
+    awarded=Number(batch[2]?.results?.[0]?.xp||0);
   }
-  const awarded=Number(inserted.xp||0);
+  const balance=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();
+  if(duplicate && awarded===0)return json({success:true,awarded:0,alreadyAwarded:true,xpBalance:Number(balance?.xp_balance||0)});
   return json({success:true,awarded,xpBalance:Number(balance?.xp_balance||0),difficulty,effort,goalRelevance,onTime,notMeaningful:!meaningful,reason:String(meaningful?(evaluation.reason||"Vazifa mazmuni va mehnati hisobga olindi."):"Vazifa nomi juda qisqa yoki noaniq bo‘lgani uchun XP berilmadi.").slice(0,180)});
 }
 async function handleSpendXP(request,env,user){
