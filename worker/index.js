@@ -423,7 +423,9 @@ async function handleAI(request,env,user){
     goals:goals.map(g=>({title:String(g.title||"").slice(0,100),description:String(g.description||"").slice(0,400),deadline:String(g.deadline||""),priority:String(g.priority||"medium"),progress:Number(g.progress||0)})),
     tasks:tasks.map(t=>({title:String(t.title||"").slice(0,100),description:String(t.description||"").slice(0,300),goalTitle:goalTitles.get(String(t.goalId||""))||"",date:String(t.date||""),completed:Boolean(t.completed),priority:String(t.priority||"medium"),estimatedMinutes:Number(t.estimatedMinutes||0),createdAt:String(t.createdAt||""),completedAt:String(t.completedAt||"")})),
     dailyRoutine:dailyRoutine.map(item=>({id:String(item.id||""),time:String(item.time||""),title:String(item.title||"").slice(0,90),description:String(item.description||"").slice(0,180),estimatedMinutes:Math.max(5,Math.min(480,Number(item.estimatedMinutes||30)||30))})),
-    routineProgress:userData.routineLogs&&userData.routineLogs[todayLocal]&&typeof userData.routineLogs[todayLocal]==="object"?userData.routineLogs[todayLocal]:{}
+    routineProgress:userData.routineLogs&&userData.routineLogs[todayLocal]&&typeof userData.routineLogs[todayLocal]==="object"?userData.routineLogs[todayLocal]:{},
+    todayCompletedTasks:tasks.filter(t=>t.completed&&String(t.completedAt||"").slice(0,10)===todayLocal).map(t=>({title:String(t.title||"").slice(0,100),completedAt:String(t.completedAt||"")})),
+    todayPendingTasks:tasks.filter(t=>!t.completed&&(!t.date||t.date===todayLocal)).map(t=>({title:String(t.title||"").slice(0,100),priority:String(t.priority||"medium"),estimatedMinutes:Number(t.estimatedMinutes||0)}))
   });
   let messages;
   if(action==="routine"){
@@ -440,7 +442,9 @@ async function handleAI(request,env,user){
   }
   else{
     const message=String(body.message||"").trim();if(!message||message.length>500)return json({success:false,message:"Xabar 1–500 belgi bo‘lishi kerak."},400);
-    messages=[{role:"system",content:system+" Foydalanuvchining SmartGoal konteksti: "+context}];
+    const planningIntent=/(bugun|bugungi|kunlik).{0,50}(reja|plan|jadval)|(reja|plan|jadval).{0,50}(bugun|bugungi|kun)/iu.test(message);
+    const chatRules=planningIntent?" BU XABAR BUGUNGI REJA SO‘ROVI. Faqat bugungi sana "+todayLocal+" va hozirgi Toshkent vaqti "+currentLocalTime+" dan keyingi vaqtlarni rejalashtir. Bugun bajarilgan vazifalarni qayta topshiriq qilma: ular faqat bajarilgan natija sifatida tilga olinishi mumkin. Bugungi bajarilmagan vazifalar ro‘yxatidan tashqarida yangi majburiy vazifa o‘ylab topma. Kun tartibidagi hozirgi vaqtdan oldingi bandlar o‘tib ketgan; ularni qayta rejalashtirma va foydalanuvchini ayblama. Agar bugungi barcha vazifalar tugagan bo‘lsa, bugun uchun yangi o‘qish/sport topshirig‘i bermagin; dam olish va ertangi kunga yengil tayyorgarlikni taklif qil. Maktabga borish yoki uyg‘onish bajarilmagan deb taxmin qilma: routineProgress va vaqtni hisobga ol; holati noma’lum bo‘lsa, bajarilmadi demagin. Faqat kontekstda mavjud bo‘lgan maqsad/vazifa nomlari va muddatlardan foydalan. Vaqt aniq bo‘lmasa, aniq soat uydirma. Ohang muloyim, ayblovsiz bo‘lsin. Javobni 3–5 qisqa band bilan chekla.":" ";
+    messages=[{role:"system",content:system+chatRules+" Foydalanuvchining SmartGoal konteksti: "+context}];
     for(const item of (Array.isArray(body.history)?body.history.slice(-8):[])){if(!item||!["user","assistant"].includes(item.role))continue;const content=String(item.content||"").trim().slice(0,500);if(content)messages.push({role:item.role,content});}
     messages.push({role:"user",content:message});
   }
