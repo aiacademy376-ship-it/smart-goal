@@ -340,7 +340,8 @@ async function handleTaskCompletion(request,env,user){
     return json({success:false,message:"AI murakkablikni to‘g‘ri baholay olmadi. Qayta urinib ko‘ring."},503);
   }
   const difficulty=Math.round(rawDifficulty);
-  const todayUTC=new Date().toISOString().slice(0,10),onTime=todayUTC<=dueDate,suggestedXP=Math.min(15,difficulty*2+(onTime?5:0)),now=new Date().toISOString();
+  const tashkentDateParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const todayLocal=tashkentDateParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-"),onTime=todayLocal<=dueDate,suggestedXP=Math.min(15,difficulty*2+(onTime?5:0)),now=new Date().toISOString();
   const inserted=await env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) SELECT ?,?,?,MIN(?,MAX(0,45-COALESCE((SELECT SUM(xp) FROM xp_ledger WHERE user_id=? AND award_date=?),0))),?,?,? WHERE NOT EXISTS (SELECT 1 FROM xp_ledger WHERE user_id=? AND task_id=?) RETURNING xp").bind(crypto.randomUUID(),user.id,taskId,suggestedXP,user.id,todayUTC,todayUTC,("Task: "+title).slice(0,140),now,user.id,taskId).first();
   if(!inserted){const b=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();return json({success:true,awarded:0,alreadyAwarded:true,xpBalance:Number(b?.xp_balance||0)});}
   const awarded=Number(inserted.xp||0);if(awarded>0)await env.DB.prepare("UPDATE users SET xp_balance=xp_balance+?,updated_at=? WHERE id=?").bind(awarded,now,user.id).run();
