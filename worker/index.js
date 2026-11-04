@@ -450,7 +450,7 @@ async function handleTaskCompletion(request,env,user){
     return json({success:true,awarded:0,alreadyAwarded:Boolean(duplicate),dailyLimitReached:!duplicate,xpBalance:Number(balance?.xp_balance||0)});
   }
   const awarded=Number(inserted.xp||0);
-  return json({success:true,awarded,xpBalance:Number(balance?.xp_balance||0),difficulty,effort,goalRelevance,onTime,dailyLimitReached:awarded===0,reason:String(evaluation.reason||"AI vazifani baholadi.").slice(0,180)});
+  return json({success:true,awarded,xpBalance:Number(balance?.xp_balance||0),difficulty,effort,goalRelevance,onTime,dailyLimitReached:awarded===0,reason:String(meaningful?(evaluation.reason||"Vazifa mazmuni va mehnati hisobga olindi."):"Vazifa nomi juda qisqa yoki noaniq bo‘lgani uchun eng kam XP berildi.").slice(0,180)});
 }
 async function handleSpendXP(request,env,user){
   const body=await readJson(request),amount=Math.floor(Number(body.amount)||0);if(amount<1||amount>5000)return json({success:false,message:"XP miqdori noto‘g‘ri."},400);
