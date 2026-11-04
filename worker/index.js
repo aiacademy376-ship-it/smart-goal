@@ -390,8 +390,17 @@ async function handleTaskCompletion(request,env,user){
   const goalDeadline=String(savedGoal?.deadline||"");
   if(title.length<2||!/^\d{4}-\d{2}-\d{2}$/.test(dueDate)||Number.isNaN(Date.parse(dueDate+"T00:00:00Z")))return json({success:false,message:"Saqlangan vazifa ma’lumotlari noto‘g‘ri."},409);
 
+  const completedDateParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date(completedAt));
+  const completedLocal=completedDateParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-");
+  const normalizeTaskText=value=>String(value||"").replace(/^Task:\s*/i,"").toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu," ").trim();
+  const sameDayRows=await env.DB.prepare("SELECT reason FROM xp_ledger WHERE user_id=? AND award_date=? AND xp>0 LIMIT 120").bind(user.id,completedLocal).all();
+  const normalizedTitle=normalizeTaskText(title);
+  if(normalizedTitle && (sameDayRows.results||[]).some(row=>normalizeTaskText(row.reason)===normalizedTitle)){
+    const balance=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();
+    return json({success:true,awarded:0,duplicateTask:true,xpBalance:Number(balance?.xp_balance||0),reason:"Bugun shu mazmundagi vazifa uchun XP avval berilgan."});
+  }
   const rateKey=await clientKey(request,"xp-task:"+user.id);
-  if(!await enforceRateLimit(env,rateKey,30,3600))return json({success:false,message:"XP baholash limiti tugadi. Keyinroq urinib ko‘ring."},429);
+  if(!await enforceRateLimit(env,rateKey,120,3600))return json({success:false,message:"Juda ko‘p vazifa ketma-ket bajarildi. Biroz kutib qayta urinib ko‘ring."},429);
   const duplicate=await env.DB.prepare("SELECT id,xp FROM xp_ledger WHERE user_id=? AND task_id=?").bind(user.id,taskId).first();
   if(duplicate && Number(duplicate.xp)>0){const b=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();return json({success:true,awarded:0,alreadyAwarded:true,xpBalance:Number(b?.xp_balance||0)});}
   const prompt=[
@@ -434,8 +443,6 @@ async function handleTaskCompletion(request,env,user){
   const titleLetters=title.replace(/[^\p{L}]/gu,"");
   const hasVowel=/[aeiouo‘’áéíóúаеёиоуыэюя]/i.test(title);
   const meaningful= evaluation.meaningful && titleLetters.length>=5 && hasVowel;
-  const completedDateParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date(completedAt));
-  const completedLocal=completedDateParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-");
   const onTime=completedLocal<=dueDate;
   const priorityBonus=priority==="high"?1:priority==="low"?0:0.5;
   const suggestedXP=meaningful
