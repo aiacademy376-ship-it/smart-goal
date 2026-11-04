@@ -18,7 +18,8 @@
     colorTheme: "violet",
     difficulty: "auto",
     sound: false,
-    reducedMotion: false
+    reducedMotion: false,
+    routineReminders: false
   };
 
   const PAGE_TITLES = {
@@ -860,7 +861,7 @@
 
         image.onload = () => {
           const canvas = document.createElement("canvas");
-          const max = 500;
+          const max = 420;
           const ratio = Math.min(1, max / Math.max(image.width, image.height));
 
           canvas.width = Math.round(image.width * ratio);
@@ -869,7 +870,7 @@
           const context = canvas.getContext("2d");
           context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-          resolve(canvas.toDataURL("image/jpeg", 0.82));
+          resolve(canvas.toDataURL("image/jpeg", 0.72));
         };
 
         image.src = reader.result;
@@ -1886,6 +1887,7 @@
           <div><strong>${icon("sparkles",16)} AI bilan kun tartibini tuzish</strong><small>Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing.</small></div>
           <textarea id="routine-ai-prompt" class="field-textarea" rows="2" maxlength="700" placeholder="Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman."></textarea>
           <button class="primary-button" type="button" data-action="generate-routine">${icon("sparkles",15)} Menga kun tartibi tuz</button>
+          <button class="secondary-button" type="button" data-action="enable-routine-reminders">${icon("bell",15)} ${settings.routineReminders ? "Eslatmalar yoqilgan" : "Vaqtida eslatib tur"}</button>
         </div>
       </section>
 
@@ -1926,6 +1928,31 @@
     else data.dailyRoutine.push({ id: uid(), ...values });
     data.dailyRoutine.sort((a,b) => a.time.localeCompare(b.time));
     saveData(); closeModal(); render(); showToast("Kun tartibi saqlandi.");
+  }
+
+  async function enableRoutineReminders() {
+    if (!("Notification" in window)) { showToast("Bu qurilmada brauzer bildirishnomalari qo‘llab-quvvatlanmaydi.", "error"); return; }
+    if (Notification.permission === "denied") { showToast("Brauzer sozlamalarida SmartGoal bildirishnomalariga ruxsat bering.", "error"); return; }
+    const permission = Notification.permission === "granted" ? "granted" : await Notification.requestPermission();
+    if (permission !== "granted") { showToast("Bildirishnomalarga ruxsat berilmadi.", "error"); return; }
+    settings.routineReminders = true; saveSettings(); render();
+    showToast("Kun tartibi eslatmalari yoqildi. Sayt ochiq turganda eslatadi.");
+  }
+
+  function checkRoutineReminders() {
+    if (!settings.routineReminders || !Array.isArray(data.dailyRoutine) || !data.dailyRoutine.length) return;
+    const now = new Date(), time = String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+    const day = now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+    for (const item of data.dailyRoutine) {
+      if (item.time !== time) continue;
+      const key = "smartgoal_routine_reminder_"+day+"_"+item.id;
+      if (localStorage.getItem(key)) continue;
+      localStorage.setItem(key,"1");
+      addNotification("Kun tartibi vaqti!", item.title + (item.description ? " — "+item.description : ""));
+      if ("Notification" in window && Notification.permission === "granted") {
+        try { new Notification("SmartGoal · "+item.title,{body:item.description || "Rejangizdagi navbatdagi ish vaqti keldi."}); } catch {}
+      }
+    }
   }
 
   async function generateRoutine() {
@@ -2826,6 +2853,9 @@
       case "generate-routine":
         generateRoutine();
         break;
+      case "enable-routine-reminders":
+        enableRoutineReminders();
+        break;
       case "add-goal":
         openGoalForm();
         break;
@@ -3235,6 +3265,8 @@
 
   async function initializeSmartGoal() {
     applySettings();
+    checkRoutineReminders();
+    if (!window.smartGoalReminderTimer) window.smartGoalReminderTimer = setInterval(checkRoutineReminders, 30000);
     const maxDate = $("#register-birthdate");
     if (maxDate) maxDate.max = today();
     localStorage.removeItem(SESSION_KEY);
