@@ -481,6 +481,24 @@ async function handleTaskCompletion(request,env,user){
   if(duplicate && awarded===0 && meaningful)return json({success:true,awarded:0,alreadyAwarded:true,xpBalance:Number(balance?.xp_balance||0)});
   return json({success:true,awarded,xpBalance:Number(balance?.xp_balance||0),difficulty,effort,goalRelevance,onTime,notMeaningful:!meaningful,reason:String(meaningful?(evaluation.reason||"Vazifa mazmuni va mehnati hisobga olindi."):"Vazifa nomi juda qisqa yoki noaniq bo‘lgani uchun XP berilmadi.").slice(0,180)});
 }
+async function handleUpdateProfile(request,env,user){
+  const body=await readJson(request);
+  const name=String(body.name||"").trim(),username=String(body.username||"").trim().toLowerCase();
+  if(name.length<2||name.length>60)return json({success:false,message:"Ism 2–60 belgi bo‘lishi kerak."},400);
+  if(!/^[a-z0-9_][a-z0-9_.]{2,19}$/.test(username))return json({success:false,message:"Username 3–20 belgi bo‘lishi kerak."},400);
+  const rateKey=await clientKey(request,"profile-update:"+user.id);
+  if(!await enforceRateLimit(env,rateKey,10,3600))return json({success:false,message:"Profilni tez-tez o‘zgartiryapsiz. Keyinroq urinib ko‘ring."},429);
+  try{
+    await env.DB.prepare("UPDATE users SET name=?,username=?,updated_at=? WHERE id=?")
+      .bind(name,username,new Date().toISOString(),user.id).run();
+    return json({success:true,name,username});
+  }catch(error){
+    if(String(error?.message||"").toLowerCase().includes("unique"))return json({success:false,message:"Bu username boshqa foydalanuvchi tomonidan band."},409);
+    console.error("SmartGoal profile update error:",error);
+    return json({success:false,message:"Profilni saqlashda server xatosi yuz berdi."},500);
+  }
+}
+
 async function handleSpendXP(request,env,user){
   const body=await readJson(request),amount=Math.floor(Number(body.amount)||0);if(amount<1||amount>5000)return json({success:false,message:"XP miqdori noto‘g‘ri."},400);
   const updated=await env.DB.prepare("UPDATE users SET xp_balance=xp_balance-?,updated_at=? WHERE id=? AND xp_balance>=? RETURNING xp_balance").bind(amount,new Date().toISOString(),user.id,amount).first();
@@ -505,11 +523,12 @@ export default {
       if (request.method === "POST" && path === "/api/register") return await handleRegister(request, env);
       if (request.method === "POST" && path === "/api/login") return await handleLogin(request, env);
       if (request.method === "POST" && path === "/api/logout") return await handleLogout(request, env);
-      if (request.method === "POST" && ["/api/ai","/api/tasks/complete","/api/xp/spend"].includes(path)) {
+      if (request.method === "POST" && ["/api/ai","/api/tasks/complete","/api/xp/spend","/api/profile"].includes(path)) {
         const user=await authenticatedUser(request,env);
         if(!user)return json({success:false,message:"Avtorizatsiya talab qilinadi."},401);
         if(path==="/api/ai")return await handleAI(request,env,user);
         if(path==="/api/tasks/complete")return await handleTaskCompletion(request,env,user);
+        if(path==="/api/profile")return await handleUpdateProfile(request,env,user);
         return await handleSpendXP(request,env,user);
       }
 
