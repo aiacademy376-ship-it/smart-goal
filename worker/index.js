@@ -447,8 +447,12 @@ async function handleTaskCompletion(request,env,user){
   }
   const difficulty=Math.round(rawDifficulty),effort=Math.round(rawEffort),goalRelevance=Math.round(rawRelevance);
   const titleLetters=title.replace(/[^\p{L}]/gu,"");
-  const hasVowel=/[aeiouo‘’áéíóúаеёиоуыэюя]/i.test(title);
-  const meaningful= evaluation.meaningful && titleLetters.length>=5 && hasVowel;
+  const combinedText=title+" "+description;
+  const combinedLetters=combinedText.replace(/[^\p{L}]/gu,"");
+  const usesVowelBasedScript=/[A-Za-zА-Яа-яЁё]/.test(combinedText);
+  const hasVowel=/[aeiouyáéíóúаеёиоуыэюя]/i.test(combinedText);
+  const looksLikeRandomLatin=usesVowelBasedScript && combinedLetters.length>=5 && !hasVowel;
+  const meaningful=evaluation.meaningful && titleLetters.length>=3 && !looksLikeRandomLatin;
   const onTime=completedLocal<=dueDate;
   const priorityBonus=priority==="high"?1:priority==="low"?0:0.5;
   const suggestedXP=meaningful
