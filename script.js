@@ -1368,6 +1368,8 @@
       showToast(`${item.name} muvaffaqiyatli xarid qilindi!`);
     } finally {
       purchaseActionsInFlight.delete(id);
+      const button = document.querySelector("[data-action='confirm-purchase']");
+      if (button) button.disabled = false;
     }
   }
 
