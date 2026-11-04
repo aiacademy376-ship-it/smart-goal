@@ -1032,8 +1032,10 @@
     ["language","theme","colorTheme","fontSize","sound","reducedMotion","routineReminders","difficulty"].forEach(key => {
       if (Object.prototype.hasOwnProperty.call(remotePreferences,key) && remotePreferences[key] !== undefined) settings[key] = remotePreferences[key];
     });
+    data.preferences = { ...remotePreferences, ...settings };
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     applySettings();
+    saveData();
     if (data.profile.birthdate) data.profile.age = calculateAge(data.profile.birthdate);
   }
 
