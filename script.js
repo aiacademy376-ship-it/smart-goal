@@ -2280,7 +2280,9 @@
       default: "linear-gradient(120deg,#5145cf,#9282f6)",
       midnight: "linear-gradient(120deg,#101827,#283958)",
       galaxy: "radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",
-      royal: "linear-gradient(120deg,#7c4a20,#d3a24b)"
+      royal: "linear-gradient(120deg,#7c4a20,#d3a24b)",
+      sakura: "linear-gradient(120deg,#e7a5bd,#8b6bba)",
+      nebula: "radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)"
     };
 
     const bg = backgroundStyles[profile.background] || backgroundStyles.default;
@@ -2290,7 +2292,7 @@
 
       <section class="profile-main-card">
         <div class="profile-avatar-wrap">
-          <span class="avatar">
+          <span class="avatar avatar-frame-${escapeHTML(profile.avatarFrame || "default")}">
             ${profile.avatar
               ? `<img src="${escapeHTML(profile.avatar)}" alt="Profil rasmi">`
               : icon("user-round", 42)}
