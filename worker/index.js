@@ -334,7 +334,12 @@ async function handleTaskCompletion(request,env,user){
   let evaluation;
   try{const raw=await runSmartAI(env,[{role:"system",content:"Sen SmartGoal vazifa murakkabligini baholovchi modulisan. Faqat JSON qaytar."},{role:"user",content:prompt}],{max_tokens:120,temperature:0.1});const match=raw.match(/\{[\s\S]*\}/);if(!match)throw new Error("AI baholash formati noto‘g‘ri.");evaluation=JSON.parse(match[0]);}
   catch(error){console.error("SmartGoal XP evaluation error:",error);return json({success:false,message:"AI vazifani baholay olmadi. Keyinroq qayta urinib ko‘ring."},503);}
-  const difficulty=Math.max(1,Math.min(5,Math.round(Number(evaluation.difficulty)||0)));if(!difficulty)return json({success:false,message:"AI murakkablikni aniqlay olmadi."},503);
+  const rawDifficulty=Number(evaluation?.difficulty);
+  if(!Number.isFinite(rawDifficulty)||rawDifficulty<1||rawDifficulty>5){
+    console.error("SmartGoal XP evaluation returned invalid difficulty:",String(evaluation?.difficulty));
+    return json({success:false,message:"AI murakkablikni to‘g‘ri baholay olmadi. Qayta urinib ko‘ring."},503);
+  }
+  const difficulty=Math.round(rawDifficulty);
   const todayUTC=new Date().toISOString().slice(0,10),onTime=todayUTC<=dueDate,suggestedXP=Math.min(15,difficulty*2+(onTime?5:0)),now=new Date().toISOString();
   const inserted=await env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) SELECT ?,?,?,MIN(?,MAX(0,45-COALESCE((SELECT SUM(xp) FROM xp_ledger WHERE user_id=? AND award_date=?),0))),?,?,? WHERE NOT EXISTS (SELECT 1 FROM xp_ledger WHERE user_id=? AND task_id=?) RETURNING xp").bind(crypto.randomUUID(),user.id,taskId,suggestedXP,user.id,todayUTC,todayUTC,("Task: "+title).slice(0,140),now,user.id,taskId).first();
   if(!inserted){const b=await env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id).first();return json({success:true,awarded:0,alreadyAwarded:true,xpBalance:Number(b?.xp_balance||0)});}
