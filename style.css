@@ -5878,3 +5878,22 @@ svg {
     gap: 5px;
   }
 }
+.memory-image { display:block; width:min(100%,360px); max-height:260px; object-fit:cover; margin:10px 0; border-radius:12px; border:1px solid var(--border); }
+.store-categories { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0; }
+.store-category { min-height:38px; padding:0 14px; border:1px solid var(--border); border-radius:999px; background:var(--surface); color:var(--text-secondary); font-size:12px; font-weight:700; }
+.store-category.active { border-color:var(--primary); background:var(--primary); color:#fff; }
+.user-profile-link { display:block; padding:0; border:0; background:transparent; color:var(--text); text-align:left; cursor:pointer; }
+.user-profile-link:hover strong { color:var(--primary); text-decoration:underline; }
+.public-profile-cover { height:110px; margin:-22px -22px 0; border-radius:16px 16px 0 0; }
+.public-profile-body { position:relative; padding:0 4px 8px; text-align:center; }
+.public-profile-avatar { width:84px; height:84px; display:grid; place-items:center; overflow:hidden; margin:-42px auto 10px; border:4px solid var(--surface); border-radius:50%; background:var(--surface-2); }
+.public-profile-avatar img { width:100%; height:100%; object-fit:cover; }
+.public-profile-body h2 { margin:5px 0; }
+.public-profile-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin:18px 0; }
+.public-profile-stats > div { display:grid; gap:4px; padding:12px 5px; border:1px solid var(--border); border-radius:12px; }
+.public-profile-stats strong { font-size:19px; }
+.public-profile-stats small { color:var(--text-muted); font-size:10px; }
+.profile-public-stat { display:flex; justify-content:center; gap:7px; align-items:center; color:var(--text-secondary); font-size:12px; }
+.avatar-frame-premium { outline:3px solid #a78bfa; outline-offset:2px; }
+.avatar-frame-gold { outline:3px solid #d6a83e; outline-offset:2px; box-shadow:0 0 0 5px rgba(214,168,62,.18); }
+@media(max-width:520px) { .public-profile-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } .public-profile-cover { margin-left:-16px; margin-right:-16px; } }
