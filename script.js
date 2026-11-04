@@ -1157,65 +1157,25 @@
 
   function openTaskForm(taskId = null) {
     const task = data.tasks.find(item => item.id === taskId);
-
-    openModal(
-      task ? "Vazifani tahrirlash" : "Yangi vazifa",
-      `
-        <form id="task-form" class="form-grid">
-          <input type="hidden" name="id" value="${escapeHTML(task?.id || "")}">
-
-          <div class="form-field full-width">
-            <label class="field-label">Vazifa nomi</label>
-            <input class="field-input" name="title" maxlength="100" required
-              placeholder="Masalan: 20 bet kitob o‘qish"
-              value="${escapeHTML(task?.title || "")}">
-          </div>
-
-          <div class="form-field">
-            <label class="field-label">Bajarish sanasi</label>
-            <input class="field-input" type="date" name="date"
-              value="${escapeHTML(task?.date || today())}">
-          </div>
-
-          <div class="form-field">
-            <label class="field-label">Qanchalik muhim?</label>
-            <select class="field-select" name="priority">
-              <option value="low" ${task?.priority === "low" ? "selected" : ""}>Oddiy</option>
-              <option value="medium" ${!task?.priority || task?.priority === "medium" ? "selected" : ""}>Muhim</option>
-              <option value="high" ${task?.priority === "high" ? "selected" : ""}>Juda muhim</option>
-            </select>
-          </div>
-
-          <div class="form-field">
-            <label class="field-label">Taxminiy bajarish vaqti</label>
-            <select class="field-select" name="estimatedMinutes">
-              ${[15,30,45,60,90,120,180].map(value => `<option value="${value}" ${(task?.estimatedMinutes||30)===value?"selected":""}>${value} daqiqa</option>`).join("")}
-            </select>
-            <small>XP miqdorini AI belgilaydi (0–15 XP).</small>
-          </div>
-
-          <div class="form-field full-width">
-            <label class="field-label">Vazifa haqida qo‘shimcha ma’lumot (ixtiyoriy)</label>
-            <textarea class="field-input" name="description" rows="2" maxlength="500" placeholder="Masalan: 20 bet o‘qib, asosiy fikrlarni 5 jumlada yozish">${escapeHTML(task?.description || "")}</textarea>
-            <small>Bu ma’lumot AI’ga vazifaning haqiqiy qiyinligini yaxshiroq tushunishga yordam beradi.</small>
-          </div>
-
-          <div class="form-field full-width">
-            <label class="field-label">Bog‘langan maqsad</label>
-            <select class="field-select" name="goalId">
-              <option value="">Maqsadsiz vazifa</option>
-              ${data.goals.map(goal =>
-                `<option value="${escapeHTML(goal.id)}" ${task?.goalId === goal.id ? "selected" : ""}>${escapeHTML(goal.title)}</option>`
-              ).join("")}
-            </select>
-          </div>
-        </form>
-      `,
-      `
-        <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
-        <button class="primary-button" type="submit" form="task-form">Saqlash</button>
-      `
-    );
+    openModal(task ? "Vazifani tahrirlash" : "Yangi vazifa", `
+      <form id="task-form" class="form-grid">
+        <input type="hidden" name="id" value="${escapeHTML(task?.id || "")}">
+        <div class="form-field full-width">
+          <label class="field-label">Vazifa nomi</label>
+          <input class="field-input" name="title" maxlength="100" required placeholder="Masalan: 20 bet kitob o‘qish" value="${escapeHTML(task?.title || "")}">
+        </div>
+        <div class="form-field full-width">
+          <label class="field-label">Qisqa mazmuni</label>
+          <textarea class="field-textarea" name="description" rows="3" maxlength="500" placeholder="Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.">${escapeHTML(task?.description || "")}</textarea>
+          <small>Qisqa va aniq izoh AI’ga ishning qiyinligi va mehnatini adolatli baholashga yordam beradi.</small>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Qaysi kuni bajariladi?</label>
+          <input class="field-input" type="date" name="date" required value="${escapeHTML(task?.date || today())}">
+        </div>
+      </form>`, `
+      <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
+      <button class="primary-button" type="submit" form="task-form">Saqlash</button>`);
   }
 
   function saveTask(form) {
@@ -1232,9 +1192,9 @@
       title,
       description: String(fd.get("description") || "").trim().slice(0, 500),
       date: String(fd.get("date") || today()),
-      priority: ["low", "medium", "high"].includes(String(fd.get("priority"))) ? String(fd.get("priority")) : "medium",
-      estimatedMinutes: Math.max(5, Math.min(480, Number(fd.get("estimatedMinutes")) || 30)),
-      goalId: String(fd.get("goalId") || "")
+      priority: "medium",
+      estimatedMinutes: 30,
+      goalId: ""
     };
 
     if (id) {
