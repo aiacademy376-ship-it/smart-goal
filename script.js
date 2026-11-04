@@ -2442,6 +2442,7 @@
     const rank = getRank();
     const profile = data.profile;
     const completedTasks = data.tasks.filter(task => task.completed).length;
+    const customizationScore = [profile.background && profile.background !== "default", profile.avatarFrame && profile.avatarFrame !== "default", Boolean(profile.activeBadge)].filter(Boolean).length;
 
     const backgroundStyles = {
       default: "linear-gradient(120deg,#5145cf,#9282f6)",
@@ -2530,6 +2531,10 @@
           <div class="setting-row">
             <div class="setting-info"><strong>Yutuqlar</strong></div>
             <strong>${data.achievements.length}</strong>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><strong>Profil bezagi</strong><small>Fon, avatar ramkasi va maxsus belgi</small></div>
+            <strong>${customizationScore} / 3</strong>
           </div>
         </section>
       </div>
@@ -3444,7 +3449,7 @@
       const p = result.profile, rank = getRank(Number(p.xp || 0));
       const covers = {default:"linear-gradient(120deg,#5145cf,#9282f6)",midnight:"linear-gradient(120deg,#101827,#283958)",galaxy:"radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",royal:"linear-gradient(120deg,#7c4a20,#d3a24b)",sakura:"linear-gradient(120deg,#e7a5bd,#8b6bba)",nebula:"radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)",aurora:"linear-gradient(130deg,#123d43,#5b4a9a 55%,#a3d5c6)",forest:"linear-gradient(130deg,#102f26,#39745a 55%,#b4c99a)",sunrise:"linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)"};
       const avatar = p.avatar ? '<img src="'+escapeHTML(p.avatar)+'" alt="Profil rasmi" loading="lazy" decoding="async">' : icon("user-round",40);
-      const avatarFrame = ["premium","gold"].includes(p.avatarFrame) ? " avatar-frame-"+p.avatarFrame : "";
+      const avatarFrame = ["premium","gold","neon"].includes(p.avatarFrame) ? " avatar-frame-"+p.avatarFrame : "";
       const badge = p.activeBadge ? '<span class="profile-active-badge">'+icon("award",13)+' '+escapeHTML(p.activeBadge)+'</span>' : "";
       const birthday = p.birthdate ? '<div class="profile-public-stat">'+icon("cake")+" "+escapeHTML(formatDate(p.birthdate))+'</div>' : "";
       const isSelf=p.username===data.profile.username;
