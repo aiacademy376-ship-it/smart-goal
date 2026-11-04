@@ -3472,7 +3472,7 @@
       const response = await fetch("/api/users/profile?username=" + encodeURIComponent(username), {credentials:"same-origin"});
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success || !result.profile) throw new Error(result.message || "Profilni yuklab bo‘lmadi.");
-      const p = result.profile, rank = getRank(Number(p.xp || 0));
+      const p = result.profile, rank = getRank(Number(p.totalEarnedXP || p.xp || 0));
       const covers = {default:"linear-gradient(120deg,#5145cf,#9282f6)",midnight:"linear-gradient(120deg,#101827,#283958)",galaxy:"radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",royal:"linear-gradient(120deg,#7c4a20,#d3a24b)",sakura:"linear-gradient(120deg,#e7a5bd,#8b6bba)",nebula:"radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)",aurora:"linear-gradient(130deg,#123d43,#5b4a9a 55%,#a3d5c6)",forest:"linear-gradient(130deg,#102f26,#39745a 55%,#b4c99a)",sunrise:"linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)"};
       const avatar = p.avatar ? '<img src="'+escapeHTML(p.avatar)+'" alt="Profil rasmi" loading="lazy" decoding="async">' : icon("user-round",40);
       const avatarFrame = ["premium","gold","neon"].includes(p.avatarFrame) ? " avatar-frame-"+p.avatarFrame : "";
