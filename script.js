@@ -2842,6 +2842,7 @@
   }
 
   let communitySearchSequence = 0;
+  let communitySearchTimer = null;
 
   async function searchCommunityUsers(value) {
     const query = normalizedUsername(value);
@@ -2971,9 +2972,6 @@
       runGlobalSearch(target.value);
     }
 
-    if (target.id === "community-search") {
-      searchCommunityUsers(target.value);
-    }
   }
 
   /* -------------------- INITIALIZATION -------------------- */
@@ -3020,7 +3018,13 @@
     document.addEventListener("keydown", handleInput);
 
     document.addEventListener("input", event => {
-      if (event.target.id === "community-search") handleInput(event);
+      if (event.target.id !== "community-search") return;
+      if (communitySearchTimer) clearTimeout(communitySearchTimer);
+      const value = event.target.value;
+      communitySearchTimer = setTimeout(() => {
+        communitySearchTimer = null;
+        searchCommunityUsers(value);
+      }, 350);
     });
 
     $("#modal-overlay")?.addEventListener("click", event => {
