@@ -6213,3 +6213,13 @@ button, .nav-link, .icon-button { touch-action:manipulation; }
   .routine-item-actions { grid-column:2; justify-content:flex-end; }
   .public-showcase-chip { font-size:11px; padding:6px 8px; }
 }
+
+.dashboard-routine-list { display:grid; gap:0; }
+.dashboard-routine-row { display:grid; grid-template-columns:58px minmax(0,1fr) auto; align-items:center; gap:9px; padding:10px 0; border-top:1px solid var(--border); }
+.dashboard-routine-row time { color:var(--primary); font-weight:800; font-size:12px; font-variant-numeric:tabular-nums; }
+.dashboard-routine-row strong { min-width:0; font-size:13px; overflow-wrap:anywhere; }
+.dashboard-routine-row .routine-status-pill { margin:0; }
+@media (max-width:420px) {
+  .dashboard-routine-row { grid-template-columns:48px minmax(0,1fr); }
+  .dashboard-routine-row .routine-status-pill { grid-column:2; justify-self:start; }
+}
