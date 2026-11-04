@@ -2629,7 +2629,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     };
     const messages=aiConversation.length?aiConversation:[{role:"assistant",content:welcome[settings.language]||welcome.uz}];
     const activeGoals=data.goals.filter(goal=>!goal.completed).length;
-    const openTasks=data.tasks.filter(task=>!task.completed).length;
+    const openTasks=data.tasks.filter(task=>!task.completed&&!task.isRoutineEntry).length;
     return `
       ${pageHeader("SHAXSIY YORDAMCHI","Smart AI","Savollaringizga javob, maqsadlaringizga esa aniq reja va foydali maslahatlar.")}
       <section class="ai-panel"><span class="eyebrow">SMARTGOAL INTELLIGENCE</span><h2>Har kuni yaxshiroq natija sari.</h2><p>AI maqsadlaringiz, vazifalaringiz va kun tartibingizni hisobga olib, amaliy maslahat beradi. Boshqa mavzularda ham bemalol so‘rashingiz mumkin.</p><div class="ai-context-pills"><span>${icon("target",14)} ${activeGoals} faol maqsad</span><span>${icon("list-checks",14)} ${openTasks} bajarilmagan vazifa</span><span>${icon("calendar-clock",14)} ${(data.dailyRoutine||[]).length} kun tartibi bandi</span></div></section>
@@ -3752,6 +3752,17 @@ remove planner task block      <section class="card" style="margin-top:20px">
       $("#modal-body [data-delete-scope]").forEach(input => {
         if (input !== target) input.checked = target.checked;
       });
+      return;
+    }
+
+    if (target.matches("#modal-body [data-delete-scope]")) {
+      const all = $("#modal-body [data-delete-scope='all']");
+      const options = $("#modal-body [data-delete-scope]:not([data-delete-scope='all'])");
+      const checked = options.filter(input => input.checked).length;
+      if (all) {
+        all.checked = checked === options.length;
+        all.indeterminate = checked > 0 && checked < options.length;
+      }
       return;
     }
 
