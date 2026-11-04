@@ -1191,7 +1191,13 @@
     if (id) {
       const task = data.tasks.find(item => item.id === id);
       if (!task) return;
+      const textChanged = task.title !== values.title || task.description !== values.description;
       Object.assign(task, values);
+      if (textChanged && Number(task.xpEarned || 0) === 0) {
+        task.completed = false;
+        task.completedAt = null;
+        task.xpAwarded = false;
+      }
     } else {
       data.tasks.unshift({
         id: uid(), ...values, completed: false, xpAwarded: false, xpEarned: 0, completedAt: null, createdAt: new Date().toISOString()
