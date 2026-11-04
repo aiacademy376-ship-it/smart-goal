@@ -1205,6 +1205,7 @@
       });
     }
 
+    refreshGoalProgress();
     saveData();
     closeModal();
     render();
@@ -1296,6 +1297,7 @@
             }
           }
         }
+        refreshGoalProgress();
         checkAchievements();
       } else {
         task.completed = false;
@@ -1727,6 +1729,19 @@
   }
 
   /* -------------------- GOALS PAGE -------------------- */
+
+  function refreshGoalProgress() {
+    for (const goal of data.goals) {
+      const linked=data.tasks.filter(task=>task.goalId===goal.id);
+      if (!linked.length) {
+        if (goal.completed) { goal.completed=false; goal.progress=0; }
+        continue;
+      }
+      const completed=linked.filter(task=>task.completed).length;
+      goal.progress=Math.round(completed/linked.length*100);
+      goal.completed=completed===linked.length;
+    }
+  }
 
   function getGoalProgress(goal) {
     const linked = data.tasks.filter(task => task.goalId === goal.id);
@@ -2985,6 +3000,7 @@
         break;
       case "confirm-delete-task":
         data.tasks = data.tasks.filter(item => item.id !== id);
+        refreshGoalProgress();
         saveData();
         closeModal();
         render();
