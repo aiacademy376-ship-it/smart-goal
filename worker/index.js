@@ -424,8 +424,6 @@ async function handleTaskCompletion(request,env,user){
   const titleLetters=title.replace(/[^\p{L}]/gu,"");
   const hasVowel=/[aeiouo‘’áéíóúаеёиоуыэюя]/i.test(title);
   const meaningful= evaluation.meaningful && titleLetters.length>=5 && hasVowel;
-  const tashkentDateParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
-  const todayLocal=tashkentDateParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-");
   const completedDateParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tashkent",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date(completedAt));
   const completedLocal=completedDateParts.filter(part=>part.type!=="literal").map(part=>part.value).join("-");
   const onTime=completedLocal<=dueDate;
@@ -438,8 +436,8 @@ async function handleTaskCompletion(request,env,user){
   // D1 batches are transactional, so a failed balance update cannot leave an orphaned award.
   const ledgerId=crypto.randomUUID();
   const batch=await env.DB.batch([
-    env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) SELECT ?,?,?,MIN(?,MAX(0,45-COALESCE((SELECT SUM(xp) FROM xp_ledger WHERE user_id=? AND award_date=?),0))),?,?,? WHERE NOT EXISTS (SELECT 1 FROM xp_ledger WHERE user_id=? AND task_id=?)")
-      .bind(ledgerId,user.id,taskId,suggestedXP,user.id,todayLocal,todayLocal,("Task: "+title).slice(0,140),now,user.id,taskId),
+    env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) VALUES (?,?,?,?,?,?,?) ON CONFLICT(user_id,task_id) DO NOTHING")
+      .bind(ledgerId,user.id,taskId,suggestedXP,completedLocal,("Task: "+title).slice(0,140),now),
     env.DB.prepare("UPDATE users SET xp_balance=xp_balance+(SELECT xp FROM xp_ledger WHERE id=?),updated_at=? WHERE id=? AND EXISTS (SELECT 1 FROM xp_ledger WHERE id=? AND xp>0)")
       .bind(ledgerId,now,user.id,ledgerId),
     env.DB.prepare("SELECT xp FROM xp_ledger WHERE id=?").bind(ledgerId),
@@ -449,10 +447,10 @@ async function handleTaskCompletion(request,env,user){
   const balance=batch[3]?.results?.[0];
   if(!inserted){
     const duplicate=await env.DB.prepare("SELECT xp FROM xp_ledger WHERE user_id=? AND task_id=?").bind(user.id,taskId).first();
-    return json({success:true,awarded:0,alreadyAwarded:Boolean(duplicate),dailyLimitReached:!duplicate,xpBalance:Number(balance?.xp_balance||0)});
+    return json({success:true,awarded:0,alreadyAwarded:Boolean(duplicate),xpBalance:Number(balance?.xp_balance||0)});
   }
   const awarded=Number(inserted.xp||0);
-  return json({success:true,awarded,xpBalance:Number(balance?.xp_balance||0),difficulty,effort,goalRelevance,onTime,notMeaningful:!meaningful,dailyLimitReached:awarded===0&&meaningful,reason:String(meaningful?(evaluation.reason||"Vazifa mazmuni va mehnati hisobga olindi."):"Vazifa nomi juda qisqa yoki noaniq bo‘lgani uchun XP berilmadi.").slice(0,180)});
+  return json({success:true,awarded,xpBalance:Number(balance?.xp_balance||0),difficulty,effort,goalRelevance,onTime,notMeaningful:!meaningful,reason:String(meaningful?(evaluation.reason||"Vazifa mazmuni va mehnati hisobga olindi."):"Vazifa nomi juda qisqa yoki noaniq bo‘lgani uchun XP berilmadi.").slice(0,180)});
 }
 async function handleSpendXP(request,env,user){
   const body=await readJson(request),amount=Math.floor(Number(body.amount)||0);if(amount<1||amount>5000)return json({success:false,message:"XP miqdori noto‘g‘ri."},400);
