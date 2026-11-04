@@ -138,7 +138,7 @@
       name: "Sky mavzusi",
       description: "Yengil moviy ranglar va sokin ko‘rinish.",
       type: "theme",
-      value: "ocean",
+      value: "sky",
       price: 90,
       icon: "cloud-sun"
     },
@@ -2525,7 +2525,7 @@
             <h3>Rang mavzusi</h3>
             <p>Ba’zi ranglar do‘kondan ochko evaziga olinadi.</p>
             <div class="theme-options">
-              ${["violet", "ocean", "emerald", "sunset", "rose"].map(theme => {
+              ${["violet", "ocean", "sky", "emerald", "sunset", "rose"].map(theme => {
                 const free = theme === "violet";
                 const owned = data.inventory.some(item => item.id === `theme-${theme}`);
                 const available = free || owned;
