@@ -281,10 +281,42 @@ async function handleData(request, env, user) {
       return json({ success: false, message: "Ma’lumot formati noto‘g‘ri." }, 400);
     }
     const balance = await env.DB.prepare("SELECT xp_balance FROM users WHERE id = ?").bind(user.id).first();
-    const safeData = { ...body.data, xp: Number(balance?.xp_balance || 0) };
+    const existingRow = await env.DB.prepare("SELECT data_json FROM user_data WHERE user_id=?").bind(user.id).first();
+    let existingData={}; try { existingData=existingRow?JSON.parse(existingRow.data_json):{}; } catch { existingData={}; }
+    const inventory=Array.isArray(existingData.inventory)?existingData.inventory:[];
+    let spentXP=Number(existingData.spentXP||0);
+    if(!spentXP && inventory.length){
+      const legacyPrices={"theme-ocean":250,"theme-emerald":400,"theme-sunset":550,"theme-rose":750,"background-midnight":1200,"background-galaxy":2500,"background-royal":5000,"badge-focus":900,"badge-diamond":3000,"avatar-premium":1800};
+      spentXP=inventory.reduce((sum,item)=>sum+(legacyPrices[item?.id]||0),0);
+    }
+    const ownsDecoration=(type,value)=>inventory.some(item=>item&&item.type===type&&item.value===value);
+    const profile={...(body.data.profile||{})};
+    profile.name=user.name; profile.username=user.username; profile.email=user.email; profile.birthdate=user.birthdate||"";
+    if(profile.background!=="default"&&!ownsDecoration("background",profile.background))profile.background=existingData.profile?.background||"default";
+    if(profile.avatarFrame!=="default"&&!ownsDecoration("avatar",profile.avatarFrame))profile.avatarFrame=existingData.profile?.avatarFrame||"default";
+    if(profile.activeBadge&&!ownsDecoration("badge",profile.activeBadge))profile.activeBadge=existingData.profile?.activeBadge||"";
+    const preferences={...(body.data.preferences||{})};
+    if(preferences.colorTheme&&preferences.colorTheme!=="violet"&&!ownsDecoration("theme",preferences.colorTheme))preferences.colorTheme=existingData.preferences?.colorTheme||"violet";
+    const previousTasks=Array.isArray(existingData.tasks)?existingData.tasks:[];
+    const incomingTasks=Array.isArray(body.data.tasks)?body.data.tasks:[];
+    const now = new Date().toISOString();
+    const tasks=incomingTasks.filter(task=>task&&typeof task==="object"&&!Array.isArray(task)).slice(0,2000).map(task=>{
+      const id=String(task.id||"");
+      const previous=previousTasks.find(item=>item&&String(item.id||"")===id);
+      const title=String(task.title||"").slice(0,100);
+      const description=String(task.description||"").slice(0,500);
+      const date=String(task.date||"");
+      const changed=Boolean(previous)&&(title!==String(previous.title||"")||description!==String(previous.description||"")||date!==String(previous.date||""));
+      let completed=Boolean(task.completed),completedAt=null;
+      const createdAt=previous?String(previous.createdAt||now):now;
+      if(!previous){completedAt=completed?now:null;}
+      else if(changed){completed=false;completedAt=null;}
+      else if(completed){completedAt=previous.completed===true&&previous.completedAt?previous.completedAt:now;}
+      return {...task,title,description,date,createdAt,completed,completedAt};
+    });
+    const safeData = { ...body.data, profile, preferences, tasks, inventory, spentXP, xp: Number(balance?.xp_balance || 0) };
     const serialized = JSON.stringify(safeData);
     if (new TextEncoder().encode(serialized).byteLength > MAX_BODY_BYTES) return json({ success: false, message: "Ma’lumot hajmi juda katta." }, 413);
-    const now = new Date().toISOString();
     await env.DB.prepare(
       "INSERT INTO user_data (user_id, data_json, updated_at) VALUES (?, ?, ?) " +
       "ON CONFLICT(user_id) DO UPDATE SET data_json = excluded.data_json, updated_at = excluded.updated_at"
