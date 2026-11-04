@@ -5922,3 +5922,9 @@ html[data-font-size="large"] { zoom: 1.06; }
   .main-area { padding-left: max(var(--content-gutter), env(safe-area-inset-left)); padding-right: max(var(--content-gutter), env(safe-area-inset-right)); }
   .modal-overlay { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
 }
+
+.daily-coach-card { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:15px; margin:18px 0 20px; }
+.daily-coach-icon { width:44px; height:44px; display:grid; place-items:center; border-radius:14px; background:var(--primary-soft); color:var(--primary); }
+.daily-coach-card h3 { margin:3px 0 5px; font-size:15px; }
+.daily-coach-card p { margin:0; color:var(--text-secondary); font-size:12px; line-height:1.6; }
+@media(max-width:700px) { .daily-coach-card { grid-template-columns:auto minmax(0,1fr); } .daily-coach-card > button { grid-column:1/-1; width:100%; } }
