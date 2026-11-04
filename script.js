@@ -386,6 +386,7 @@
   let remoteSyncQueued = false;
   let aiConversation = [];
   let communityRelations = { incoming: [], outgoing: [], friends: [] };
+  let communityLeaderboard = [];
   const taskActionsInFlight = new Set();
   const purchaseActionsInFlight = new Set();
 
@@ -2239,6 +2240,7 @@
 
   function renderCommunity() {
     setTimeout(loadCommunityRelations, 0);
+    setTimeout(loadCommunityLeaderboard, 0);
     return `
       ${pageHeader(
         "HAMJAMIYAT",
@@ -2259,6 +2261,11 @@
         <div id="community-results" style="margin-top:20px">
           ${emptyState("Qidiruvga tayyor", "Username kiriting. Haqiqiy foydalanuvchilar ro‘yxati backend bilan ulanadi.", "users")}
         </div>
+      </section>
+
+      <section class="card community-leaderboard-card" style="margin-top:20px">
+        <div class="card-header"><div><h3 class="card-title">Eng faol foydalanuvchilar</h3><p class="card-description">Jami ishlab topilgan XP bo‘yicha reyting.</p></div><button class="card-action" type="button" data-action="refresh-leaderboard">Yangilash</button></div>
+        <div id="community-leaderboard">${communityLeaderboard.length ? communityLeaderboard.map(user=>`<div class="leaderboard-row"><span class="leaderboard-rank">#${user.rank}</span><div class="leaderboard-user"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username)}"><strong>${escapeHTML(user.name)}</strong></button><small>@${escapeHTML(user.username)} · Level ${getRank(Number(user.totalEarnedXP||0)).level}</small></div><strong class="leaderboard-xp">${formatNumber(user.totalEarnedXP)} XP</strong></div>`).join("") : emptyState("Reyting yuklanmoqda","Eng faol foydalanuvchilar ro‘yxati olinmoqda.","trophy")}</div>
       </section>
 
       <section class="card" style="margin-top:20px">
@@ -3020,6 +3027,9 @@
       case "refresh-friends":
         loadCommunityRelations();
         break;
+      case "refresh-leaderboard":
+        loadCommunityLeaderboard();
+        break;
       case "generate-ai-plan":
         generateAIPlan();
         break;
@@ -3304,6 +3314,20 @@
     if(!username) return;
     window.history.replaceState({},document.title,window.location.pathname);
     setTimeout(()=>openPublicProfile(username),0);
+  }
+
+  async function loadCommunityLeaderboard() {
+    const container=$("#community-leaderboard");
+    if(!container)return;
+    try{
+      const response=await fetch("/api/users/leaderboard",{credentials:"same-origin"});
+      const result=await response.json().catch(()=>({}));
+      if(!response.ok||!result.success)throw new Error(result.message||"Reyting yuklanmadi.");
+      communityLeaderboard=Array.isArray(result.users)?result.users:[];
+      if(!communityLeaderboard.length){container.innerHTML=emptyState("Reyting hozircha bo‘sh","Birinchi XP yig‘gan foydalanuvchi bo‘ling.","trophy");return;}
+      container.innerHTML=communityLeaderboard.map(user=>`<div class="leaderboard-row"><span class="leaderboard-rank">#${user.rank}</span><div class="leaderboard-user"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username)}"><strong>${escapeHTML(user.name)}</strong></button><small>@${escapeHTML(user.username)} · Level ${getRank(Number(user.totalEarnedXP||0)).level}</small></div><strong class="leaderboard-xp">${formatNumber(user.totalEarnedXP)} XP</strong></div>`).join("");
+      refreshIcons();
+    }catch(error){container.innerHTML=emptyState("Reyting yuklanmadi",error.message||"Server bilan aloqa uzildi.","alert-circle");}
   }
 
   async function openPublicProfile(username) {
