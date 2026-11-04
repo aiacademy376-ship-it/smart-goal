@@ -377,6 +377,7 @@
   let currentPage = "dashboard";
   let currentSettingsTab = "general";
   let storeFilter = "all";
+  let taskListLimit = 50;
   let toastTimeout = null;
   let remoteAuthenticated = false;
   let remoteSyncTimer = null;
@@ -1174,6 +1175,11 @@
           <label class="field-label">Qaysi kuni bajariladi?</label>
           <input class="field-input" type="date" name="date" required value="${escapeHTML(task?.date || today())}">
         </div>
+        <details class="form-field full-width task-extra-settings">
+          <summary>Qo‘shimcha sozlama (ixtiyoriy)</summary>
+          <label class="field-label" for="task-goal">Qaysi maqsadga tegishli?</label>
+          <select class="field-select" id="task-goal" name="goalId"><option value="">Maqsadsiz vazifa</option>${data.goals.map(goal=>`<option value="${escapeHTML(goal.id)}" ${task?.goalId===goal.id?"selected":""}>${escapeHTML(goal.title)}</option>`).join("")}</select>
+        </details>
       </form>`, `
       <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
       <button class="primary-button" type="submit" form="task-form">Saqlash</button>`);
@@ -1195,7 +1201,7 @@
       date: String(fd.get("date") || today()),
       priority: "medium",
       estimatedMinutes: 30,
-      goalId: ""
+      goalId: String(fd.get("goalId") || "")
     };
 
     if (id) {
@@ -1773,6 +1779,7 @@
 
   function renderSchedule() {
     const tasks = [...data.tasks].sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+    const visibleTasks = tasks.slice(0, taskListLimit);
 
     return `
       ${pageHeader(
@@ -1791,7 +1798,7 @@
         </div>
 
         <div class="task-list">
-          ${tasks.length ? tasks.map(task => `
+          ${tasks.length ? visibleTasks.map(task => `
             <div class="task-item ${task.completed ? "task-completed" : ""}">
               <input class="task-checkbox" type="checkbox"
                 data-action="toggle-task" data-id="${escapeHTML(task.id)}"
@@ -1814,6 +1821,7 @@
             </div>
           `).join("") : emptyState("Vazifalar mavjud emas", "Yangi vazifa qo‘shib rejangizni boshlang.", "calendar-check")}
         </div>
+        ${tasks.length > taskListLimit ? `<button class="secondary-button task-load-more" type="button" data-action="load-more-tasks">Yana ${Math.min(50,tasks.length-taskListLimit)} ta vazifani ko‘rsatish</button>` : ""}
       </section>
     `;
   }
@@ -2877,6 +2885,10 @@
         showToast("Maqsad o‘chirildi.");
         break;
 
+      case "load-more-tasks":
+        taskListLimit += 50;
+        render();
+        break;
       case "add-task":
         openTaskForm();
         break;
