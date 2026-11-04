@@ -1253,7 +1253,9 @@
               data.activity = data.activity.slice(-180);
             }
 
-            if (result.dailyLimitReached) {
+            if (result.notMeaningful) {
+              showToast("Bu vazifa nomi tushunarsiz. Aniq nima qilganingizni yozing — shunda AI adolatli baholaydi.", "error");
+            } else if (result.dailyLimitReached) {
               showToast("Kunlik 45 XP limiti to‘ldi. Vazifa qayd etildi, XP berilmadi.", "error");
             } else if (result.alreadyAwarded) {
               showToast("Bu vazifa uchun XP avval berilgan.", "error");
