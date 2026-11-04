@@ -2025,7 +2025,7 @@
     aiConversation.push({role:"user",content:message});aiConversation=aiConversation.slice(-12);chat.insertAdjacentHTML("beforeend",'<div class="ai-message user">'+escapeHTML(message)+'</div><div class="ai-message" id="ai-typing">AI javob yozmoqda...</div>');
     input.value="";const submit=form.querySelector("button[type='submit']");if(submit)submit.disabled=true;chat.scrollTop=chat.scrollHeight;
     try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message,history:aiConversation.slice(0,-1),language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI bilan bog‘lanib bo‘lmadi.");aiConversation.push({role:"assistant",content:result.answer});aiConversation=aiConversation.slice(-12);$("#ai-typing")?.remove();chat.insertAdjacentHTML("beforeend",'<div class="ai-message">'+escapeHTML(result.answer)+'</div>');}
-    catch(error){$("#ai-typing")?.remove();const msg=error.message||"AI hozircha javob bera olmadi.";aiConversation.push({role:"assistant",content:msg});chat.insertAdjacentHTML("beforeend",'<div class="ai-message">'+escapeHTML(msg)+'</div>');}
+    catch(error){$("#ai-typing")?.remove();const msg=error.message||"AI hozircha javob bera olmadi.";if(aiConversation.at(-1)?.role==="user"&&aiConversation.at(-1)?.content===message)aiConversation.pop();chat.insertAdjacentHTML("beforeend",'<div class="ai-message">'+escapeHTML(msg)+'</div>');}
     finally{if(submit)submit.disabled=false;chat.scrollTop=chat.scrollHeight;}
   }
   async function generateAIPlan() {
