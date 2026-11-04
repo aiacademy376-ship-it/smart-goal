@@ -2146,6 +2146,7 @@
       if (!file.type.startsWith("image/") || file.size > 4 * 1024 * 1024) { showToast("Rasm 4 MB dan kichik bo‘lishi kerak.", "error"); return; }
       try { image = await resizeImage(file); } catch { showToast("Rasmni yuklab bo‘lmadi.", "error"); return; }
     }
+    if (image && data.memories.filter(item => item.image).length >= 12) { showToast("Profil va yutuqlar uchun jami 12 tagacha rasm saqlash mumkin.", "error"); return; }
     data.memories.unshift({
       id: uid(),
       title,
@@ -2154,6 +2155,7 @@
       date: String(fd.get("date") || today()),
       image
     });
+    data.memories = data.memories.slice(0,100);
 
     saveData();
     closeModal();
@@ -2331,6 +2333,7 @@
 
         <div class="profile-name">${escapeHTML(profile.name || "Foydalanuvchi")}</div>
         <div class="profile-username">@${escapeHTML(profile.username || "username")}</div>
+        ${profile.activeBadge ? `<span class="profile-active-badge">${icon("award",13)} ${escapeHTML(profile.activeBadge)}</span>` : ""}
 
         <p class="profile-bio">${escapeHTML(profile.bio || "Hali biografiya qo‘shilmagan.")}</p>
 
