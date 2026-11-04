@@ -264,6 +264,7 @@
         name: "SmartGoal foydalanuvchisi",
         username: "",
         birthdate: "",
+        birthdatePublic: false,
         age: null,
         bio: "",
         avatar: "",
@@ -731,6 +732,9 @@
             <textarea class="field-textarea" id="profile-bio" name="bio"
               maxlength="240" placeholder="O‘zingiz haqingizda qisqacha...">${escapeHTML(profile.bio)}</textarea>
           </div>
+          <div class="form-field full-width">
+            <label class="checkbox-label"><input type="checkbox" name="birthdatePublic" ${profile.birthdatePublic ? "checked" : ""}><span>Tug‘ilgan kunim va yoshim profilimda hammaga ko‘rinsin</span></label>
+          </div>
 
           <div class="form-field full-width">
             <label class="field-label" for="profile-avatar">Profil rasmi</label>
@@ -774,6 +778,7 @@
     data.profile.name = name;
     data.profile.username = username;
     data.profile.bio = bio;
+    data.profile.birthdatePublic = formData.get("birthdatePublic") === "on";
 
     if (file instanceof File && file.size > 0) {
       if (!file.type.startsWith("image/") || file.size > 2 * 1024 * 1024) {
@@ -2007,6 +2012,7 @@
             <div class="achievement-icon">${icon(memory.type === "certificate" ? "file-badge" : "bookmark", 20)}</div>
             <div>
               <strong>${escapeHTML(memory.title)}</strong>
+              ${memory.image ? `<img class="memory-image" src="${escapeHTML(memory.image)}" alt="${escapeHTML(memory.title)}">` : ""}
               <p>${escapeHTML(memory.description || "")}</p>
               <small>${escapeHTML(formatDate(memory.date))}</small>
             </div>
@@ -2042,6 +2048,11 @@
             <label class="field-label">Sana</label>
             <input class="field-input" type="date" name="date" value="${today()}">
           </div>
+          <div class="form-field full-width">
+            <label class="field-label">Yutuq rasmi (ixtiyoriy)</label>
+            <input class="field-input" type="file" name="image" accept="image/png,image/jpeg,image/webp">
+            <small>Sertifikat yoki esdalik rasmini qo‘shing. Rasm avtomatik kichraytiriladi.</small>
+          </div>
         </form>
       `,
       `
@@ -2051,7 +2062,7 @@
     );
   }
 
-  function saveMemory(form) {
+  async function saveMemory(form) {
     const fd = new FormData(form);
     const title = String(fd.get("title") || "").trim();
 
@@ -2060,12 +2071,19 @@
       return;
     }
 
+    const file = fd.get("image");
+    let image = "";
+    if (file instanceof File && file.size > 0) {
+      if (!file.type.startsWith("image/") || file.size > 4 * 1024 * 1024) { showToast("Rasm 4 MB dan kichik bo‘lishi kerak.", "error"); return; }
+      try { image = await resizeImage(file); } catch { showToast("Rasmni yuklab bo‘lmadi.", "error"); return; }
+    }
     data.memories.unshift({
       id: uid(),
       title,
       description: String(fd.get("description") || "").trim(),
       type: String(fd.get("type") || "memory"),
-      date: String(fd.get("date") || today())
+      date: String(fd.get("date") || today()),
+      image
     });
 
     saveData();
@@ -2280,7 +2298,7 @@
         <p class="profile-bio">${escapeHTML(profile.bio || "Hali biografiya qo‘shilmagan.")}</p>
 
         <div class="profile-meta">
-          ${profile.age !== null && profile.age !== undefined ? `<span>${icon("calendar")} ${profile.age} yosh</span>` : ""}
+          ${profile.birthdatePublic && profile.age !== null && profile.age !== undefined ? `<span>${icon("calendar")} ${profile.age} yosh</span>` : ""}
           <span>${icon("calendar-days")} ${escapeHTML(formatDate((profile.createdAt || "").slice(0, 10)))}</span>
           <span>${icon("check-circle")} ${completedTasks} ta vazifa</span>
         </div>
