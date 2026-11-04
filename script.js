@@ -275,6 +275,7 @@
       spentXP: 0,
       goals: [],
       tasks: [],
+      dailyRoutine: [],
       activity: [],
       achievements: [],
       inventory: [],
@@ -310,6 +311,7 @@
       preferences: { ...initial.preferences, ...(saved.preferences || {}) },
       goals: Array.isArray(saved.goals) ? saved.goals : [],
       tasks: Array.isArray(saved.tasks) ? saved.tasks : [],
+      dailyRoutine: Array.isArray(saved.dailyRoutine) ? saved.dailyRoutine : [],
       activity: Array.isArray(saved.activity) ? saved.activity : [],
       achievements: Array.isArray(saved.achievements) ? saved.achievements : [],
       inventory: Array.isArray(saved.inventory) ? saved.inventory : [],
@@ -1808,54 +1810,92 @@
   function renderPlanner() {
     const activeGoals = data.goals.filter(goal => !goal.completed);
     const pendingTasks = data.tasks.filter(task => !task.completed);
+    const routine = [...(data.dailyRoutine || [])].sort((a,b) => String(a.time).localeCompare(String(b.time)));
 
     return `
-      ${pageHeader(
-        "VAQTNI BOSHQARISH",
-        "Rejalashtiruvchi",
-        "Kunlik va haftalik rejalaringizni tartibga soling."
-      )}
+      ${pageHeader("VAQTNI BOSHQARISH","Rejalashtiruvchi","Kunlik rejangiz, odatlaringiz va maqsadlaringizni bir joyda boshqaring.")}
 
-      <section class="card">
+      <section class="card routine-card">
         <div class="card-header">
-          <div>
-            <h3 class="card-title">Bugungi reja</h3>
-            <p class="card-description">${escapeHTML(formatDate(today()))}</p>
-          </div>
-          ${actionButton("add-task", "Vazifa qo‘shish")}
+          <div><span class="eyebrow">SIZNING SHAXSIY REJANGIZ</span><h3 class="card-title">Kun tartibim</h3><p class="card-description">Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.</p></div>
+          ${actionButton("add-routine","Band qo‘shish","plus")}
         </div>
-
-        ${pendingTasks.length
-          ? `<div class="task-list">${pendingTasks.filter(task => task.date === today()).map(task => `
-              <div class="task-item">
-                <input class="task-checkbox" type="checkbox" data-action="toggle-task" data-id="${escapeHTML(task.id)}">
-                <div class="task-info"><strong>${escapeHTML(task.title)}</strong><small>AI: 0–15 XP</small></div>
+        <div class="routine-list">
+          ${routine.length ? routine.map(item => `
+            <article class="routine-item">
+              <time>${escapeHTML(item.time || "--:--")}</time>
+              <div class="routine-item-content"><strong>${escapeHTML(item.title)}</strong><small>${escapeHTML(item.description || "")}</small></div>
+              <div class="routine-item-actions">
+                <button class="icon-button" type="button" data-action="edit-routine" data-id="${escapeHTML(item.id)}" aria-label="Tahrirlash">${icon("pencil",15)}</button>
+                <button class="icon-button" type="button" data-action="delete-routine" data-id="${escapeHTML(item.id)}" aria-label="O‘chirish">${icon("trash-2",15)}</button>
               </div>
-            `).join("") || emptyState("Bugungi vazifalar yo‘q", "Yangi vazifa qo‘shishingiz mumkin.", "calendar-check")}</div>`
-          : emptyState("Reja hali bo‘sh", "Vazifalar qo‘shish orqali rejalashtirishni boshlang.", "calendar")}
+            </article>`).join("") : emptyState("Kun tartibi hali tuzilmagan","Masalan, 07:00 — uyg‘onish, 07:15 — badantarbiya kabi bandlar qo‘shing.","sunrise")}
+        </div>
+        <div class="routine-ai">
+          <div><strong>${icon("sparkles",16)} AI bilan kun tartibini tuzish</strong><small>Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing.</small></div>
+          <textarea id="routine-ai-prompt" class="field-textarea" rows="2" maxlength="700" placeholder="Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman."></textarea>
+          <button class="primary-button" type="button" data-action="generate-routine">${icon("sparkles",15)} Menga kun tartibi tuz</button>
+        </div>
       </section>
 
       <section class="card" style="margin-top:20px">
-        <div class="card-header">
-          <div>
-            <h3 class="card-title">Maqsadlar asosida tavsiyalar</h3>
-            <p class="card-description">AI maqsad va vazifalaringizdan kelib chiqib reja tuzadi.</p>
-          </div>
-          <button class="card-action" type="button" data-action="generate-ai-plan">AI reja tuzsin</button>
-        </div>
+        <div class="card-header"><div><h3 class="card-title">Bugungi vazifalar</h3><p class="card-description">${escapeHTML(formatDate(today()))}</p></div>${actionButton("add-task","Vazifa qo‘shish")}</div>
+        ${pendingTasks.filter(task => task.date === today()).length
+          ? `<div class="task-list">${pendingTasks.filter(task => task.date === today()).map(task => `<div class="task-item"><input class="task-checkbox" type="checkbox" data-action="toggle-task" data-id="${escapeHTML(task.id)}"><div class="task-info"><strong>${escapeHTML(task.title)}</strong><small>${escapeHTML(task.description || formatDate(task.date))}</small></div><span class="task-reward">${icon("zap",12)} AI: 0–15 XP</span></div>`).join("")}</div>`
+          : emptyState("Bugungi vazifalar yo‘q","Yangi vazifa qo‘shib, kunlik rejangizni boshlang.","calendar-check")}
+      </section>
 
+      <section class="card" style="margin-top:20px">
+        <div class="card-header"><div><h3 class="card-title">Maqsadlar asosida tavsiyalar</h3><p class="card-description">AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.</p></div><button class="card-action" type="button" data-action="generate-ai-plan">AI reja tuzsin</button></div>
         <div id="ai-plan-output" class="card-description" style="white-space:pre-wrap;margin:12px 0"></div>
-        ${activeGoals.length ? activeGoals.map(goal => `
-          <div class="goal-item">
-            <div class="goal-item-header">
-              <div><strong>${escapeHTML(goal.title)}</strong><small>${escapeHTML(goal.description || "Maqsadga erishish uchun muntazam ishlang.")}</small></div>
-              <span class="goal-percentage">${goal.progress || 0}%</span>
-            </div>
-            <p class="card-description">Tavsiya: ushbu maqsad uchun bugun kamida bitta kichik vazifa belgilang.</p>
-          </div>
-        `).join("") : emptyState("Faol maqsad yo‘q", "Avval maqsad yarating.", "target")}
+        ${activeGoals.length ? activeGoals.map(goal => `<div class="goal-item"><div class="goal-item-header"><div><strong>${escapeHTML(goal.title)}</strong><small>${escapeHTML(goal.description || "Maqsadga erishish uchun muntazam ishlang.")}</small></div><span class="goal-percentage">${goal.progress || 0}%</span></div><p class="card-description">Tavsiya: ushbu maqsad uchun bugun kamida bitta kichik vazifa belgilang.</p></div>`).join("") : emptyState("Faol maqsad yo‘q","Avval maqsad yarating.","target")}
       </section>
     `;
+  }
+
+  function openRoutineForm(id = null) {
+    const item = (data.dailyRoutine || []).find(row => row.id === id);
+    openModal(item ? "Kun tartibini tahrirlash" : "Kun tartibiga yangi band", `
+      <form id="routine-form" class="form-grid">
+        <input type="hidden" name="id" value="${escapeHTML(item?.id || "")}">
+        <div class="form-field"><label class="field-label">Vaqt</label><input class="field-input" type="time" name="time" required value="${escapeHTML(item?.time || "07:00")}"></div>
+        <div class="form-field full-width"><label class="field-label">Nima qilasiz?</label><input class="field-input" name="title" maxlength="90" required placeholder="Masalan: Uyg‘onish" value="${escapeHTML(item?.title || "")}"></div>
+        <div class="form-field full-width"><label class="field-label">Qisqa izoh (ixtiyoriy)</label><textarea class="field-textarea" name="description" maxlength="180" rows="2" placeholder="Masalan: Suv ichish va xonani shamollatish">${escapeHTML(item?.description || "")}</textarea></div>
+      </form>`, `
+      <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
+      <button class="primary-button" type="submit" form="routine-form">Saqlash</button>`);
+  }
+
+  function saveRoutine(form) {
+    const fd = new FormData(form), id = String(fd.get("id") || "");
+    const time = String(fd.get("time") || ""), title = String(fd.get("title") || "").trim();
+    if (!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(time) || title.length < 2) { showToast("Vaqt va mashg‘ulot nomini to‘g‘ri kiriting.", "error"); return; }
+    const values = { time, title, description: String(fd.get("description") || "").trim().slice(0,180) };
+    if (id) { const item = data.dailyRoutine.find(row => row.id === id); if (item) Object.assign(item, values); }
+    else data.dailyRoutine.push({ id: uid(), ...values });
+    data.dailyRoutine.sort((a,b) => a.time.localeCompare(b.time));
+    saveData(); closeModal(); render(); showToast("Kun tartibi saqlandi.");
+  }
+
+  async function generateRoutine() {
+    const input = $("#routine-ai-prompt"), prompt = String(input?.value || "").trim();
+    if (!prompt) { showToast("Avval kuningiz haqida qisqacha yozing.", "error"); return; }
+    const button = document.querySelector("[data-action='generate-routine']");
+    if (button) { button.disabled = true; button.textContent = "AI reja tuzmoqda..."; }
+    try {
+      const response = await fetch("/api/ai", { method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"routine",prompt,language:settings.language}) });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || !result.success) throw new Error(result.message || "AI kun tartibini tuza olmadi.");
+      const match = String(result.answer || "").match(/\\[[\\s\\S]*\\]/);
+      if (!match) throw new Error("AI reja formatini tushunib bo‘lmadi. Qayta urinib ko‘ring.");
+      const items = JSON.parse(match[0]);
+      if (!Array.isArray(items) || !items.length) throw new Error("AI bo‘sh kun tartibi qaytardi.");
+      const cleaned = items.slice(0,14).filter(item => /^([01]\\d|2[0-3]):[0-5]\\d$/.test(String(item.time || "")) && String(item.title || "").trim().length >= 2).map(item => ({id:uid(),time:item.time,title:String(item.title).slice(0,90),description:String(item.description || "").slice(0,180)}));
+      if (!cleaned.length) throw new Error("AI yaratgan vaqtlar noto‘g‘ri formatda.");
+      data.dailyRoutine = cleaned.sort((a,b) => a.time.localeCompare(b.time));
+      saveData(); render(); showToast("AI kun tartibingizni tayyorladi. Xohlasangiz, bandlarni tahrirlang.");
+    } catch (error) { showToast(error.message || "AI xatolik berdi.", "error"); }
+    finally { if (button) { button.disabled = false; button.innerHTML = icon("sparkles",15) + " Menga kun tartibi tuz"; refreshIcons(); } }
   }
 
   /* -------------------- ANALYTICS PAGE -------------------- */
@@ -2739,6 +2779,19 @@
       case "generate-ai-plan":
         generateAIPlan();
         break;
+      case "add-routine":
+        openRoutineForm();
+        break;
+      case "edit-routine":
+        openRoutineForm(id);
+        break;
+      case "delete-routine":
+        data.dailyRoutine = (data.dailyRoutine || []).filter(item => item.id !== id);
+        saveData(); render(); showToast("Kun tartibidan band o‘chirildi.");
+        break;
+      case "generate-routine":
+        generateRoutine();
+        break;
       case "add-goal":
         openGoalForm();
         break;
@@ -2946,6 +2999,10 @@
       case "task-form":
         event.preventDefault();
         saveTask(form);
+        break;
+      case "routine-form":
+        event.preventDefault();
+        saveRoutine(form);
         break;
       case "memory-form":
         event.preventDefault();
