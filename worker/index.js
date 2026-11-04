@@ -528,6 +528,7 @@ async function handleStorePurchase(request,env,user){
   const rateKey=await clientKey(request,"store:"+user.id);
   if(!await enforceRateLimit(env,rateKey,30,60))return json({success:false,message:"Xaridlar juda tez takrorlandi. Biroz kuting."},429);
   const now=new Date().toISOString();
+  await env.DB.prepare("INSERT OR IGNORE INTO user_data (user_id,data_json,updated_at) VALUES (?,?,?)").bind(user.id,JSON.stringify({inventory:[],spentXP:0}),now).run();
   const purchasedItem={id:itemId,type:item.type,value:item.value,purchasedAt:now};
   const itemJson=JSON.stringify(purchasedItem);
   const batch=await env.DB.batch([
