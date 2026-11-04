@@ -1643,7 +1643,7 @@
 
             <div class="task-info">
               <strong>${escapeHTML(task.title)}</strong>
-              <small>${escapeHTML(formatDate(task.date))}</small>
+              <small>${escapeHTML(formatDate(task.date))} · ${Number(task.estimatedMinutes||30)} daqiqa</small>
             </div>
 
             <span class="task-reward">${icon("zap", 12)} AI: 0–15 XP</span>
@@ -1909,7 +1909,7 @@
 
               <div class="task-info">
                 <strong>${escapeHTML(task.title)}</strong>
-                <small>${escapeHTML(formatDate(task.date))}</small>
+                <small>${escapeHTML(formatDate(task.date))} · ${Number(task.estimatedMinutes||30)} daqiqa</small>
               </div>
 
               <span class="task-reward">${icon("zap", 12)} AI: 0–15 XP</span>
@@ -2122,7 +2122,7 @@
       <section class="card" style="margin-top:20px">
         <h3 class="card-title">Maqsadlar sari bosib o‘tilgan yo‘l</h3>
         <p class="card-description">Har bir maqsad uchun bajarilgan ishlar va qolgan qadamlar.</p>
-        ${data.goals.length ? data.goals.map(goal => { const progress=getGoalProgress(goal); return `<div class="goal-progress-analytics"><div class="goal-item-header"><strong>${escapeHTML(goal.title)}</strong><span class="goal-percentage">${progress.progress}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${progress.progress}%"></div></div><div class="goal-progress-detail"><span>${progress.completed} / ${progress.total} vazifa bajarildi</span><span>${progress.remaining} ta qoldi</span></div></div>`; }).join("") : emptyState("Hali maqsad yo‘q","Maqsad yarating va unga tegishli vazifalarni belgilang.","target")}
+        ${data.goals.length ? data.goals.map(goal => { const progress=getGoalProgress(goal); return `<div class="goal-progress-analytics"><div class="goal-item-header"><strong>${escapeHTML(goal.title)}</strong><span class="goal-percentage">${progress.progress}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${progress.progress}%"></div></div><div class="goal-progress-detail"><span>${progress.completed} / ${progress.total} vazifa bajarildi · ${progress.remaining} ta qoldi</span><span>${progress.daysLeft===null?"Muddat yo‘q":progress.daysLeft<0?Math.abs(progress.daysLeft)+" kun kechikkan":progress.daysLeft===0?"Bugun oxirgi kun":progress.daysLeft+" kun qoldi"}</span></div></div>`; }).join("") : emptyState("Hali maqsad yo‘q","Maqsad yarating va unga tegishli vazifalarni belgilang.","target")}
       </section>
 
       <section class="card" style="margin-top:20px">
