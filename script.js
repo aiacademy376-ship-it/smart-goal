@@ -334,6 +334,8 @@
   let remoteSyncQueued = false;
   let aiConversation = [];
   let communityRelations = { incoming: [], outgoing: [], friends: [] };
+  const taskActionsInFlight = new Set();
+  const purchaseActionsInFlight = new Set();
 
   function saveData() {
     try {
@@ -1176,26 +1178,97 @@
   }
 
   async function toggleTask(id) {
-    const task=data.tasks.find(item=>item.id===id);if(!task)return;
-    if(!task.completed){
-      task.completed=true;task.completedAt=new Date().toISOString();render();
-      if(!task.xpAwarded){try{
-        const goal=data.goals.find(item=>item.id===task.goalId);
-        if(remoteAuthenticated && !await flushRemoteSync())throw new Error("Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.");
-        const response=await fetch("/api/tasks/complete",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({task:{id:task.id,title:task.title,date:task.date||today(),estimatedMinutes:task.estimatedMinutes||30,goalTitle:goal?.title||""}})});
-        const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI vazifani baholay olmadi.");
-        data.xp=Number(result.xpBalance||0);task.xpAwarded=true;task.xpEarned=Number(result.awarded||0);
-        if(task.xpEarned>0){data.activity.push({id:uid(),date:today(),xp:task.xpEarned,reason:"AI baholadi: "+task.title});data.activity=data.activity.slice(-180);}
-        if(result.dailyLimitReached)showToast("Kunlik 45 XP limiti to‘ldi. Vazifa qayd etildi, XP berilmadi.","error");
-        else if(result.alreadyAwarded)showToast("Bu vazifa uchun XP avval berilgan.","error");
-        else showToast("AI bahosi: +"+task.xpEarned+" XP · "+result.difficulty+"/5 · "+(result.onTime?"muddatida":"kechikib"));
-      }catch(error){task.completed=false;task.completedAt=null;saveData();render();showToast(error.message||"XP hisoblashda xatolik.","error");return;}}
-      if(task.goalId){const goal=data.goals.find(item=>item.id===task.goalId);if(goal){const linked=data.tasks.filter(item=>item.goalId===goal.id),completed=linked.filter(item=>item.completed).length;goal.progress=linked.length?Math.round(completed/linked.length*100):goal.progress;if(goal.progress>=100&&!goal.completed){goal.completed=true;addNotification("Maqsad yakunlandi!","“"+goal.title+"” maqsadini bajardingiz.");}}}
-      checkAchievements();
-    }else{task.completed=false;task.completedAt=null;showToast("Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.");}
-    saveData();render();
-  }
+    if (taskActionsInFlight.has(id)) return;
+    const task = data.tasks.find(item => item.id === id);
+    if (!task) return;
+    taskActionsInFlight.add(id);
 
+    try {
+      if (!task.completed) {
+        task.completed = true;
+        task.completedAt = new Date().toISOString();
+        render();
+
+        if (!task.xpAwarded) {
+          try {
+            const goal = data.goals.find(item => item.id === task.goalId);
+            if (remoteAuthenticated && !await flushRemoteSync()) {
+              throw new Error("Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.");
+            }
+            const response = await fetch("/api/tasks/complete", {
+              method: "POST",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                task: {
+                  id: task.id,
+                  title: task.title,
+                  date: task.date || today(),
+                  estimatedMinutes: task.estimatedMinutes || 30,
+                  goalTitle: goal?.title || ""
+                }
+              })
+            });
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok || !result.success) {
+              throw new Error(result.message || "AI vazifani baholay olmadi.");
+            }
+
+            data.xp = Number(result.xpBalance || 0);
+            task.xpAwarded = true;
+            task.xpEarned = Number(result.awarded || 0);
+            if (task.xpEarned > 0) {
+              data.activity.push({
+                id: uid(),
+                date: today(),
+                xp: task.xpEarned,
+                reason: "AI baholadi: " + task.title
+              });
+              data.activity = data.activity.slice(-180);
+            }
+
+            if (result.dailyLimitReached) {
+              showToast("Kunlik 45 XP limiti to‘ldi. Vazifa qayd etildi, XP berilmadi.", "error");
+            } else if (result.alreadyAwarded) {
+              showToast("Bu vazifa uchun XP avval berilgan.", "error");
+            } else {
+              showToast("AI bahosi: +" + task.xpEarned + " XP · " + result.difficulty + "/5 · " + (result.onTime ? "muddatida" : "kechikib"));
+            }
+          } catch (error) {
+            task.completed = false;
+            task.completedAt = null;
+            saveData();
+            render();
+            showToast(error.message || "XP hisoblashda xatolik.", "error");
+            return;
+          }
+        }
+
+        if (task.goalId) {
+          const goal = data.goals.find(item => item.id === task.goalId);
+          if (goal) {
+            const linked = data.tasks.filter(item => item.goalId === goal.id);
+            const completed = linked.filter(item => item.completed).length;
+            goal.progress = linked.length ? Math.round(completed / linked.length * 100) : goal.progress;
+            if (goal.progress >= 100 && !goal.completed) {
+              goal.completed = true;
+              addNotification("Maqsad yakunlandi!", "“" + goal.title + "” maqsadini bajardingiz.");
+            }
+          }
+        }
+        checkAchievements();
+      } else {
+        task.completed = false;
+        task.completedAt = null;
+        showToast("Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.");
+      }
+
+      saveData();
+      render();
+    } finally {
+      taskActionsInFlight.delete(id);
+    }
+  }
 
   function deleteTask(id) {
     const task = data.tasks.find(item => item.id === id);
@@ -1266,28 +1339,36 @@
   }
 
   async function confirmPurchase(id) {
+    if (purchaseActionsInFlight.has(id)) return;
     const item = STORE_ITEMS.find(product => product.id === id);
     if (!item) return;
+    purchaseActionsInFlight.add(id);
 
-    if (data.inventory.some(product => product.id === id)) {
-      showToast("Bu mahsulot sizda mavjud.", "error");
+    try {
+      if (data.inventory.some(product => product.id === id)) {
+        showToast("Bu mahsulot sizda mavjud.", "error");
+        closeModal();
+        return;
+      }
+
+      const button = document.querySelector("[data-action='confirm-purchase']");
+      if (button) button.disabled = true;
+      if (!await spendXP(item.price)) return;
+
+      data.inventory.push({
+        id: item.id,
+        type: item.type,
+        value: item.value,
+        purchasedAt: new Date().toISOString()
+      });
+
+      saveData();
       closeModal();
-      return;
+      render();
+      showToast(`${item.name} muvaffaqiyatli xarid qilindi!`);
+    } finally {
+      purchaseActionsInFlight.delete(id);
     }
-
-    if (!await spendXP(item.price)) return;
-
-    data.inventory.push({
-      id: item.id,
-      type: item.type,
-      value: item.value,
-      purchasedAt: new Date().toISOString()
-    });
-
-    saveData();
-    closeModal();
-    render();
-    showToast(`${item.name} muvaffaqiyatli xarid qilindi!`);
   }
 
   function useItem(id) {
