@@ -2270,7 +2270,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
       const items = JSON.parse(match[0]);
       if (!Array.isArray(items) || !items.length) throw new Error("AI bo‘sh kun tartibi qaytardi.");
       const usedTimes = new Set();
-      const cleaned = items.slice(0,14).filter(item => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(item.time || "")) && String(item.title || "").trim().length >= 2 && !usedTimes.has(item.time) && usedTimes.add(item.time)).map(item => ({id:uid(),time:item.time,title:String(item.title).slice(0,90),description:String(item.description || "").slice(0,180)}));
+      const cleaned = items.slice(0,14).filter(item => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(item.time || "")) && String(item.title || "").trim().length >= 2 && !usedTimes.has(item.time) && usedTimes.add(item.time)).map(item => ({id:uid(),time:item.time,title:String(item.title).slice(0,90),description:String(item.description || "").slice(0,180),estimatedMinutes:Math.max(5,Math.min(480,Number(item.estimatedMinutes||30)||30))}));
       if (!cleaned.length) throw new Error("AI yaratgan vaqtlar noto‘g‘ri formatda.");
       const existing = Array.isArray(data.dailyRoutine) ? data.dailyRoutine : [];
       const occupiedTimes = new Set(existing.map(item => String(item.time || "")));
@@ -2285,8 +2285,9 @@ remove planner task block      <section class="card" style="margin-top:20px">
   /* -------------------- ANALYTICS PAGE -------------------- */
 
   function renderAnalytics() {
-    const completed = data.tasks.filter(task => task.completed).length;
-    const total = data.tasks.length;
+    const routineTasks = data.tasks.filter(task => task.isRoutineEntry);
+    const completed = routineTasks.filter(task => task.completed).length;
+    const total = routineTasks.length;
     const completion = total ? Math.round(completed / total * 100) : 0;
     const weeklyXP = getLastSevenDays().reduce((sum, day) => sum + day.xp, 0);
 
