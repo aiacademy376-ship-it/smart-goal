@@ -1321,7 +1321,7 @@
               const response = await fetch("/api/tasks/complete", {
                 method: "POST", credentials: "same-origin",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ task: { id: task.id } })
+                body: JSON.stringify({ task: { id: task.id }, language: settings.language })
               });
               const result = await response.json().catch(() => ({}));
               if (!response.ok || !result.success) throw new Error(result.message || "AI vazifani baholay olmadi.");
@@ -1332,10 +1332,10 @@
                 data.activity.push({ id: uid(), date: today(), xp: task.xpEarned, reason: "AI baholadi: " + task.title });
                 data.activity = data.activity.slice(-180);
               }
-              if (result.notMeaningful) showToast("AI bu vazifani aniq ish deb baholamadi. Nomini yoki qisqa mazmunini aniqroq yozing.", "error");
+              if (result.notMeaningful) showToast(settings.language==="ru"?"AI не смог определить конкретную задачу. Уточните название или описание.":settings.language==="en"?"AI could not identify a clear task. Please clarify its title or description.":"AI bu vazifani aniq ish deb baholamadi. Nomini yoki qisqa mazmunini aniqroq yozing.", "error");
               else if (result.duplicateTask) showToast(result.reason || "Bugun shu mazmundagi vazifa uchun XP avval berilgan.", "error");
               else if (result.alreadyAwarded) showToast("Bu vazifa uchun XP avval berilgan.", "error");
-              else if (task.xpEarned > 0) showToast("AI bahosi: +" + task.xpEarned + " XP · qiyinlik " + (result.difficulty || "—") + "/5 · mehnat " + (result.effort || "—") + "/5 · " + (result.onTime ? "muddatida" : "kechikkan"));
+              else if (task.xpEarned > 0) showToast(settings.language==="ru"?"Оценка AI: +"+task.xpEarned+" XP · сложность "+(result.difficulty||"—")+"/5 · усилия "+(result.effort||"—")+"/5 · "+(result.onTime?"в срок":"с опозданием"):settings.language==="en"?"AI score: +"+task.xpEarned+" XP · difficulty "+(result.difficulty||"—")+"/5 · effort "+(result.effort||"—")+"/5 · "+(result.onTime?"on time":"late"):"AI bahosi: +" + task.xpEarned + " XP · qiyinlik " + (result.difficulty || "—") + "/5 · mehnat " + (result.effort || "—") + "/5 · " + (result.onTime ? "muddatida" : "kechikkan"));
               else showToast(result.reason || "AI vazifani tekshirdi, lekin bu safar XP ajratilmadi.", "error");
             } catch (error) {
               task.completed = false;
