@@ -184,8 +184,62 @@
       description: "Profil rasmingiz uchun maxsus ramka.",
       type: "avatar",
       value: "premium",
-      price: 180,
+      price: 360,
       icon: "frame"
+    },
+    {
+      id: "background-aurora",
+      name: "Aurora profil foni",
+      description: "Yashil va binafsha shimol yog‘dusi uslubidagi fon.",
+      type: "background",
+      value: "aurora",
+      price: 520,
+      icon: "sparkles"
+    },
+    {
+      id: "background-forest",
+      name: "Forest profil foni",
+      description: "Tabiat ranglaridagi sokin profil foni.",
+      type: "background",
+      value: "forest",
+      price: 480,
+      icon: "trees"
+    },
+    {
+      id: "background-sunrise",
+      name: "Sunrise profil foni",
+      description: "Yangi kun va yangi maqsadlar uchun iliq fon.",
+      type: "background",
+      value: "sunrise",
+      price: 450,
+      icon: "sunrise"
+    },
+    {
+      id: "badge-scholar",
+      name: "Scholar belgisi",
+      description: "Bilim va muntazam o‘rganish ramzi.",
+      type: "badge",
+      value: "Scholar",
+      price: 240,
+      icon: "graduation-cap"
+    },
+    {
+      id: "badge-explorer",
+      name: "Explorer belgisi",
+      description: "Yangi ko‘nikmalarni sinab ko‘rish ramzi.",
+      type: "badge",
+      value: "Explorer",
+      price: 280,
+      icon: "compass"
+    },
+    {
+      id: "avatar-frame-neon",
+      name: "Neon avatar ramkasi",
+      description: "Profil rasmingiz uchun yorqin neon ramka.",
+      type: "avatar",
+      value: "neon",
+      price: 420,
+      icon: "zap"
     }
   ];
 
@@ -2386,7 +2440,10 @@
       galaxy: "radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",
       royal: "linear-gradient(120deg,#7c4a20,#d3a24b)",
       sakura: "linear-gradient(120deg,#e7a5bd,#8b6bba)",
-      nebula: "radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)"
+      nebula: "radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)",
+      aurora: "linear-gradient(130deg,#123d43,#5b4a9a 55%,#a3d5c6)",
+      forest: "linear-gradient(130deg,#102f26,#39745a 55%,#b4c99a)",
+      sunrise: "linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)"
     };
 
     const bg = backgroundStyles[profile.background] || backgroundStyles.default;
@@ -3345,7 +3402,7 @@
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success || !result.profile) throw new Error(result.message || "Profilni yuklab bo‘lmadi.");
       const p = result.profile, rank = getRank(Number(p.xp || 0));
-      const covers = {default:"linear-gradient(120deg,#5145cf,#9282f6)",midnight:"linear-gradient(120deg,#101827,#283958)",galaxy:"radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",royal:"linear-gradient(120deg,#7c4a20,#d3a24b)",sakura:"linear-gradient(120deg,#e7a5bd,#8b6bba)",nebula:"radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)"};
+      const covers = {default:"linear-gradient(120deg,#5145cf,#9282f6)",midnight:"linear-gradient(120deg,#101827,#283958)",galaxy:"radial-gradient(circle at 80% 20%,#7256c9,#161b43 65%)",royal:"linear-gradient(120deg,#7c4a20,#d3a24b)",sakura:"linear-gradient(120deg,#e7a5bd,#8b6bba)",nebula:"radial-gradient(circle at 25% 25%,#a35ac8,#111b3c 70%)",aurora:"linear-gradient(130deg,#123d43,#5b4a9a 55%,#a3d5c6)",forest:"linear-gradient(130deg,#102f26,#39745a 55%,#b4c99a)",sunrise:"linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)"};
       const avatar = p.avatar ? '<img src="'+escapeHTML(p.avatar)+'" alt="Profil rasmi" loading="lazy" decoding="async">' : icon("user-round",40);
       const avatarFrame = ["premium","gold"].includes(p.avatarFrame) ? " avatar-frame-"+p.avatarFrame : "";
       const badge = p.activeBadge ? '<span class="profile-active-badge">'+icon("award",13)+' '+escapeHTML(p.activeBadge)+'</span>' : "";
