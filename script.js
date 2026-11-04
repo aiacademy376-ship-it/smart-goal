@@ -1797,7 +1797,7 @@
           <div class="stat-top">
             <span class="stat-icon green">${icon("check-circle-2")}</span>
           </div>
-          <p class="stat-label">Bajarilgan vazifalar</p>
+          <p class="stat-label">Bajarilgan kun tartibi bandlari</p>
           <div class="stat-value">${formatNumber(completed)}</div>
           <span class="stat-change">${completedToday} ta bugun</span>
         </div>
@@ -2163,6 +2163,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
         <input type="hidden" name="id" value="${escapeHTML(item?.id || "")}">
         <div class="form-field"><label class="field-label">Vaqt</label><input class="field-input" type="time" name="time" required value="${escapeHTML(item?.time || "07:00")}"></div>
         <div class="form-field full-width"><label class="field-label">Nima qilasiz?</label><input class="field-input" name="title" maxlength="90" required placeholder="Masalan: Uyg‘onish" value="${escapeHTML(item?.title || "")}"></div>
+        <div class="form-field"><label class="field-label">Davomiyligi (daqiqa)</label><input class="field-input" type="number" name="estimatedMinutes" min="5" max="480" step="5" value="${Math.max(5,Math.min(480,Number(item?.estimatedMinutes||30)))}"></div>
         <div class="form-field full-width"><label class="field-label">Qisqa izoh (ixtiyoriy)</label><textarea class="field-textarea" name="description" maxlength="180" rows="2" placeholder="Masalan: Suv ichish va xonani shamollatish">${escapeHTML(item?.description || "")}</textarea></div>
       </form>`, `
       <button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button>
@@ -3182,7 +3183,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
       : [...selected];
     if (scopes.includes("tasks")) data.tasks = [];
     if (scopes.includes("goals")) data.goals = [];
-    if (scopes.includes("dailyRoutine")) { data.dailyRoutine = []; data.routineLogs = {}; }
+    if (scopes.includes("dailyRoutine")) { data.dailyRoutine = []; data.routineLogs = {}; data.tasks = data.tasks.filter(task => !task.isRoutineEntry); }
     if (scopes.includes("plans")) { data.plans = []; data.aiPlans = []; }
     if (scopes.includes("achievements")) data.achievements = [];
     if (scopes.includes("memories")) data.memories = [];
