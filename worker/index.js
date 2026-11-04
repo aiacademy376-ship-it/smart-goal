@@ -534,13 +534,13 @@ async function handleStorePurchase(request,env,user){
   if(!await enforceRateLimit(env,rateKey,30,60))return json({success:false,message:"Xaridlar juda tez takrorlandi. Biroz kuting."},429);
   const now=new Date().toISOString();
   await env.DB.prepare("INSERT OR IGNORE INTO user_data (user_id,data_json,updated_at) VALUES (?,?,?)").bind(user.id,JSON.stringify({inventory:[],spentXP:0}),now).run();
-  const purchasedItem={id:itemId,type:item.type,value:item.value,purchasedAt:now};
+  const purchasedItem={id:itemId,type:item.type,value:item.value,purchasedAt:now,purchaseToken:crypto.randomUUID()};
   const itemJson=JSON.stringify(purchasedItem);
   const batch=await env.DB.batch([
     env.DB.prepare("UPDATE user_data SET data_json=json_insert(json_set(json_set(data_json,'$.inventory',CASE WHEN json_type(data_json,'$.inventory')='array' THEN json_extract(data_json,'$.inventory') ELSE json('[]') END),'$.spentXP',COALESCE(CAST(json_extract(data_json,'$.spentXP') AS INTEGER),0)+?),'$.inventory[#]',json(?)),updated_at=? WHERE user_id=? AND EXISTS(SELECT 1 FROM users WHERE id=? AND xp_balance>=?) AND NOT EXISTS(SELECT 1 FROM json_each(CASE WHEN json_type(data_json,'$.inventory')='array' THEN json_extract(data_json,'$.inventory') ELSE json('[]') END) AS item WHERE json_extract(item.value,'$.id')=?)")
       .bind(item.price,itemJson,now,user.id,user.id,item.price,itemId),
-    env.DB.prepare("UPDATE users SET xp_balance=xp_balance-?,updated_at=? WHERE id=? AND xp_balance>=? AND EXISTS(SELECT 1 FROM user_data WHERE user_id=? AND json_extract(data_json,'$.inventory[#-1].id')=? AND json_extract(data_json,'$.inventory[#-1].purchasedAt')=?)")
-      .bind(item.price,now,user.id,item.price,user.id,itemId,now),
+    env.DB.prepare("UPDATE users SET xp_balance=xp_balance-?,updated_at=? WHERE id=? AND xp_balance>=? AND EXISTS(SELECT 1 FROM user_data WHERE user_id=? AND json_extract(data_json,'$.inventory[#-1].id')=? AND json_extract(data_json,'$.inventory[#-1].purchaseToken')=?)")
+      .bind(item.price,now,user.id,item.price,user.id,itemId,purchasedItem.purchaseToken),
     env.DB.prepare("SELECT xp_balance FROM users WHERE id=?").bind(user.id)
   ]);
   const changed=Number(batch[0]?.meta?.changes||0);
