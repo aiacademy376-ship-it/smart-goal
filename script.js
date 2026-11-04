@@ -1007,6 +1007,7 @@
       }
       showApplication();
       checkAchievements();
+      checkRoutineReminders();
       openRequestedProfile();
       showToast("Xush kelibsiz!");
     } catch (error) {
