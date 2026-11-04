@@ -1779,7 +1779,7 @@
               <div class="progress-fill" style="width:${rank.progress}%"></div>
             </div>
             <div class="goal-footer">
-              <span>${formatNumber(data.xp)} XP</span>
+              <span>${formatNumber(Number(data.xp||0)+Number(data.spentXP||0))} XP</span>
               <span>${rank.next ? `${formatNumber(rank.next.xp)} XP` : "MAX"}</span>
             </div>
             <button class="card-action" type="button" data-page="profile" style="margin-top:16px">
@@ -2442,6 +2442,7 @@
     const rank = getRank();
     const profile = data.profile;
     const completedTasks = data.tasks.filter(task => task.completed).length;
+    const totalEarnedXP = Number(data.xp || 0) + Number(data.spentXP || 0);
     const customizationScore = [profile.background && profile.background !== "default", profile.avatarFrame && profile.avatarFrame !== "default", Boolean(profile.activeBadge)].filter(Boolean).length;
 
     const backgroundStyles = {
@@ -2506,7 +2507,7 @@
           </div>
 
           <div class="goal-footer">
-            <span>${formatNumber(data.xp)} XP</span>
+            <span>${formatNumber(totalEarnedXP)} XP</span>
             <span>${rank.next ? `${formatNumber(rank.next.xp)} XP` : "MAX"}</span>
           </div>
         </section>
