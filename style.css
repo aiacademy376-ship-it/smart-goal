@@ -6274,3 +6274,69 @@ button, input, select, textarea { max-width: 100%; }
   .topbar-right { gap: 4px; }
   .settings-panel { padding: 10px; }
 }
+
+
+/* SMARTGOAL PATCH: settings actions and robust responsive chat */
+.settings-layout,
+.settings-panel,
+.settings-section,
+.setting-row,
+.setting-info { min-width: 0; }
+.settings-panel { width: 100%; }
+.setting-row { flex-wrap: wrap; align-items: center; }
+.setting-info { flex: 1 1 220px; }
+.setting-row > .secondary-button,
+.setting-row > .field-select {
+  display: inline-flex !important;
+  flex: 0 0 auto;
+  min-width: 116px;
+  max-width: min(100%, 190px) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 1;
+}
+.setting-row > .secondary-button { white-space: nowrap; }
+.settings-section .theme-options { min-width: 0; }
+.ai-chat-card { min-width: 0; width: 100%; overflow: hidden; }
+.ai-chat {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  max-height: min(58vh, 680px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2px 1px;
+}
+.ai-message {
+  width: fit-content;
+  max-width: min(88%, 760px);
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.ai-message p, .ai-message li, .ai-message h1, .ai-message h2, .ai-message h3 {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.ai-input-row { width: 100%; min-width: 0; }
+.ai-input-row input { flex: 1 1 0; width: 1%; min-width: 0; }
+.settings-nav, .settings-panel { min-width: 0; }
+@media (max-width: 760px) {
+  .settings-layout { grid-template-columns: minmax(0,1fr); gap: 12px; }
+  .settings-nav { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .settings-nav button { min-width: 0; justify-content: flex-start; }
+  .settings-panel { padding: 15px; }
+  .setting-row { align-items: flex-start; gap: 10px; }
+  .setting-info { flex-basis: 100%; }
+  .setting-row > .secondary-button,
+  .setting-row > .field-select { max-width: 100% !important; }
+  .ai-message { max-width: 94%; }
+}
+@media (max-width: 380px) {
+  .settings-nav { grid-template-columns: minmax(0,1fr); }
+  .setting-row > .secondary-button,
+  .setting-row > .field-select { width: 100%; max-width: 100% !important; }
+}
