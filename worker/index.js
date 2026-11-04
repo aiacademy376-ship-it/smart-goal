@@ -281,10 +281,22 @@ async function handleData(request, env, user) {
 
 async function runSmartAI(env,messages,options={}){
   if(!env.AI||typeof env.AI.run!=="function")throw new Error("AI xizmati hali Cloudflare’da ulanmagan.");
-  const result=await env.AI.run("@cf/zai-org/glm-4.7-flash",{messages,max_tokens:options.max_tokens||650,temperature:options.temperature??0.35});
-  const answer=typeof result==="string"?result:result?.response||result?.result?.response||result?.text||"";
-  if(!String(answer).trim())throw new Error("AI javob qaytarmadi.");
-  return String(answer).trim();
+  const result=await env.AI.run("@cf/zai-org/glm-4.7-flash",{messages,max_tokens:options.max_tokens||650,temperature:options.temperature??0.35,chat_template_kwargs:{enable_thinking:false}});
+  // Workers AI chat-completion models return OpenAI-style choices[0].message.content.
+  // Keep the alternate shapes for compatibility with other Workers AI response formats.
+  const candidate=result?.choices?.[0]?.message?.content
+    ?? result?.choices?.[0]?.text
+    ?? result?.response
+    ?? result?.result?.response
+    ?? result?.result?.choices?.[0]?.message?.content
+    ?? result?.text
+    ?? result?.output_text
+    ?? (typeof result==="string"?result:"");
+  const answer=Array.isArray(candidate)
+    ? candidate.map(part=>typeof part==="string"?part:(part?.text||part?.content||"")).join("")
+    : typeof candidate==="string"?candidate:String(candidate??"");
+  if(!answer.trim())throw new Error("AI javobi bo‘sh qaytdi. Cloudflare Workers AI response formatini tekshiring.");
+  return answer.trim();
 }
 async function handleAI(request,env,user){
   if(!env.AI)return json({success:false,message:"Smart AI binding sozlanmagan."},503);
