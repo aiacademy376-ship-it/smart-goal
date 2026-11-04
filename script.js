@@ -1869,7 +1869,7 @@
   function saveRoutine(form) {
     const fd = new FormData(form), id = String(fd.get("id") || "");
     const time = String(fd.get("time") || ""), title = String(fd.get("title") || "").trim();
-    if (!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(time) || title.length < 2) { showToast("Vaqt va mashg‘ulot nomini to‘g‘ri kiriting.", "error"); return; }
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(time) || title.length < 2) { showToast("Vaqt va mashg‘ulot nomini to‘g‘ri kiriting.", "error"); return; }
     const values = { time, title, description: String(fd.get("description") || "").trim().slice(0,180) };
     if (id) { const item = data.dailyRoutine.find(row => row.id === id); if (item) Object.assign(item, values); }
     else data.dailyRoutine.push({ id: uid(), ...values });
@@ -1886,11 +1886,11 @@
       const response = await fetch("/api/ai", { method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"routine",prompt,language:settings.language}) });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success) throw new Error(result.message || "AI kun tartibini tuza olmadi.");
-      const match = String(result.answer || "").match(/\\[[\\s\\S]*\\]/);
+      const match = String(result.answer || "").match(/\[[\s\\S]*\]/);
       if (!match) throw new Error("AI reja formatini tushunib bo‘lmadi. Qayta urinib ko‘ring.");
       const items = JSON.parse(match[0]);
       if (!Array.isArray(items) || !items.length) throw new Error("AI bo‘sh kun tartibi qaytardi.");
-      const cleaned = items.slice(0,14).filter(item => /^([01]\\d|2[0-3]):[0-5]\\d$/.test(String(item.time || "")) && String(item.title || "").trim().length >= 2).map(item => ({id:uid(),time:item.time,title:String(item.title).slice(0,90),description:String(item.description || "").slice(0,180)}));
+      const cleaned = items.slice(0,14).filter(item => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(item.time || "")) && String(item.title || "").trim().length >= 2).map(item => ({id:uid(),time:item.time,title:String(item.title).slice(0,90),description:String(item.description || "").slice(0,180)}));
       if (!cleaned.length) throw new Error("AI yaratgan vaqtlar noto‘g‘ri formatda.");
       data.dailyRoutine = cleaned.sort((a,b) => a.time.localeCompare(b.time));
       saveData(); render(); showToast("AI kun tartibingizni tayyorladi. Xohlasangiz, bandlarni tahrirlang.");
