@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - smartgoal/cloudflare-upgrade
+      - smartgoal/production-integration
 
 jobs:
   validate:
