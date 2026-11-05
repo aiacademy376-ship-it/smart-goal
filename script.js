@@ -2789,7 +2789,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
       <section class="card">
         <div class="card-header notification-toolbar">
           <div><h3 class="card-title">Barcha bildirishnomalar</h3><p class="card-description">${data.notifications.length} ta xabar · ${unreadCount()} ta o‘qilmagan</p></div>
-          <button class="primary-button" type="button" data-action="mark-all-read" ${unreadCount()?"":"disabled"}>${icon("check-check",16)} Barchasini o‘qilgan qilish</button>
+          <button class="primary-button" type="button" data-action="mark-all-read" ${unreadCount()?"":"disabled"}>${icon("check-check",16)} Barchasini o'qilgan deb belgilash</button>
         </div>
 
         <div class="notification-list">
@@ -3487,7 +3487,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Barcha bildirishnomalar": "Все уведомления",
     "ta xabar": "сообщений",
     "ta o‘qilmagan": "непрочитанных",
-    "Barchasini o‘qilgan qilish": "Отметить все как прочитанные",
+    "Barchasini o'qilgan deb belgilash": "Отметить все как прочитанные",
     "O‘qildi": "Прочитано",
     "Bildirishnomalar yo‘q": "Уведомлений пока нет",
     "Yangi xabarlar shu yerda paydo bo‘ladi.": "Новые сообщения будут появляться здесь.",
@@ -3593,7 +3593,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Barcha bildirishnomalar": "All notifications",
     "ta xabar": "messages",
     "ta o‘qilmagan": "unread",
-    "Barchasini o‘qilgan qilish": "Mark all as read",
+    "Barchasini o'qilgan deb belgilash": "Mark all as read",
     "O‘qildi": "Read",
     "Bildirishnomalar yo‘q": "No notifications yet",
     "Yangi xabarlar shu yerda paydo bo‘ladi.": "New messages will appear here.",
