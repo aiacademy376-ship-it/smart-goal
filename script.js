@@ -3857,6 +3857,35 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Profilni ko‘rish": "View profile"
   });
 
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Bajarildi": "Выполнено",
+    "Bajarilmadi": "Не выполнено",
+    "Vaqt yetmadi": "Не хватило времени",
+    "Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.": "Например: просыпаюсь в 07:00, иду в школу в 08:30, возвращаюсь в 14:00. Вечером хочу учить английский.",
+    "Masalan: Uyg‘onish": "Например: Подъём",
+    "Masalan: Suv ichish va xonani shamollatish": "Например: Выпить воды и проветрить комнату",
+    "Masalan: Birinchi sertifikatim": "Например: Мой первый сертификат",
+    "Bu kun nima uchun muhim?": "Почему этот день важен?",
+    "Hamjamiyat bo‘limlari": "Разделы сообщества",
+    "@username": "@имя_пользователя",
+    "Sozlamalar bo‘limlari": "Разделы настроек",
+    "Ovoz sozlamasi": "Настройка звука"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Bajarildi": "Completed",
+    "Bajarilmadi": "Not completed",
+    "Vaqt yetmadi": "Ran out of time",
+    "Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.": "For example: I wake up at 7:00, go to school at 8:30, return at 14:00, and want to study English in the evening.",
+    "Masalan: Uyg‘onish": "For example: Wake up",
+    "Masalan: Suv ichish va xonani shamollatish": "For example: Drink water and air out the room",
+    "Masalan: Birinchi sertifikatim": "For example: My first certificate",
+    "Bu kun nima uchun muhim?": "Why is this day important?",
+    "Hamjamiyat bo‘limlari": "Community sections",
+    "@username": "@username",
+    "Sozlamalar bo‘limlari": "Settings sections",
+    "Ovoz sozlamasi": "Sound setting"
+  });
+
   const translationOriginalText = new WeakMap();
   const translationOriginalAttributes = new WeakMap();
 
