@@ -400,6 +400,8 @@
 
   const today = () => { const d=new Date(); return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-"); };
 
+  const priorityLabel = value => ({low:{uz:"Past",ru:"Низкий",en:"Low"},medium:{uz:"O‘rta",ru:"Средний",en:"Medium"},high:{uz:"Yuqori",ru:"Высокий",en:"High"}}[value] || {uz:"O‘rta",ru:"Средний",en:"Medium"})[settings.language] || "O‘rta";
+
   const formatDate = value => {
     if (!value) return "Sana belgilanmagan";
 
@@ -1405,8 +1407,9 @@
       if (!task.completed) {
         task.completed = true;
         task.completedAt = new Date().toISOString();
+        task.xpCompletionId = uid();
         render();
-        if (!task.xpAwarded || Number(task.xpEarned || 0) === 0) {
+        if (task.completedAt && task.xpCompletionId) {
           if (!remoteAuthenticated) {
             task.xpAwarded = false;
             task.xpEarned = 0;
@@ -1417,7 +1420,7 @@
               const response = await apiFetch("/api/tasks/complete", {
                 method: "POST", credentials: "include",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ task: { id: task.id }, language: settings.language })
+                body: JSON.stringify({ task: { id: task.id }, completionId: task.xpCompletionId, language: settings.language })
               });
               const result = await response.json().catch(() => ({}));
               if (!response.ok || !result.success) throw new Error(result.message || "AI vazifani baholay olmadi.");
@@ -1429,8 +1432,8 @@
                 data.activity = data.activity.slice(-180);
               }
               if (result.notMeaningful) showToast(settings.language==="ru"?"AI не смог определить конкретную задачу. Уточните название или описание.":settings.language==="en"?"AI could not identify a clear task. Please clarify its title or description.":"AI bu vazifani aniq ish deb baholamadi. Nomini yoki qisqa mazmunini aniqroq yozing.", "error");
-              else if (result.duplicateTask) showToast(result.reason || "Bugun shu mazmundagi vazifa uchun XP avval berilgan.", "error");
-              else if (result.alreadyAwarded) showToast(settings.language==="ru"?"За эту задачу XP уже начислялись.":settings.language==="en"?"XP has already been awarded for this task.":"Bu vazifa uchun XP avval berilgan.", "error");
+              else if (result.duplicateTask) showToast(result.reason || "Bu bajarish uchun XP allaqachon hisoblangan.", "error");
+              else if (result.alreadyAwarded) showToast(settings.language==="ru"?"XP за это выполнение уже начислены.":settings.language==="en"?"XP for this completion has already been awarded.":"Bu bajarish uchun XP allaqachon berilgan.", "error");
               else if (task.xpEarned > 0) showToast(settings.language==="ru"?"Оценка AI: +"+task.xpEarned+" XP · сложность "+(result.difficulty||"—")+"/5 · усилия "+(result.effort||"—")+"/5 · "+(result.onTime?"в срок":"с опозданием"):settings.language==="en"?"AI score: +"+task.xpEarned+" XP · difficulty "+(result.difficulty||"—")+"/5 · effort "+(result.effort||"—")+"/5 · "+(result.onTime?"on time":"late"):"AI bahosi: +" + task.xpEarned + " XP · qiyinlik " + (result.difficulty || "—") + "/5 · mehnat " + (result.effort || "—") + "/5 · " + (result.onTime ? "muddatida" : "kechikkan"));
               else showToast(result.reason || "AI vazifani tekshirdi, lekin bu safar XP ajratilmadi.", "error");
             } catch (error) {
@@ -1460,6 +1463,7 @@
       } else {
         task.completed = false;
         task.completedAt = null;
+        task.xpCompletionId = null;
         refreshGoalProgress();
         showToast("Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.");
       }
@@ -2019,7 +2023,7 @@
 
             <div class="goal-progress-detail"><span>${progress.total ? `${progress.completed}/${progress.total} vazifa bajarildi · yana ${progress.remaining} ta qoldi` : "Vazifalarni shu maqsadga bog‘lab, rivojlanishni kuzating."}</span><span>${progress.daysLeft===null ? "Muddat yo‘q" : progress.daysLeft<0 ? "Muddat o‘tgan" : progress.daysLeft===0 ? "Bugun oxirgi kun" : `Yana ${progress.daysLeft} kun`}</span></div>
             <div class="goal-footer">
-              <span>${goal.completed ? "Yakunlangan" : `Ustuvorlik: ${escapeHTML(goal.priority || "medium")}`}</span>
+              <span>${goal.completed ? translateUIString("Yakunlangan") : translateUIString("Ustuvorlik") + ": " + priorityLabel(goal.priority)}</span>
               <span>
                 <button class="card-action" type="button" data-action="edit-goal" data-id="${escapeHTML(goal.id)}">Tahrirlash</button>
                 <button class="card-action" type="button" data-action="delete-goal" data-id="${escapeHTML(goal.id)}">O‘chirish</button>
@@ -4232,7 +4236,6 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Parol 8–128 belgi bo‘lishi kerak.":"Пароль должен содержать от 8 до 128 символов.",
     "Xush kelibsiz!":"Добро пожаловать!",
     "Vazifa nomini kiriting.":"Введите название задачи.",
-    "Bugun shu mazmundagi vazifa uchun XP avval berilgan.":"Сегодня за задачу с таким содержанием XP уже начислялись.",
     "AI vazifani tekshirdi, lekin bu safar XP ajratilmadi.":"AI проверил задачу, но в этот раз XP не начислены.",
     "Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.":"Задача снова открыта. Ранее начисленные XP не возвращаются.",
     "Mahsulot profilingizga qo‘llandi.":"Предмет применён к вашему профилю.",
@@ -4264,7 +4267,6 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Parol 8–128 belgi bo‘lishi kerak.":"Password must be 8–128 characters.",
     "Xush kelibsiz!":"Welcome!",
     "Vazifa nomini kiriting.":"Enter a task title.",
-    "Bugun shu mazmundagi vazifa uchun XP avval berilgan.":"XP has already been awarded today for a task with similar content.",
     "AI vazifani tekshirdi, lekin bu safar XP ajratilmadi.":"AI reviewed the task, but no XP was awarded this time.",
     "Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.":"Task reopened. Previously awarded XP will not be refunded.",
     "Mahsulot profilingizga qo‘llandi.":"Item applied to your profile.",
@@ -4438,6 +4440,10 @@ remove planner task block      <section class="card" style="margin-top:20px">
     if (match) return language === "ru" ? "Показать ещё " + match[1] + " задач" : language === "en" ? "Show " + match[1] + " more tasks" : raw;
     match = normalized.match(/^Yana (\d+) ta xotirani ko‘rsatish$/);
     if (match) return language === "ru" ? "Показать ещё " + match[1] + " воспоминаний" : language === "en" ? "Show " + match[1] + " more memories" : raw;
+    match = normalized.match(/^Yana (\d+) kun$/);
+    if (match) return language === "ru" ? "Осталось " + match[1] + " дн." : language === "en" ? match[1] + " days left" : raw;
+    match = normalized.match(/^Ustuvorlik: (low|medium|high)$/i);
+    if (match) return (language === "ru" ? "Приоритет: " : language === "en" ? "Priority: " : "Ustuvorlik: ") + ({low:language==="ru"?"Низкий":language==="en"?"Low":"Past",medium:language==="ru"?"Средний":language==="en"?"Medium":"O‘rta",high:language==="ru"?"Высокий":language==="en"?"High":"Yuqori"}[match[1].toLowerCase()]);
     match = normalized.match(/^Profil bezagi: (\d+) /);
     if (match) return language === "ru" ? "Оформление профиля: " + match[1] + " / 5" : language === "en" ? "Profile customization: " + match[1] + " / 5" : raw;
     return raw;

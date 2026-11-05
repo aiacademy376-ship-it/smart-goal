@@ -135,6 +135,11 @@ jobs:
           assert "45 XP" not in script and "45-COALESCE" not in worker, "A daily XP cap is still present"
           assert "rawDifficulty=scoreValue" in worker, "Robust AI score parsing is missing"
           assert "Vazifa nomi va izohi o‘zbek, rus, ingliz yoki boshqa tilda" in worker, "Multilingual task evaluation is missing"
+          assert "task.xpCompletionId = uid()" in script, "Each task completion must get a unique XP event ID"
+          assert "completionId: task.xpCompletionId" in script and "completionId=String(body.completionId||\"\").trim()" in worker, "XP completion event ID is not passed to the server"
+          assert "bind(user.id,completionId)" in worker, "XP ledger idempotency must use the completion event ID"
+          assert "sameDayRows" not in worker and "duplicateTask" not in worker, "Same-day similar-task XP rejection must stay removed"
+          assert "Math.min(15" in worker, "The 15 XP per-completion limit must remain active"
 
           store_start = script.index("const STORE_ITEMS")
           store_end = script.index("const ACHIEVEMENTS", store_start)
