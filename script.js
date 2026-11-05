@@ -39,6 +39,37 @@
     profile: "Mening profilim"
   };
 
+  // Canonical, shareable URLs for every application section.
+  const PAGE_ROUTES = {
+    dashboard: "/",
+    goals: "/goals",
+    schedule: "/tasks",
+    planner: "/planner",
+    analytics: "/statistics",
+    achievements: "/achievements",
+    rewards: "/rewards",
+    community: "/community",
+    ai: "/ai",
+    notifications: "/notifications",
+    settings: "/settings",
+    profile: "/profile"
+  };
+  const ROUTE_PAGES = Object.fromEntries(
+    Object.entries(PAGE_ROUTES).map(([page, path]) => [path, page])
+  );
+  Object.assign(ROUTE_PAGES, {
+    "/dashboard": "dashboard",
+    "/schedule": "schedule",
+    "/analytics": "analytics",
+    "/rewards-shop": "rewards",
+    "/my-profile": "profile"
+  });
+
+  function resolvePageFromPath(pathname = window.location.pathname) {
+    const normalized = String(pathname || "/").replace(/\/+$/, "") || "/";
+    return ROUTE_PAGES[normalized] || "dashboard";
+  }
+
   const RANKS = [
     { level: 1, name: "Boshlovchi", xp: 0 },
     { level: 2, name: "Izlanuvchi", xp: 100 },
@@ -461,7 +492,7 @@
 
   let data = loadData();
   let settings = loadSettings();
-  let currentPage = "dashboard";
+  let currentPage = resolvePageFromPath();
   let currentSettingsTab = "general";
   let storeFilter = "all";
   let taskListLimit = 50;
@@ -3355,6 +3386,247 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Maqsadlarimni tahlil qilib, bugun nima qilishim kerakligini ayt.":"Analyze my goals and tell me what I should do today.","Kun tartibimni yaxshilashga yordam ber.":"Help me improve my daily routine.","Vazifalarimni qiyinligi va muddatiga qarab tartibla.":"Prioritize my tasks by difficulty and deadlines.","Motivatsiyam tushib ketdi. Amaliy maslahat ber.":"I have lost motivation. Give me practical advice.","Bugun nimaga erishamiz?":"What will we achieve today?","Hali vazifalar yo‘q. Birinchi vazifangizni qo‘shing!":"No tasks yet. Add your first task!","Hali maqsad yo‘q. O‘z maqsadingizni belgilang!":"No goals yet. Set your first goal!","Bugungi rejalaringizga xush kelibsiz":"Welcome to your daily planner","Yangi hisob yarating":"Create a new account","O‘zingiz haqingizdagi ma’lumotlarni kiriting.":"Enter your information.","Davom etish uchun ma’lumotlaringizni kiriting.":"Enter your details to continue.","SMARTGOAL’GA QO‘SHILING":"JOIN SMARTGOAL","XUSH KELIBSIZ":"WELCOME BACK","Barcha maydonlarni to‘g‘ri to‘ldiring.":"Please complete all fields correctly.","Parol 8–128 belgi bo‘lishi kerak.":"Password must be 8–128 characters.","Ro‘yxatdan o‘tishda xatolik yuz berdi.":"Registration failed.","Server bilan bog‘lanib bo‘lmadi.":"Could not connect to the server.","Maqsadni tahrirlash":"Edit goal","Maqsad nomini kiriting.":"Enter a goal title.","Maqsad saqlandi.":"Goal saved.","Maqsadni o‘chirish":"Delete goal","Vazifani tahrirlash":"Edit task","Vazifa nomini kiriting.":"Enter a task title.","Vazifa nima haqida ekanini kamida bir jumla bilan yozing.":"Briefly describe the task in at least one sentence.","Vazifa qurilmada saqlandi. AI orqali XP olish uchun akkauntingizga kiring.":"Task saved on this device. Sign in to receive AI-assessed XP.","Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.":"Task was not saved to the server. Check your connection and try again.","Maqsad yakunlandi!":"Goal completed!","Vazifani o‘chirish":"Delete task","Yangi yutuq ochildi!":"New achievement unlocked!","Xaridni amalga oshirib bo‘lmadi.":"Purchase failed.","Mahsulot profilingizga qo‘llandi.":"Item applied to your profile.","Siz eng yuqori mavjud darajaga yetdingiz!":"You reached the highest available level!","Ma’lumotni saqlashda xatolik yuz berdi.":"An error occurred while saving data.","Ma’lumot serverga saqlanmadi.":"Data was not saved to the server.","Internet yoki server bilan aloqa uzildi. Ma’lumot qurilmada saqlandi.":"Connection to the internet or server was lost. Data was saved on this device.","Ma’lumotlarni yuklab bo‘lmadi.":"Could not load data.","Serverdan kelgan ma’lumot noto‘g‘ri.":"The server returned invalid data.","Serverdan chiqish so‘rovi bajarilmadi:":"The server sign-out request failed:","Yangi xabarlar shu yerda paydo bo‘ladi.":"New notifications will appear here.","Hali biografiya qo‘shilmagan.":"No biography added yet.","Hali badge yo‘q":"No badges yet","Sozlamalar bo‘limlari":"Settings sections","Tug‘ilgan sanani o‘zgartirish":"Change birthday","Ma’lumotlar tiklandi.":"Data restored.","Ma’lumotlarni tozalash":"Clear data"
   });
 
+  // Coverage additions for authentication, navigation, forms, feedback and dynamic states.
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "O'ZINGIZNING YANGI BOSQICHINGIZ":"ВАШ НОВЫЙ ЭТАП",
+    "Bugungi kichik qadam — ertangi katta natija.":"Маленький шаг сегодня — большой результат завтра.",
+    "Maqsadlaringizni tartibga soling, odatlaringizni rivojlantiring va har kuni kechagidan yaxshiroq bo'ling.":"Упорядочьте цели, развивайте привычки и становитесь лучше каждый день.",
+    "XUSH KELIBSIZ":"С ВОЗВРАЩЕНИЕМ",
+    "Hisobingizga kiring":"Войдите в аккаунт",
+    "Davom etish uchun ma'lumotlaringizni kiriting.":"Введите данные, чтобы продолжить.",
+    "Kirish":"Войти",
+    "Ro'yxatdan o'tish":"Регистрация",
+    "Username yoki elektron pochta":"Имя пользователя или электронная почта",
+    "Username yoki email":"Имя пользователя или email",
+    "Parol":"Пароль",
+    "Parolingizni kiriting":"Введите пароль",
+    "Bu qurilmada eslab qolish":"Запомнить на этом устройстве",
+    "Parolni unutdingizmi?":"Забыли пароль?",
+    "Ism va familiya":"Имя и фамилия",
+    "Elektron pochta":"Электронная почта",
+    "Tug'ilgan sana":"Дата рождения",
+    "Yoshingiz avtomatik hisoblanadi.":"Возраст рассчитывается автоматически.",
+    "Maktab yoki sinf tanlash shart emas.":"Указывать школу или класс не нужно.",
+    "Foydalanish shartlari va maxfiylik siyosatiga roziman.":"Я принимаю условия использования и политику конфиденциальности.",
+    "Hali hisobingiz yo'qmi?":"Ещё нет аккаунта?",
+    "Hisob yarating":"Создайте аккаунт",
+    "O'zgarishni bugundan boshla.":"Начните меняться уже сегодня.",
+    "Har kuni bir qadam oldinga.":"Каждый день на шаг вперёд.",
+    "ASOSIY":"ОСНОВНОЕ",
+    "RIVOJLANISH":"РАЗВИТИЕ",
+    "SHAXSIY":"ЛИЧНОЕ",
+    "Yig'ilgan ochkolar":"Накопленные очки",
+    "Hisobdan chiqish":"Выйти из аккаунта",
+    "Menyuni yopish":"Закрыть меню",
+    "Yopish":"Закрыть",
+    "Foydalanuvchi":"Пользователь",
+    "SmartGoal yuklanmoqda...":"SmartGoal загружается...",
+    "Maqsad topildi:":"Найдена цель:",
+    "Ism va familiyani to'g'ri kiriting.":"Введите корректные имя и фамилию.",
+    "Username formati noto'g'ri.":"Неверный формат имени пользователя.",
+    "Rasm 2 MB dan kichik bo'lishi kerak.":"Размер изображения должен быть меньше 2 МБ.",
+    "Rasmni yuklashda xatolik yuz berdi.":"Не удалось загрузить изображение.",
+    "Profilni saqlashda xatolik.":"Не удалось сохранить профиль.",
+    "Hisob yaratilmoqda...":"Создание аккаунта...",
+    "Server bilan aloqa o'rnatilmadi. Internetni tekshirib qayta urinib ko'ring.":"Не удалось связаться с сервером. Проверьте интернет и попробуйте снова.",
+    "Username yoki email va parolni kiriting.":"Введите имя пользователя или email и пароль.",
+    "Kirish amalga oshmadi.":"Не удалось войти.",
+    "Hisobdan chiqdingiz.":"Вы вышли из аккаунта.",
+    "Masalan: Ingliz tilini o'rganish":"Например: изучать английский язык",
+    "O'tkazib yuborildi":"Пропущено",
+    "Birinchi kun tartibi bandingizni qo'shing.":"Добавьте первый пункт распорядка дня.",
+    "Kun tartibiga band qo'shish":"Добавить пункт распорядка",
+    "Muddat yo'q":"Без срока",
+    "Muddat o'tgan":"Срок истёк",
+    "Bugun oxirgi kun":"Последний день — сегодня",
+    "Bajarilgan band va uning XP bahosi o'zgartirilmaydi.":"Выполненный пункт и начисленные за него XP не изменяются.",
+    "Vaqt va mashg'ulot nomini to'g'ri kiriting.":"Укажите корректное время и название занятия.",
+    "Bu vaqtga boshqa mashg'ulot belgilangan. Boshqa vaqt tanlang.":"На это время уже запланировано другое занятие. Выберите другое время.",
+    "Ilova ichidagi kun tartibi eslatmalari yoqildi.":"Внутренние напоминания о распорядке включены.",
+    "AI maslahat bera olmadi.":"AI не смог дать совет.",
+    "AI bilan aloqa uzildi.":"Соединение с AI прервано.",
+    "Avval kuningiz haqida qisqacha yozing.":"Сначала кратко расскажите о своём дне.",
+    "AI reja tuzmoqda...":"AI составляет план...",
+    "AI kun tartibini tuza olmadi.":"AI не удалось составить распорядок.",
+    "AI bo'sh kun tartibi qaytardi.":"AI вернул пустой распорядок.",
+    "AI xatolik berdi.":"AI выдал ошибку.",
+    "Hammaga ko'rinadi":"Видно всем",
+    "Faqat menga ko'rinadi":"Видно только мне",
+    "Rasm 4 MB dan kichik bo'lishi kerak.":"Размер изображения должен быть меньше 4 МБ.",
+    "Rasmni yuklab bo'lmadi.":"Не удалось загрузить изображение.",
+    "Xotirangiz saqlandi.":"Воспоминание сохранено.",
+    "Faollik zanjiri":"Серия активности",
+    "Ketma-ket faol kun":"Дней активности подряд",
+    "Faolligingiz va yutuqlaringiz haqidagi xabarlar.":"Уведомления о вашей активности и достижениях.",
+    "Qaysi ma'lumotlarni o'chirmoqchisiz?":"Какие данные вы хотите удалить?",
+    "Avval o'chiriladigan bo'limni tanlang.":"Сначала выберите раздел для удаления.",
+    "Tanlangan ma'lumotlar o'chirildi. XP va xaridlaringiz saqlandi.":"Выбранные данные удалены. XP и покупки сохранены.",
+    "Yengil moviy ranglar va sokin ko'rinish.":"Спокойное оформление в светло-голубых тонах.",
+    "Profilingizga nozik va yorqin uslub.":"Нежный и яркий стиль для вашего профиля.",
+    "Yulduzli kosmik bezak.":"Космическое оформление со звёздами.",
+    "Har kuni o'z ustida ishlaydiganlar uchun.":"Для тех, кто каждый день работает над собой.",
+    "Yumshoq lavanda ranglaridagi interfeys.":"Интерфейс в мягких лавандовых тонах.",
+    "Coral profil foni":"Коралловый фон профиля",
+    "Iliq marjon ranglari bilan o'ziga xos profil.":"Уникальный профиль в тёплых коралловых тонах.",
+    "Ember profil foni":"Огненный фон профиля",
+    "Chuqur ranglar va olovli aksentlar.":"Глубокие цвета и огненные акценты.",
+    "Creator belgisi":"Значок Creator",
+    "Yangi g'oyalarni amaliy natijaga aylantiruvchilar uchun.":"Для тех, кто превращает идеи в реальные результаты.",
+    "Profil rasmingiz uchun billurdek yorqin ramka.":"Яркая кристальная рамка для фото профиля.",
+    "Profilingizga jo'shqin va yorqin uslub.":"Энергичный и яркий стиль для вашего профиля.",
+    "Sovuq moviy va oq ranglar uyg'unligi.":"Сочетание холодных голубых и белых оттенков.",
+    "Iliq oltin ranglar bilan yorqin interfeys.":"Яркий интерфейс с тёплыми золотыми оттенками.",
+    "Ocean profil foni":"Океанический фон профиля",
+    "Chuqur dengiz ranglaridagi profil foni.":"Фон профиля в глубоких морских оттенках.",
+    "Mountain profil foni":"Горный фон профиля",
+    "Tog' manzarasidan ilhomlangan fon.":"Фон, вдохновлённый горными пейзажами.",
+    "Aurora Night fon":"Фон «Северное сияние — ночь»",
+    "Tungi osmon va shimol yog'dusi ranglari.":"Цвета ночного неба и северного сияния.",
+    "Focus Pro belgisi":"Значок Focus Pro",
+    "Innovator belgisi":"Значок Innovator",
+    "Mentor belgisi":"Значок Mentor",
+    "Bilimini boshqalar bilan ulashuvchilar uchun.":"Для тех, кто делится знаниями с другими.",
+    "Ranglar jilosi bilan zamonaviy ramka.":"Современная рамка с переливами цветов.",
+    "Carbon avatar ramkasi":"Углеродная рамка аватара",
+    "Minimal qoramtir premium ramka.":"Минималистичная тёмная премиум-рамка.",
+    "Aurora avatar ramkasi":"Рамка аватара «Северное сияние»",
+    "Yashil va binafsha rangli yorqin ramka.":"Яркая рамка в зелёных и фиолетовых оттенках."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "O'ZINGIZNING YANGI BOSQICHINGIZ":"YOUR NEXT CHAPTER",
+    "Bugungi kichik qadam — ertangi katta natija.":"A small step today leads to a big result tomorrow.",
+    "Maqsadlaringizni tartibga soling, odatlaringizni rivojlantiring va har kuni kechagidan yaxshiroq bo'ling.":"Organize your goals, build better habits, and improve every day.",
+    "XUSH KELIBSIZ":"WELCOME BACK",
+    "Hisobingizga kiring":"Sign in to your account",
+    "Davom etish uchun ma'lumotlaringizni kiriting.":"Enter your details to continue.",
+    "Kirish":"Sign in",
+    "Ro'yxatdan o'tish":"Create account",
+    "Username yoki elektron pochta":"Username or email",
+    "Username yoki email":"Username or email",
+    "Parol":"Password",
+    "Parolingizni kiriting":"Enter your password",
+    "Bu qurilmada eslab qolish":"Remember this device",
+    "Parolni unutdingizmi?":"Forgot your password?",
+    "Ism va familiya":"Full name",
+    "Elektron pochta":"Email address",
+    "Tug'ilgan sana":"Date of birth",
+    "Yoshingiz avtomatik hisoblanadi.":"Your age is calculated automatically.",
+    "Maktab yoki sinf tanlash shart emas.":"You do not need to select a school or grade.",
+    "Foydalanish shartlari va maxfiylik siyosatiga roziman.":"I agree to the Terms of Use and Privacy Policy.",
+    "Hali hisobingiz yo'qmi?":"Don't have an account yet?",
+    "Hisob yarating":"Create your account",
+    "O'zgarishni bugundan boshla.":"Start making a change today.",
+    "Har kuni bir qadam oldinga.":"One step forward every day.",
+    "ASOSIY":"MAIN",
+    "RIVOJLANISH":"GROWTH",
+    "SHAXSIY":"PERSONAL",
+    "Yig'ilgan ochkolar":"Earned points",
+    "Hisobdan chiqish":"Sign out",
+    "Menyuni yopish":"Close menu",
+    "Yopish":"Close",
+    "Foydalanuvchi":"User",
+    "SmartGoal yuklanmoqda...":"Loading SmartGoal...",
+    "Maqsad topildi:":"Goal found:",
+    "Ism va familiyani to'g'ri kiriting.":"Enter a valid first and last name.",
+    "Username formati noto'g'ri.":"Invalid username format.",
+    "Rasm 2 MB dan kichik bo'lishi kerak.":"Image must be smaller than 2 MB.",
+    "Rasmni yuklashda xatolik yuz berdi.":"Image upload failed.",
+    "Profilni saqlashda xatolik.":"Could not save profile.",
+    "Hisob yaratilmoqda...":"Creating your account...",
+    "Server bilan aloqa o'rnatilmadi. Internetni tekshirib qayta urinib ko'ring.":"Could not connect to the server. Check your internet connection and try again.",
+    "Username yoki email va parolni kiriting.":"Enter your username or email and password.",
+    "Kirish amalga oshmadi.":"Sign-in failed.",
+    "Hisobdan chiqdingiz.":"You have signed out.",
+    "Masalan: Ingliz tilini o'rganish":"Example: Learn English",
+    "O'tkazib yuborildi":"Skipped",
+    "Birinchi kun tartibi bandingizni qo'shing.":"Add your first routine item.",
+    "Kun tartibiga band qo'shish":"Add routine item",
+    "Muddat yo'q":"No deadline",
+    "Muddat o'tgan":"Overdue",
+    "Bugun oxirgi kun":"Due today",
+    "Bajarilgan band va uning XP bahosi o'zgartirilmaydi.":"Completed routine items and their XP awards cannot be changed.",
+    "Vaqt va mashg'ulot nomini to'g'ri kiriting.":"Enter a valid time and activity name.",
+    "Bu vaqtga boshqa mashg'ulot belgilangan. Boshqa vaqt tanlang.":"Another activity is already scheduled at this time. Choose a different time.",
+    "Ilova ichidagi kun tartibi eslatmalari yoqildi.":"In-app routine reminders are enabled.",
+    "AI maslahat bera olmadi.":"AI could not provide advice.",
+    "AI bilan aloqa uzildi.":"The connection to AI was lost.",
+    "Avval kuningiz haqida qisqacha yozing.":"First, briefly describe your day.",
+    "AI reja tuzmoqda...":"AI is creating your plan...",
+    "AI kun tartibini tuza olmadi.":"AI could not create the routine.",
+    "AI bo'sh kun tartibi qaytardi.":"AI returned an empty routine.",
+    "AI xatolik berdi.":"AI returned an error.",
+    "Hammaga ko'rinadi":"Visible to everyone",
+    "Faqat menga ko'rinadi":"Only visible to me",
+    "Rasm 4 MB dan kichik bo'lishi kerak.":"Image must be smaller than 4 MB.",
+    "Rasmni yuklab bo'lmadi.":"Could not download the image.",
+    "Xotirangiz saqlandi.":"Memory saved.",
+    "Faollik zanjiri":"Activity streak",
+    "Ketma-ket faol kun":"Consecutive active days",
+    "Faolligingiz va yutuqlaringiz haqidagi xabarlar.":"Updates about your activity and achievements.",
+    "Qaysi ma'lumotlarni o'chirmoqchisiz?":"Which data would you like to delete?",
+    "Avval o'chiriladigan bo'limni tanlang.":"Choose a section to delete first.",
+    "Tanlangan ma'lumotlar o'chirildi. XP va xaridlaringiz saqlandi.":"Selected data was deleted. Your XP and purchases were preserved.",
+    "Yengil moviy ranglar va sokin ko'rinish.":"A calm interface in light blue tones.",
+    "Profilingizga nozik va yorqin uslub.":"A delicate, bright style for your profile.",
+    "Yulduzli kosmik bezak.":"A starry cosmic design.",
+    "Har kuni o'z ustida ishlaydiganlar uchun.":"For people who work on themselves every day.",
+    "Yumshoq lavanda ranglaridagi interfeys.":"An interface in soft lavender tones.",
+    "Coral profil foni":"Coral profile background",
+    "Iliq marjon ranglari bilan o'ziga xos profil.":"A distinctive profile in warm coral tones.",
+    "Ember profil foni":"Ember profile background",
+    "Chuqur ranglar va olovli aksentlar.":"Deep colors with fiery accents.",
+    "Creator belgisi":"Creator badge",
+    "Yangi g'oyalarni amaliy natijaga aylantiruvchilar uchun.":"For people who turn new ideas into practical results.",
+    "Profil rasmingiz uchun billurdek yorqin ramka.":"A brilliant crystal frame for your profile photo.",
+    "Profilingizga jo'shqin va yorqin uslub.":"A bold, vibrant style for your profile.",
+    "Sovuq moviy va oq ranglar uyg'unligi.":"A blend of cool blue and white tones.",
+    "Iliq oltin ranglar bilan yorqin interfeys.":"A bright interface with warm golden tones.",
+    "Ocean profil foni":"Ocean profile background",
+    "Chuqur dengiz ranglaridagi profil foni.":"A profile background in deep ocean tones.",
+    "Mountain profil foni":"Mountain profile background",
+    "Tog' manzarasidan ilhomlangan fon.":"A background inspired by mountain scenery.",
+    "Aurora Night fon":"Aurora Night background",
+    "Tungi osmon va shimol yog'dusi ranglari.":"Night-sky and aurora colors.",
+    "Focus Pro belgisi":"Focus Pro badge",
+    "Innovator belgisi":"Innovator badge",
+    "Mentor belgisi":"Mentor badge",
+    "Bilimini boshqalar bilan ulashuvchilar uchun.":"For people who share their knowledge.",
+    "Ranglar jilosi bilan zamonaviy ramka.":"A modern frame with iridescent colors.",
+    "Carbon avatar ramkasi":"Carbon avatar frame",
+    "Minimal qoramtir premium ramka.":"A minimal dark premium frame.",
+    "Aurora avatar ramkasi":"Aurora avatar frame",
+    "Yashil va binafsha rangli yorqin ramka.":"A bright frame in green and violet."
+  });
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Har bir qadamingizni ko'rib boring":"Отслеживайте каждый свой шаг",
+    "yoki":"или",
+    "Mukofotlar do'koni":"Магазин наград",
+    "Oyna":"Окно"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Har bir qadamingizni ko'rib boring":"See every step of your journey",
+    "yoki":"or",
+    "Mukofotlar do'koni":"Rewards shop",
+    "Oyna":"Window"
+  });
+
+  // Localize data-driven rank, achievement and reward catalog labels as well.
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Focus Pro":"Focus Pro",
+    "Boshlovchi":"Новичок","Izlanuvchi":"Исследователь","Harakatdagi":"В движении","Intiluvchan":"Целеустремлённый","Tirishqoq":"Усердный","Mahoratli":"Опытный","Strateg":"Стратег","Yetakchi":"Лидер","Usta":"Мастер","Afsona":"Легенда",
+    "Birinchi qadam":"Первый шаг","Birinchi vazifangizni bajaring.":"Выполните свою первую задачу.","Harakat boshlandi":"Начало положено","5 ta vazifani bajaring.":"Выполните 5 задач.","Tinimsiz harakat":"Постоянное движение","10 ta vazifani bajaring.":"Выполните 10 задач.","Maqsad sari":"К цели","Birinchi maqsadingizni yakunlang.":"Завершите свою первую цель.","Maqsadlar ustasi":"Мастер целей","3 ta maqsadni yakunlang.":"Завершите 3 цели.","500 ochko to‘plang.":"Наберите 500 очков.","Minglik marrasi":"Рубеж в тысячу","1000 ochko to‘plang.":"Наберите 1000 очков.","Barqaror intizom":"Стабильная дисциплина","25 ta vazifani bajaring.":"Выполните 25 задач.","Mehnat chempioni":"Чемпион труда","50 ta vazifani bajaring.":"Выполните 50 задач.","Yuz qadam":"Сто шагов","100 ta vazifani bajaring.":"Выполните 100 задач.","Katta orzular":"Большие мечты","5 ta maqsad yarating.":"Создайте 5 целей.","Rejalar me’mori":"Архитектор планов","10 ta maqsad yarating.":"Создайте 10 целей.","Birinchi marralar":"Первые рубежи","250 XP to‘plang.":"Наберите 250 XP.","Kuchli salohiyat":"Большой потенциал","2500 XP to‘plang.":"Наберите 2500 XP.","Afsonaviy natija":"Легендарный результат","5000 XP to‘plang.":"Наберите 5000 XP.","Kun tartibi ustasi":"Мастер распорядка","Kun tartibiga 10 ta band kiriting.":"Добавьте 10 пунктов в распорядок.",
+    "Ocean mavzusi":"Тема Ocean","Emerald mavzusi":"Тема Emerald","Sunset mavzusi":"Тема Sunset","Rose mavzusi":"Тема Rose","Midnight fon":"Фон Midnight","Galaxy fon":"Фон Galaxy","Royal fon":"Фон Royal","Focus badge":"Значок Focus","Diamond badge":"Значок Diamond","Sky mavzusi":"Тема Sky","Sakura profil foni":"Фон профиля Sakura","Nebula profil foni":"Фон профиля Nebula","Builder belgisi":"Значок Builder","Oltin avatar ramkasi":"Золотая рамка аватара","Premium avatar ramkasi":"Премиум-рамка аватара","Forest profil foni":"Лесной фон профиля","Sunrise profil foni":"Фон профиля Sunrise","Scholar belgisi":"Значок Scholar","Explorer belgisi":"Значок Explorer","Lavender mavzusi":"Тема Lavender","Mint mavzusi":"Тема Mint","Streak belgisi":"Значок Streak","Crystal avatar ramkasi":"Кристальная рамка аватара","Flame avatar ramkasi":"Огненная рамка аватара","Graphite mavzusi":"Тема Graphite","Ice mavzusi":"Тема Ice","Amber mavzusi":"Тема Amber","Prism avatar ramkasi":"Рамка аватара Prism",
+    "AI vazifani baholay olmadi.":"AI не смог оценить задачу.","XP hisoblashda xatolik.":"Ошибка при начислении XP.","Bu mahsulot sizda allaqachon mavjud.":"Этот предмет у вас уже есть.","Xarid vaqtida xatolik yuz berdi.":"Ошибка при покупке.","AI javob yozmoqda...":"AI печатает...","AI bilan bog‘lanib bo‘lmadi.":"Не удалось связаться с AI.","AI bo‘sh javob qaytardi. Qayta urinib ko‘ring.":"AI вернул пустой ответ. Попробуйте ещё раз.","AI hozircha javob bera olmadi.":"AI пока не смог ответить.","AI reja tuzishda xatolik yuz berdi.":"Ошибка при создании плана AI.","AI reja formatini tushunib bo‘lmadi. Qayta urinib ko‘ring.":"Не удалось распознать формат плана AI. Попробуйте ещё раз.","AI yaratgan vaqtlar noto‘g‘ri formatda.":"AI вернул время в неверном формате.","Mavjud bandlaringiz saqlandi, AI yangi mashg‘ulotlarni qo‘shdi.":"Существующие пункты сохранены, AI добавил новые занятия."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Focus Pro":"Focus Pro",
+    "Boshlovchi":"Beginner","Izlanuvchi":"Explorer","Harakatdagi":"On the move","Intiluvchan":"Driven","Tirishqoq":"Persistent","Mahoratli":"Skilled","Strateg":"Strategist","Yetakchi":"Leader","Usta":"Master","Afsona":"Legend",
+    "Birinchi qadam":"First step","Birinchi vazifangizni bajaring.":"Complete your first task.","Harakat boshlandi":"Momentum started","5 ta vazifani bajaring.":"Complete 5 tasks.","Tinimsiz harakat":"Steady progress","10 ta vazifani bajaring.":"Complete 10 tasks.","Maqsad sari":"Toward a goal","Birinchi maqsadingizni yakunlang.":"Complete your first goal.","Maqsadlar ustasi":"Goal master","3 ta maqsadni yakunlang.":"Complete 3 goals.","500 ochko to‘plang.":"Earn 500 points.","Minglik marrasi":"The thousand mark","1000 ochko to‘plang.":"Earn 1,000 points.","Barqaror intizom":"Consistent discipline","25 ta vazifani bajaring.":"Complete 25 tasks.","Mehnat chempioni":"Work champion","50 ta vazifani bajaring.":"Complete 50 tasks.","Yuz qadam":"One hundred steps","100 ta vazifani bajaring.":"Complete 100 tasks.","Katta orzular":"Big dreams","5 ta maqsad yarating.":"Create 5 goals.","Rejalar me’mori":"Architect of plans","10 ta maqsad yarating.":"Create 10 goals.","Birinchi marralar":"First milestones","250 XP to‘plang.":"Earn 250 XP.","Kuchli salohiyat":"Great potential","2500 XP to‘plang.":"Earn 2,500 XP.","Afsonaviy natija":"Legendary result","5000 XP to‘plang.":"Earn 5,000 XP.","Kun tartibi ustasi":"Routine master","Kun tartibiga 10 ta band kiriting.":"Add 10 items to your daily routine.",
+    "Ocean mavzusi":"Ocean theme","Emerald mavzusi":"Emerald theme","Sunset mavzusi":"Sunset theme","Rose mavzusi":"Rose theme","Midnight fon":"Midnight background","Galaxy fon":"Galaxy background","Royal fon":"Royal background","Focus badge":"Focus badge","Diamond badge":"Diamond badge","Sky mavzusi":"Sky theme","Sakura profil foni":"Sakura profile background","Nebula profil foni":"Nebula profile background","Builder belgisi":"Builder badge","Oltin avatar ramkasi":"Gold avatar frame","Premium avatar ramkasi":"Premium avatar frame","Forest profil foni":"Forest profile background","Sunrise profil foni":"Sunrise profile background","Scholar belgisi":"Scholar badge","Explorer belgisi":"Explorer badge","Lavender mavzusi":"Lavender theme","Mint mavzusi":"Mint theme","Streak belgisi":"Streak badge","Crystal avatar ramkasi":"Crystal avatar frame","Flame avatar ramkasi":"Flame avatar frame","Graphite mavzusi":"Graphite theme","Ice mavzusi":"Ice theme","Amber mavzusi":"Amber theme","Prism avatar ramkasi":"Prism avatar frame",
+    "AI vazifani baholay olmadi.":"AI could not evaluate the task.","XP hisoblashda xatolik.":"Error calculating XP.","Bu mahsulot sizda allaqachon mavjud.":"You already own this item.","Xarid vaqtida xatolik yuz berdi.":"An error occurred during purchase.","AI javob yozmoqda...":"AI is typing...","AI bilan bog‘lanib bo‘lmadi.":"Could not connect to AI.","AI bo‘sh javob qaytardi. Qayta urinib ko‘ring.":"AI returned an empty response. Please try again.","AI hozircha javob bera olmadi.":"AI could not respond right now.","AI reja tuzishda xatolik yuz berdi.":"An error occurred while creating the AI plan.","AI reja formatini tushunib bo‘lmadi. Qayta urinib ko‘ring.":"Could not understand the AI plan format. Please try again.","AI yaratgan vaqtlar noto‘g‘ri formatda.":"AI returned times in an invalid format.","Mavjud bandlaringiz saqlandi, AI yangi mashg‘ulotlarni qo‘shdi.":"Your existing items were kept and AI added new activities."
+  });
+
   function translateVisibleUI(root = document.body) {
     if (!root) return;
     const dictionary = UI_TRANSLATIONS[settings.language] || {};
@@ -3366,7 +3638,11 @@ remove planner task block      <section class="card" style="margin-top:20px">
       if (!translationOriginalText.has(node)) translationOriginalText.set(node, node.nodeValue || "");
       const original = translationOriginalText.get(node), trimmed = original.trim();
       if (!trimmed) continue;
-      node.nodeValue = original.replace(trimmed, dictionary[trimmed] || trimmed);
+      // HTML line wrapping can insert indentation/newlines inside a text node.
+      // Normalize whitespace before dictionary lookup so the same phrase is
+      // translated consistently regardless of its markup formatting.
+      const normalized = trimmed.replace(/\s+/g, " ");
+      node.nodeValue = original.replace(trimmed, dictionary[trimmed] || dictionary[normalized] || trimmed);
     }
     root.querySelectorAll("input[placeholder],textarea[placeholder],button[aria-label],button[title],[data-ai-prompt]").forEach(element => {
       let originals = translationOriginalAttributes.get(element);
@@ -3380,18 +3656,27 @@ remove planner task block      <section class="card" style="margin-top:20px">
     });
   }
 
-  function navigate(page) {
-    if (!PAGE_TITLES[page]) return;
-
-    currentPage = page;
-
-    $$(".nav-link").forEach(button => {
-      button.classList.toggle("active", button.dataset.page === page);
+  function syncNavigationState() {
+    $(".nav-link").forEach(button => {
+      button.classList.toggle("active", button.dataset.page === currentPage);
     });
 
     const title = $("#page-title");
-    if (title) title.textContent = PAGE_TITLES[page];
+    if (title) title.textContent = PAGE_TITLES[currentPage] || PAGE_TITLES.dashboard;
+    document.title = (PAGE_TITLES[currentPage] || PAGE_TITLES.dashboard) + " | SmartGoal";
+  }
 
+  function navigate(page, options = {}) {
+    if (!PAGE_TITLES[page]) return;
+
+    currentPage = page;
+    const targetPath = PAGE_ROUTES[page];
+    if (targetPath && window.location.pathname !== targetPath) {
+      const method = options.replace ? "replaceState" : "pushState";
+      window.history[method]({ smartGoalPage: page }, "", targetPath);
+    }
+
+    syncNavigationState();
     $("#sidebar")?.classList.remove("open");
     render();
   }
@@ -3429,6 +3714,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
     updateSidebarPoints();
     updateNotificationIndicators();
     updateCurrentDate();
+    const localizedPageTitle = (UI_TRANSLATIONS[settings.language] || {})[PAGE_TITLES[currentPage]] || PAGE_TITLES[currentPage];
+    document.title = localizedPageTitle + " | SmartGoal";
     refreshIcons(content);
     refreshIcons($("#sidebar-avatar"));
     refreshIcons($("#topbar-avatar"));
@@ -3966,6 +4253,12 @@ remove planner task block      <section class="card" style="margin-top:20px">
   }
 
   function attachEvents() {
+    window.addEventListener("popstate", () => {
+      currentPage = resolvePageFromPath();
+      syncNavigationState();
+      render();
+    });
+
     document.addEventListener("click", handleClick);
     document.addEventListener("change", handleChange);
     document.addEventListener("submit", handleSubmit);
@@ -4023,6 +4316,10 @@ remove planner task block      <section class="card" style="margin-top:20px">
   /* -------------------- START -------------------- */
 
   function start() {
+    if (!ROUTE_PAGES[window.location.pathname]) {
+      window.history.replaceState({ smartGoalPage: currentPage }, "", PAGE_ROUTES[currentPage] || "/");
+    }
+    syncNavigationState();
     attachEvents();
     initializeSmartGoal();
     setInterval(() => {

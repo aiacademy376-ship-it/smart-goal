@@ -7,6 +7,7 @@ on:
       - smartgoal/cloudflare-upgrade
       - smartgoal/production-integration
       - smartgoal/community-settings-refresh
+      - smartgoal/full-localization-routing-quality
 
 jobs:
   validate:
@@ -54,7 +55,37 @@ jobs:
           assert 'data-action="edit-birthdate"' in script and 'name="username"' in script, "Profile and birthday editing must remain available"
           assert "aiacademy376-ship-it.github.io" in html and "smart-goal.pages.dev" in html, "GitHub Pages canonical redirect is missing"
 
+          for route in (
+              'dashboard: "/"', 'goals: "/goals"', 'schedule: "/tasks"',
+              'planner: "/planner"', 'analytics: "/statistics"',
+              'achievements: "/achievements"', 'rewards: "/rewards"',
+              'community: "/community"', 'ai: "/ai"',
+              'notifications: "/notifications"', 'settings: "/settings"',
+              'profile: "/profile"'
+          ):
+              assert route in script, f"Missing application route: {route}"
+          assert 'window.addEventListener("popstate"' in script, "Browser back/forward routing is missing"
+          assert 'window.history[method]' in script, "Client-side route history is missing"
+          for required_translation in (
+              '"Hisobingizga kiring"', '"Username yoki elektron pochta"',
+              '"Parolni unutdingizmi?"', '"ASOSIY"', '"RIVOJLANISH"',
+              '"SHAXSIY"', '"Hisobdan chiqish"', '"SmartGoal yuklanmoqda..."'
+          ):
+              assert script.count(required_translation) >= 2, (
+                  f"Missing Uzbek source translation pair: {required_translation}"
+              )
+
           assert "translationOriginalText = new WeakMap()" in script, "Language switching source-text cache is missing"
+          assert 'trimmed.replace(/\\s+/g, " ")' in script, "Whitespace-safe translation lookup is missing"
+          for translated_label in (
+              '"Boshlovchi"', '"Afsona"', '"Birinchi qadam"',
+              '"Kun tartibi ustasi"', '"Ocean mavzusi"',
+              '"Focus Pro"', '"AI javob yozmoqda..."',
+              '"AI bilan bog‘lanib bo‘lmadi."'
+          ):
+              assert script.count(translated_label) >= 2, (
+                  f"Missing RU/EN translation for UI label: {translated_label}"
+              )
           assert 'name="estimatedMinutes"' in script and 'name="priority"' in script, "AI task-scoring inputs are missing"
           assert "async function generateDailyAdvice()" in script, "Personal AI coaching action is missing"
           assert "async function generateRoutine()" in script, "AI routine builder is missing"
