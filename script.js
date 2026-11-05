@@ -2800,7 +2800,10 @@ remove planner task block      <section class="card" style="margin-top:20px">
       forest: "linear-gradient(130deg,#102f26,#39745a 55%,#b4c99a)",
       sunrise: "linear-gradient(130deg,#713f57,#e18c70 55%,#f5d99a)",
       coral: "linear-gradient(130deg,#7c3448,#e57e73 55%,#ffd0a6)",
-      ember: "linear-gradient(130deg,#271d2e,#8b3c36 55%,#f1a15a)"
+      ember: "linear-gradient(130deg,#271d2e,#8b3c36 55%,#f1a15a)",
+      ocean: "linear-gradient(130deg,#092d46,#167a9b 55%,#75c8d8)",
+      mountain: "linear-gradient(130deg,#27384c,#71879a 55%,#c9d4d8)",
+      "aurora-night": "linear-gradient(130deg,#071d32,#265b68 55%,#7d67a8)"
     };
 
     const bg = backgroundStyles[profile.background] || backgroundStyles.default;
