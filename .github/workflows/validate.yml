@@ -8,6 +8,10 @@ on:
       - smartgoal/production-integration
       - smartgoal/community-settings-refresh
       - smartgoal/full-localization-routing-quality
+      - smartgoal/fix-route-init-selector
+  pull_request:
+    branches:
+      - main
 
 jobs:
   validate:
@@ -65,6 +69,8 @@ jobs:
           ):
               assert route in script, f"Missing application route: {route}"
           assert 'window.addEventListener("popstate"' in script, "Browser back/forward routing is missing"
+          assert '$$(".nav-link").forEach' in script, "Navigation state must use the multi-element selector"
+          assert not re.search(r'(?<!\$)\$\("\.nav-link"\)\.forEach', script), "Navigation initialization uses a single-element selector"
           assert 'window.history[method]' in script, "Client-side route history is missing"
           for required_translation in (
               '"Hisobingizga kiring"', '"Username yoki elektron pochta"',
