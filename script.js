@@ -11,6 +11,8 @@
   const DATA_KEY = "smartgoal_v3_data";
   const SETTINGS_KEY = "smartgoal_v3_settings";
   const SESSION_KEY = "smartgoal_v3_session";
+  const API_BASE="https://smartgoal-api.hyuhyu3268-4d9.workers.dev"; const API_TOKEN_KEY="smartgoal_api_token";
+  function apiFetch(path,options={}){const headers=new Headers(options.headers||{}),token=localStorage.getItem(API_TOKEN_KEY);if(token)headers.set("Authorization","Bearer "+token);if(options.body&&!headers.has("Content-Type"))headers.set("Content-Type","application/json");return fetch(API_BASE+path,{...options,headers,credentials:"include"});}
 
   const DEFAULT_SETTINGS = {
     language: "uz",
@@ -505,9 +507,9 @@
     remoteSyncRunning = true;
     let synced = false;
     try {
-      const response = await fetch("/api/data", {
+      const response = await apiFetch("/api/data", {
         method: "PUT",
-        credentials: "same-origin",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data })
       });
@@ -650,7 +652,7 @@
   async function spendXP(amount) {
     const points=Math.max(0,Math.floor(Number(amount)||0));
     if(!points||data.xp<points){showToast("Bu xarid uchun ochkolaringiz yetarli emas.","error");return false;}
-    try{const response=await fetch("/api/xp/spend",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:points})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"XP yechilmadi.");data.xp=Number(result.xpBalance||0);data.spentXP=(Number(data.spentXP)||0)+points;saveData();return true;}
+    try{const response=await apiFetch("/api/xp/spend",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({amount:points})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"XP yechilmadi.");data.xp=Number(result.xpBalance||0);data.spentXP=(Number(data.spentXP)||0)+points;saveData();return true;}
     catch(error){showToast(error.message||"XP yechishda xatolik yuz berdi.","error");return false;}
   }
 
@@ -885,7 +887,7 @@
     if (remoteAuthenticated) {
       try {
         if (!await flushRemoteSync()) throw new Error("Ma’lumotlar serverga saqlanmadi. Qayta urinib ko‘ring.");
-        const response = await fetch("/api/profile", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,username})});
+        const response = await apiFetch("/api/profile", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,username})});
         const result = await response.json().catch(()=>({}));
         if (!response.ok || !result.success) throw new Error(result.message || "Profil serverda saqlanmadi.");
       } catch (error) { showToast(error.message || "Profilni saqlashda xatolik.", "error"); return; }
@@ -1023,8 +1025,10 @@
     const terms = formData.get("terms");
     const age = calculateAge(birthdate);
 
-    if (name.length < 2 || !email || age === null || !terms) {
-      showToast("Barcha maydonlarni to‘g‘ri to‘ldiring.", "error");
+    const missing=["register-name","register-email","register-birthdate","register-password"].find(id=>!$("#"+id)?.value?.trim());
+    if (missing || name.length < 2 || !email || age === null || !terms) {
+      const messages={uz:"Iltimos, barcha majburiy maydonlarni to‘ldiring.",ru:"Пожалуйста, заполните все обязательные поля.",en:"Please complete all required fields."};
+      (missing?$("#"+missing):(!terms?$("#register-form [name=terms]"):$("#register-birthdate")))?.focus();showToast(messages[settings.language]||messages.uz,"error");
       return;
     }
     if (password.length < 8 || password.length > 128) {
@@ -1040,9 +1044,9 @@
     if (button) { button.disabled = true; button.textContent = "Hisob yaratilmoqda..."; }
 
     try {
-      const response = await fetch("/api/register", {
+      const response = await apiFetch("/api/register", {
         method: "POST",
-        credentials: "same-origin",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, username, email, birthdate, password, termsAccepted: true })
       });
@@ -1054,6 +1058,7 @@
       }
 
       remoteAuthenticated = true;
+      if(result.token)localStorage.setItem(API_TOKEN_KEY,result.token);
       localStorage.removeItem(SESSION_KEY);
       data = createInitialData();
       data.profile.name = name;
@@ -1066,7 +1071,7 @@
       showApplication();
       showToast("SmartGoal’ga xush kelibsiz!");
     } catch (error) {
-      showToast(error.message || "Server bilan bog‘lanib bo‘lmadi.", "error");
+      console.error("SmartGoal registration error:",error); const fallback={uz:"Server bilan aloqa o‘rnatilmadi. Internetni tekshirib qayta urinib ko‘ring.",ru:"Не удалось связаться с сервером. Проверьте интернет и повторите попытку.",en:"Could not reach the server. Check your connection and try again."};showToast(error.message&&error.message!=="Failed to fetch"?error.message:(fallback[settings.language]||fallback.uz),"error");
       if (error.retryAfter > 0) showRegistrationRetry(error.retryAfter);
     } finally {
       if (button) { button.disabled = false; button.textContent = originalText || "Hisob yaratish"; }
@@ -1088,9 +1093,9 @@
     if (button) { button.disabled = true; button.textContent = "Tekshirilmoqda..."; }
 
     try {
-      const response = await fetch("/api/login", {
+      const response = await apiFetch("/api/login", {
         method: "POST",
-        credentials: "same-origin",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ identifier, password })
       });
@@ -1098,6 +1103,7 @@
       if (!response.ok || !result.success) throw new Error(result.message || "Kirish amalga oshmadi.");
 
       remoteAuthenticated = true;
+      if(result.token)localStorage.setItem(API_TOKEN_KEY,result.token);
       localStorage.removeItem(SESSION_KEY);
       await loadRemoteData();
       if (!data.profile.name || data.profile.name === "SmartGoal foydalanuvchisi") {
@@ -1121,7 +1127,7 @@
   }
 
   async function loadRemoteData() {
-    const response = await fetch("/api/data", { credentials: "same-origin" });
+    const response = await apiFetch("/api/data", { credentials: "include" });
     if (!response.ok) throw new Error(response.status === 401 ? "Sessiya tugagan. Qayta kiring." : "Ma’lumotlarni yuklab bo‘lmadi.");
     const result = await response.json();
     if (!result.success || !result.data) throw new Error("Serverdan kelgan ma’lumot noto‘g‘ri.");
@@ -1141,7 +1147,7 @@
 
   async function logout() {
     try {
-      await fetch("/api/logout", { method: "POST", credentials: "same-origin" });
+      await apiFetch("/api/logout", { method: "POST", credentials: "include" });
     } catch (error) {
       console.warn("Serverdan chiqish so‘rovi bajarilmadi:", error);
     }
@@ -1360,8 +1366,8 @@
           } else {
             try {
               if (!await flushRemoteSync()) throw new Error("Vazifa serverga saqlanmadi. Internetni tekshirib, qayta urinib ko‘ring.");
-              const response = await fetch("/api/tasks/complete", {
-                method: "POST", credentials: "same-origin",
+              const response = await apiFetch("/api/tasks/complete", {
+                method: "POST", credentials: "include",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ task: { id: task.id }, language: settings.language })
               });
@@ -1498,7 +1504,7 @@
       let purchasedItem;
       if (remoteAuthenticated) {
         if (!await flushRemoteSync()) throw new Error("Ma’lumotlar serverga saqlanmadi. Qayta urinib ko‘ring.");
-        const response = await fetch("/api/store/purchase", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({itemId:id})});
+        const response = await apiFetch("/api/store/purchase", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({itemId:id})});
         const result = await response.json().catch(()=>({}));
         if (!response.ok || !result.success) throw new Error(result.message || "Xaridni amalga oshirib bo‘lmadi.");
         data.xp = Number(result.xpBalance || 0);
@@ -2248,7 +2254,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     output.innerHTML = "<p>AI kun tartibingizni tahlil qilmoqda…</p>";
     if (button) button.disabled = true;
     try {
-      const response = await fetch("/api/ai", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message:prompts[language]||prompts.uz,language,history:[]})});
+      const response = await apiFetch("/api/ai", {method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message:prompts[language]||prompts.uz,language,history:[]})});
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success) throw new Error(result.message || "AI maslahat bera olmadi.");
       output.innerHTML = formatAIMessage(result.answer || "");
@@ -2265,7 +2271,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     const button = document.querySelector("[data-action='generate-routine']");
     if (button) { button.disabled = true; button.textContent = settings.language==="ru"?"AI составляет распорядок...":settings.language==="en"?"AI is building your routine...":"AI reja tuzmoqda..."; }
     try {
-      const response = await fetch("/api/ai", { method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"routine",prompt,language:settings.language}) });
+      const response = await apiFetch("/api/ai", { method:"POST", credentials:"same-origin", headers:{"Content-Type":"application/json"}, body:JSON.stringify({action:"routine",prompt,language:settings.language}) });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success) throw new Error(result.message || "AI kun tartibini tuza olmadi.");
       const match = String(result.answer || "").match(/\[[\s\S]*\]/);
@@ -2542,7 +2548,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
         ${visibleItems.map(item => {
           const owned = data.inventory.some(product => product.id === item.id);
           const canAfford = Number(data.xp) >= item.price;
-          return `<article class="store-item"><div class="store-preview">${icon(item.icon,45)}</div><div class="store-content"><h3>${escapeHTML(item.name)}</h3><p>${escapeHTML(item.description)}</p><div class="store-price"><strong>${formatNumber(item.price)} XP</strong>${owned ? `<button class="secondary-button" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button>` : `<button class="primary-button" type="button" data-action="buy-item" data-id="${escapeHTML(item.id)}" ${canAfford?"":"disabled"}>${canAfford?"Xarid":"XP yetarli emas"}</button>`}</div></div></article>`;
+          return `<article class="store-item" id="store-item-${escapeHTML(item.id)}"><div class="store-preview">${icon(item.icon,45)}</div><div class="store-content"><h3>${escapeHTML(item.name)}</h3><p>${escapeHTML(item.description)}</p><div class="store-price"><strong>${formatNumber(item.price)} XP</strong>${owned ? `<button class="secondary-button" type="button" data-action="use-item" data-id="${escapeHTML(item.id)}">Qo‘llash</button>` : `<button class="primary-button" type="button" data-action="buy-item" data-id="${escapeHTML(item.id)}" ${canAfford?"":"disabled"}>${canAfford?"Xarid":"XP yetarli emas"}</button>`}</div></div></article>`;
         }).join("") || emptyState("Bu kategoriyada mahsulot yo‘q","Boshqa kategoriyani tanlang.","package")}
       </div>
       <section class="card" style="margin-top:22px"><h3 class="card-title">Sizning kolleksiyangiz</h3><p class="card-description">Sotib olgan mahsulotlaringiz shu yerda saqlanadi.</p><div class="badge-grid" style="margin-top:16px">
@@ -2692,9 +2698,9 @@ remove planner task block      <section class="card" style="margin-top:20px">
     };
 
     try {
-      const response = await fetch("/api/ai", {
+      const response = await apiFetch("/api/ai", {
         method: "POST",
-        credentials: "same-origin",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "chat", message, history: aiConversation.slice(0, -1), language: settings.language })
       });
@@ -2732,7 +2738,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
       en:"Analyze my goals, tasks, daily routine and recent progress. Give me 3 specific, realistic, prioritized recommendations that are useful right now. Briefly explain each one. Do not invent missing information."
     };
     try{
-      const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message:prompts[settings.language]||prompts.uz,language:settings.language,history:[]})});
+      const response=await apiFetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"chat",message:prompts[settings.language]||prompts.uz,language:settings.language,history:[]})});
       const result=await response.json().catch(()=>({}));
       if(!response.ok||!result.success)throw new Error(result.message||"AI maslahat bera olmadi.");
       output.innerHTML=formatAIMessage(result.answer);
@@ -2742,7 +2748,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
 
   async function generateAIPlan() {
     const output=$("#ai-plan-output"),button=document.querySelector("[data-action='generate-ai-plan']");if(!output)return;if(button)button.disabled=true;output.textContent=settings.language==="ru"?"AI анализирует ваши цели и задачи...":settings.language==="en"?"AI is analyzing your goals and tasks...":"AI maqsadlaringiz va vazifalaringizni tahlil qilmoqda...";
-    try{const response=await fetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"plan",language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI reja tuza olmadi.");output.innerHTML=formatAIMessage(result.answer);}
+    try{const response=await apiFetch("/api/ai",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"plan",language:settings.language})});const result=await response.json().catch(()=>({}));if(!response.ok||!result.success)throw new Error(result.message||"AI reja tuza olmadi.");output.innerHTML=formatAIMessage(result.answer);}
     catch(error){output.textContent=error.message||"AI reja tuzishda xatolik yuz berdi.";}
     finally{if(button)button.disabled=false;}
   }
@@ -2965,7 +2971,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
             <h3>Rang mavzusi</h3>
             <p>Ba’zi ranglar do‘kondan ochko evaziga olinadi.</p>
             <div class="theme-options">
-              ${["violet", "ocean", "sky", "emerald", "sunset", "rose", "lavender", "mint"].map(theme => {
+              ${["violet", "ocean", "sky", "emerald", "sunset", "rose", "lavender", "mint", "graphite", "ice", "amber"].map(theme => {
                 const free = theme === "violet";
                 const owned = data.inventory.some(item => item.id === `theme-${theme}`);
                 const available = free || owned;
@@ -2992,12 +2998,12 @@ remove planner task block      <section class="card" style="margin-top:20px">
 
           <div class="setting-row">
             <div class="setting-info"><strong>Ovoz effektlari</strong><small>Vazifa bajarilganda qisqa ovoz.</small></div>
-            <button class="toggle ${settings.sound ? "active" : ""}" type="button" data-action="toggle-sound" aria-label="Ovoz sozlamasi"></button>
+            <button class="toggle ${settings.sound ? "active" : ""}" type="button" role="switch" aria-checked="${settings.sound}" data-action="toggle-sound" aria-label="Ovoz sozlamasi"><span class="toggle-state">${settings.sound ? "ON" : "OFF"}</span></button>
           </div>
 
           <div class="setting-row">
             <div class="setting-info"><strong>Kamaytirilgan animatsiya</strong><small>Harakatlar sonini kamaytirish.</small></div>
-            <button class="toggle ${settings.reducedMotion ? "active" : ""}" type="button" data-action="toggle-motion" aria-label="Animatsiya sozlamasi"></button>
+            <button class="toggle ${settings.reducedMotion ? "active" : ""}" type="button" role="switch" aria-checked="${settings.reducedMotion}" data-action="toggle-motion"><span class="toggle-state">${settings.reducedMotion ? "ON" : "OFF"}</span></button>
           </div>
         </div>
       `;
@@ -3347,6 +3353,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Faollik zanjiri":"Activity streak","Ketma-ket faol kun":"Consecutive active days"
   });
 
+  Object.assign(UI_TRANSLATIONS.ru,{"Maqsadlaringizni boshqaring":"Управляйте своими целями","Rejalashtiring va natijaga erishing":"Планируйте и достигайте результатов","Rivojlanishingizni kuzating":"Следите за своим прогрессом","Har bir qadamingizni ko‘rib boring":"Отслеживайте каждый свой шаг","Birgalikda rivojlaning":"Развивайтесь вместе","Boshqalarni toping va yutuqlaringizni ulashing":"Находите единомышленников и делитесь достижениями","Ism va familiya":"Имя и фамилия","Ismingiz va familiyangiz":"Ваше имя и фамилия","Elektron pochta":"Электронная почта","Tug‘ilgan sana":"Дата рождения","Yoshingiz avtomatik hisoblanadi. Maktab yoki sinf tanlash shart emas.":"Ваш возраст рассчитывается автоматически. Указывать школу или класс не нужно.","Parol":"Пароль","Kamida 8 ta belgi":"Не менее 8 символов","Foydalanish shartlari va maxfiylik siyosatiga roziman.":"Я принимаю условия использования и политику конфиденциальности.","Batafsil":"Подробнее","Hisob yaratish":"Создать аккаунт","Ovoz va animatsiyalar":"Звук и анимация","Ovoz effektlari":"Звуковые эффекты","Vazifa bajarilganda qisqa ovoz.":"Короткий звук при выполнении задачи.","Kamaytirilgan animatsiya":"Уменьшенная анимация","Harakatlar sonini kamaytirish.":"Уменьшить количество анимаций.","Kun / tun rejimi":"Дневной / ночной режим","Interfeys ranglarini o‘zgartirish":"Изменить цвета интерфейса","Matn o‘lchami":"Размер текста","O‘qish uchun qulay hajmni tanlang.":"Выберите удобный размер текста.","Rang mavzusi":"Цветовая тема","Ba’zi ranglar do‘kondan ochko evaziga olinadi.":"Некоторые цвета открываются за очки в магазине.","Ovoz yoqildi.":"Звук включён.","Ovoz o‘chirildi.":"Звук выключен."});Object.assign(UI_TRANSLATIONS.en,{"Maqsadlaringizni boshqaring":"Manage your goals","Rejalashtiring va natijaga erishing":"Plan and achieve results","Rivojlanishingizni kuzating":"Track your progress","Har bir qadamingizni ko‘rib boring":"See every step of your journey","Birgalikda rivojlaning":"Grow together","Boshqalarni toping va yutuqlaringizni ulashing":"Find others and share your achievements","Ism va familiya":"Full name","Ismingiz va familiyangiz":"Your full name","Elektron pochta":"Email address","Tug‘ilgan sana":"Date of birth","Yoshingiz avtomatik hisoblanadi. Maktab yoki sinf tanlash shart emas.":"Your age is calculated automatically. No school or grade information is required.","Parol":"Password","Kamida 8 ta belgi":"At least 8 characters","Foydalanish shartlari va maxfiylik siyosatiga roziman.":"I agree to the Terms of Use and Privacy Policy.","Batafsil":"Read details","Hisob yaratish":"Create account","Ovoz va animatsiyalar":"Sound and animation","Ovoz effektlari":"Sound effects","Vazifa bajarilganda qisqa ovoz.":"A short sound when a task is completed.","Kamaytirilgan animatsiya":"Reduced motion","Harakatlar sonini kamaytirish.":"Reduce interface motion.","Kun / tun rejimi":"Light / dark mode","Interfeys ranglarini o‘zgartirish":"Change interface colors","Matn o‘lchami":"Text size","O‘qish uchun qulay hajmni tanlang.":"Choose a comfortable reading size.","Rang mavzusi":"Color theme","Ba’zi ranglar do‘kondan ochko evaziga olinadi.":"Some colors can be unlocked with points in the shop.","Ovoz yoqildi.":"Sound enabled.","Ovoz o‘chirildi.":"Sound disabled."});
   const translationOriginalText = new WeakMap();
   const translationOriginalAttributes = new WeakMap();
 
@@ -3512,6 +3519,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
     const id = actionElement.dataset.id;
 
     switch (action) {
+      case "show-terms": {const lang=settings.language||"uz";const docs={uz:`<div class="terms-document"><ol><li><strong>Yosh:</strong> tug‘ilgan sanangizni to‘g‘ri kiriting; 13 yoshga to‘lmaganlar hozircha ro‘yxatdan o‘ta olmaydi.</li><li><strong>AI:</strong> Smart AI tavsiyalaridan mas’uliyat bilan foydalaning, muhim qarorlarni tekshiring.</li><li><strong>Hurmat:</strong> admin va foydalanuvchilarni haqoratlash, kamsitish, tahdid va ta’qib qilish taqiqlanadi.</li><li><strong>Halollik:</strong> XP yoki reytingni sun’iy oshirmang, xatolardan foydalanmang, begona akkauntga kirmang.</li><li><strong>Xavfsizlik:</strong> parolni sir saqlang; zararli havola, virus, spam yoki noqonuniy kontent tarqatmang.</li><li><strong>Maxfiylik:</strong> shaxsiy ma’lumotlarni asrang va ommaviy ulashish sozlamalarini tekshiring.</li><li><strong>Qonuniylik:</strong> platformadan qonuniy foydalaning; qoidabuzarlik cheklovga olib kelishi mumkin.</li></ol><p>Rozilik ushbu qoidalarga amal qilishga va’da berishingizni anglatadi.</p></div>`,ru:`<div class="terms-document"><ol><li><strong>Возраст:</strong> указывайте настоящую дату рождения; пользователи младше 13 лет пока не могут зарегистрироваться.</li><li><strong>ИИ:</strong> ответственно используйте советы Smart AI и проверяйте важные решения.</li><li><strong>Уважение:</strong> оскорбления, дискриминация, угрозы и преследование администраторов и пользователей запрещены.</li><li><strong>Честность:</strong> не накручивайте XP и рейтинг, не используйте ошибки и не входите в чужие аккаунты.</li><li><strong>Безопасность:</strong> храните пароль в тайне; не распространяйте вредоносные ссылки, вирусы, спам и незаконный контент.</li><li><strong>Конфиденциальность:</strong> защищайте личные данные и проверяйте настройки публичного доступа.</li><li><strong>Законность:</strong> соблюдайте правила; нарушения могут привести к ограничениям.</li></ol><p>Согласие означает обязательство соблюдать эти правила.</p></div>`,en:`<div class="terms-document"><ol><li><strong>Age:</strong> enter your real date of birth; users under 13 cannot register at this time.</li><li><strong>AI:</strong> use Smart AI responsibly and verify important decisions.</li><li><strong>Respect:</strong> insults, discrimination, threats, and harassment of admins or users are prohibited.</li><li><strong>Fair play:</strong> do not manipulate XP or rankings, exploit errors, or access other accounts.</li><li><strong>Security:</strong> keep your password private; do not share malicious links, malware, spam, or illegal content.</li><li><strong>Privacy:</strong> protect personal information and check public-sharing settings.</li><li><strong>Lawful use:</strong> follow platform rules; violations may result in restrictions.</li></ol><p>By agreeing, you promise to follow these rules.</p></div>`};const title={uz:"Foydalanish shartlari",ru:"Условия использования",en:"Terms of Use"},ok={uz:"Tushunarli",ru:"Понятно",en:"Got it"};openModal(title[lang],docs[lang],`<button type="button" class="primary-button" data-action="close-modal">${ok[lang]}</button>`);break;}
+
       case "view-profile":
         openPublicProfile(actionElement.dataset.username);
         break;
@@ -3647,10 +3656,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
         render();
         showToast("Rang mavzusi o‘zgartirildi.");
         break;
-      case "locked-theme":
-        navigate("rewards");
-        showToast("Bu mavzuni avval do‘kondan xarid qiling.");
-        break;
+      case "locked-theme": { const theme=actionElement.dataset.colorTheme,lang=settings.language||"uz";const msg={uz:"Bu rang hali ochilmagan. Avval do‘kondan xarid qiling.",ru:"Эта тема ещё закрыта. Сначала приобретите её в магазине.",en:"This theme is locked. Purchase it in the shop first."};const buy={uz:"Xarid qilish",ru:"Купить",en:"Purchase"};openModal(lang==="ru"?"Тема заблокирована":lang==="en"?"Theme locked":"Mavzu ochilmagan",`<p>${msg[lang]}</p>`,`<button type="button" class="primary-button" data-action="shop-theme" data-theme="${escapeHTML(theme)}">${buy[lang]}</button>`);break;}
+      case "shop-theme": {const theme=actionElement.dataset.theme;storeFilter="theme";closeModal();navigate("rewards");requestAnimationFrame(()=>document.getElementById("store-item-theme-"+theme)?.scrollIntoView({behavior:"smooth",block:"center"}));break;}
 
       case "toggle-sound":
         settings.sound = !settings.sound;
@@ -3838,7 +3845,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     const container=$("#community-leaderboard");
     if(!container)return;
     try{
-      const response=await fetch("/api/users/leaderboard",{credentials:"same-origin"});
+      const response=await apiFetch("/api/users/leaderboard",{credentials:"same-origin"});
       const result=await response.json().catch(()=>({}));
       if(!response.ok||!result.success)throw new Error(result.message||"Reyting yuklanmadi.");
       communityLeaderboard=Array.isArray(result.users)?result.users:[];
@@ -3852,7 +3859,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     if (!username) return;
     openModal("Foydalanuvchi profili", '<div class="profile-loading">Profil yuklanmoqda...</div>', '<button class="secondary-button" type="button" data-action="close-modal">Yopish</button>');
     try {
-      const response = await fetch("/api/users/profile?username=" + encodeURIComponent(username), {credentials:"same-origin"});
+      const response = await apiFetch("/api/users/profile?username=" + encodeURIComponent(username), {credentials:"same-origin"});
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success || !result.profile) throw new Error(result.message || "Profilni yuklab bo‘lmadi.");
       const p = result.profile, rank = getRank(Number(p.totalEarnedXP || p.xp || 0));
@@ -3905,9 +3912,9 @@ remove planner task block      <section class="card" style="margin-top:20px">
     results.innerHTML = emptyState("Qidirilmoqda...", "Foydalanuvchilar tekshirilmoqda.", "loader-circle");
 
     try {
-      const response = await fetch("/api/users/search?username=" + encodeURIComponent(query), {
+      const response = await apiFetch("/api/users/search?username=" + encodeURIComponent(query), {
         method: "GET",
-        credentials: "same-origin",
+        credentials: "include",
         headers: { "Accept": "application/json" }
       });
       const result = await response.json().catch(() => ({}));
@@ -3956,7 +3963,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     const container = $("#community-relations");
     if (!container) return;
     try {
-      const response = await fetch("/api/friends", { credentials: "same-origin" });
+      const response = await apiFetch("/api/friends", { credentials: "include" });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success) throw new Error(result.message || "Do‘stlar ro‘yxatini yuklab bo‘lmadi.");
       const incoming = Array.isArray(result.incoming) ? result.incoming : [];
@@ -3988,8 +3995,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
 
   async function sendFriendRequest(userId) {
     try {
-      const response = await fetch("/api/friends/request", {
-        method: "POST", credentials: "same-origin",
+      const response = await apiFetch("/api/friends/request", {
+        method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId })
       });
@@ -4008,8 +4015,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
 
   async function respondFriendRequest(requestId, decision) {
     try {
-      const response = await fetch("/api/friends/respond", {
-        method: "POST", credentials: "same-origin",
+      const response = await apiFetch("/api/friends/respond", {
+        method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ requestId, decision })
       });
@@ -4044,7 +4051,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     localStorage.removeItem(SESSION_KEY);
 
     try {
-      const response = await fetch("/api/me", { credentials: "same-origin" });
+      const response = await apiFetch("/api/me", { credentials: "include" });
       const result = await response.json().catch(() => ({}));
       if (!response.ok || !result.success || !result.user) throw new Error("Not authenticated");
       remoteAuthenticated = true;
