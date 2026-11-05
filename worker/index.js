@@ -1,6 +1,7 @@
 const SESSION_COOKIE = "sg_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
-const PASSWORD_ITERATIONS = 210000;
+// Keep within the Cloudflare Workers Web Crypto PBKDF2 iteration limit.
+const PASSWORD_ITERATIONS = 100000;
 const MAX_BODY_BYTES = 1024 * 1024;
 
 const json = (body, status = 200, headers = {}) =>
