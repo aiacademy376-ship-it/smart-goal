@@ -3596,6 +3596,87 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Eslatmalar sahifa ochiq turganda ishlaydi.": "Reminders work while the page is open."
   });
 
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Sky mavzusi": "Тема Sky",
+    "Gilos gullari profil foni": "Фон профиля «Цветущая сакура»",
+    "Tumanlik profil foni": "Фон профиля «Туманность»",
+    "Oltin avatar ramkasi": "Золотая рамка аватара",
+    "Olim belgisi": "Значок учёного",
+    "Kashfiyotchi belgisi": "Значок исследователя",
+    "Neon avatar ramkasi": "Неоновая рамка аватара",
+    "Lavanda mavzusi": "Лавандовая тема",
+    "Yalpiz mavzusi": "Мятная тема",
+    "Marjon profil foni": "Коралловый фон профиля",
+    "Cho‘g‘ profil foni": "Огненный фон профиля",
+    "Ketma-ketlik belgisi": "Значок серии",
+    "Ijodkor belgisi": "Значок создателя",
+    "Billur avatar ramkasi": "Хрустальная рамка аватара",
+    "Olov avatar ramkasi": "Огненная рамка аватара",
+    "Grafit mavzusi": "Графитовая тема",
+    "Muz mavzusi": "Ледяная тема",
+    "Qahrabo mavzusi": "Янтарная тема",
+    "Ocean profil foni": "Океанский фон профиля",
+    "Tog‘ profil foni": "Горный фон профиля",
+    "Shimol yog‘dusi tungi foni": "Ночной фон «Северное сияние»",
+    "Diqqat Pro belgisi": "Значок «Фокус Pro»",
+    "Innovator belgisi": "Значок новатора",
+    "Mentor belgisi": "Значок наставника",
+    "Prism avatar ramkasi": "Призматическая рамка аватара",
+    "Carbon avatar ramkasi": "Углеродная рамка аватара",
+    "Aurora avatar ramkasi": "Рамка аватара «Северное сияние»",
+    "Okean mavzusi": "Океанская тема",
+    "Zumrad mavzusi": "Изумрудная тема",
+    "Shafaq mavzusi": "Тема «Закат»",
+    "Atirgul mavzusi": "Розовая тема",
+    "Yarim tun foni": "Полуночный фон",
+    "Galaktika foni": "Галактический фон",
+    "Qirollik foni": "Королевский фон",
+    "Diqqat belgisi": "Значок концентрации",
+    "Olmos belgisi": "Алмазный значок",
+    "Maxsus avatar ramkasi": "Особая рамка аватара",
+    "Quruvchi belgisi": "Значок созидателя"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Sky mavzusi": "Sky theme",
+    "Gilos gullari profil foni": "Cherry blossom profile background",
+    "Tumanlik profil foni": "Nebula profile background",
+    "Oltin avatar ramkasi": "Gold avatar frame",
+    "Olim belgisi": "Scholar badge",
+    "Kashfiyotchi belgisi": "Explorer badge",
+    "Neon avatar ramkasi": "Neon avatar frame",
+    "Lavanda mavzusi": "Lavender theme",
+    "Yalpiz mavzusi": "Mint theme",
+    "Marjon profil foni": "Coral profile background",
+    "Cho‘g‘ profil foni": "Ember profile background",
+    "Ketma-ketlik belgisi": "Streak badge",
+    "Ijodkor belgisi": "Creator badge",
+    "Billur avatar ramkasi": "Crystal avatar frame",
+    "Olov avatar ramkasi": "Flame avatar frame",
+    "Grafit mavzusi": "Graphite theme",
+    "Muz mavzusi": "Ice theme",
+    "Qahrabo mavzusi": "Amber theme",
+    "Ocean profil foni": "Ocean profile background",
+    "Tog‘ profil foni": "Mountain profile background",
+    "Shimol yog‘dusi tungi foni": "Aurora night background",
+    "Diqqat Pro belgisi": "Focus Pro badge",
+    "Innovator belgisi": "Innovator badge",
+    "Mentor belgisi": "Mentor badge",
+    "Prism avatar ramkasi": "Prism avatar frame",
+    "Carbon avatar ramkasi": "Carbon avatar frame",
+    "Aurora avatar ramkasi": "Aurora avatar frame",
+    "Okean mavzusi": "Ocean theme",
+    "Zumrad mavzusi": "Emerald theme",
+    "Shafaq mavzusi": "Sunset theme",
+    "Atirgul mavzusi": "Rose theme",
+    "Yarim tun foni": "Midnight background",
+    "Galaktika foni": "Galaxy background",
+    "Qirollik foni": "Royal background",
+    "Diqqat belgisi": "Focus badge",
+    "Olmos belgisi": "Diamond badge",
+    "Maxsus avatar ramkasi": "Special avatar frame",
+    "Quruvchi belgisi": "Builder badge"
+  });
+
   const translationOriginalText = new WeakMap();
   const translationOriginalAttributes = new WeakMap();
 
@@ -3943,6 +4024,20 @@ remove planner task block      <section class="card" style="margin-top:20px">
       const itemName = dictionary[match[1]] || match[1];
       return language === "ru" ? itemName + " успешно куплен!" : language === "en" ? itemName + " purchased successfully!" : raw;
     }
+    match = normalized.match(/^(\\d+) faol maqsad$/);
+    if (match) return language === "ru" ? match[1] + " активных целей" : language === "en" ? match[1] + " active goals" : raw;
+    match = normalized.match(/^(\\d+) bajarilmagan vazifa$/);
+    if (match) return language === "ru" ? match[1] + " невыполненных задач" : language === "en" ? match[1] + " unfinished tasks" : raw;
+    match = normalized.match(/^(\\d+) kun tartibi bandi$/);
+    if (match) return language === "ru" ? match[1] + " пунктов распорядка" : language === "en" ? match[1] + " routine items" : raw;
+    match = normalized.match(/^(\\d+) ta xabar · (\\d+) ta o‘qilmagan$/);
+    if (match) return language === "ru" ? match[1] + " сообщ. · " + match[2] + " непрочитано" : language === "en" ? match[1] + " messages · " + match[2] + " unread" : raw;
+    match = normalized.match(/^Tabriklaymiz! Siz (.+)-darajaga ko‘tarildingiz\\.$/);
+    if (match) return language === "ru" ? "Поздравляем! Вы достигли " + match[1] + "-го уровня." : language === "en" ? "Congratulations! You reached level " + match[1] + "." : raw;
+    match = normalized.match(/^“(.+)” maqsadini bajardingiz\\.$/);
+    if (match) return language === "ru" ? "Вы выполнили цель «" + match[1] + "»." : language === "en" ? "You completed the goal “" + match[1] + "”." : raw;
+    match = normalized.match(/^Siz “(.+)” yutug‘ini qo‘lga kiritdingiz\\.$/);
+    if (match) return language === "ru" ? "Вы получили достижение «" + match[1] + "»." : language === "en" ? "You earned the “" + match[1] + "” achievement." : raw;
     return raw;
   }
 
