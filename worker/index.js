@@ -113,7 +113,7 @@ function validateOrigin(request, env) {
   const isSmartGoalPreview =
     parsed.protocol === "https:" &&
     !parsed.port &&
-    /^[a-z0-9-]+\\.smart-goal\\.pages\\.dev$/i.test(parsed.hostname);
+    /^[a-z0-9-]+\.smart-goal\.pages\.dev$/i.test(parsed.hostname);
 
   return allowed.includes(origin) || isSmartGoalPreview;
 }
