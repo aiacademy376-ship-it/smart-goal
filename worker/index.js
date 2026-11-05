@@ -101,14 +101,8 @@ function validateOrigin(request, env) {
     return false;
   }
 
-  const origin = parsed.origin;
-  const configured = String(env.ALLOWED_ORIGINS || "https://smart-goal.pages.dev");
-  const allowed = configured.split(",").map(value => {
-    try { return new URL(value.trim()).origin; } catch { return ""; }
-  }).filter(Boolean);
-
-  // Only the canonical SmartGoal site and explicitly configured origins may call the API.
-  return allowed.includes(origin);
+  // SmartGoal's public production site is the single allowed browser origin.
+  return parsed.origin === "https://smart-goal.pages.dev";
 }
 async function enforceRateLimit(env, key, limit, windowSeconds) {
   const now = Math.floor(Date.now() / 1000);
