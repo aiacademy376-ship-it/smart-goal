@@ -1409,7 +1409,7 @@
         task.completedAt = new Date().toISOString();
         task.xpCompletionId = uid();
         render();
-        if (task.completedAt) {
+        if (task.completedAt && task.xpCompletionId) {
           if (!remoteAuthenticated) {
             task.xpAwarded = false;
             task.xpEarned = 0;
