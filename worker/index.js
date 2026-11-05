@@ -749,7 +749,19 @@ const STORE_CATALOG = {
   "badge-streak":{price:360,type:"badge",value:"Streak"},
   "badge-creator":{price:480,type:"badge",value:"Creator"},
   "avatar-frame-crystal":{price:620,type:"avatar",value:"crystal"},
-  "avatar-frame-flame":{price:760,type:"avatar",value:"flame"}
+  "avatar-frame-flame":{price:760,type:"avatar",value:"flame"},
+  "theme-graphite":{price:220,type:"theme",value:"graphite"},
+  "theme-ice":{price:240,type:"theme",value:"ice"},
+  "theme-amber":{price:260,type:"theme",value:"amber"},
+  "background-ocean":{price:560,type:"background",value:"ocean"},
+  "background-mountain":{price:590,type:"background",value:"mountain"},
+  "background-aurora-night":{price:780,type:"background",value:"aurora-night"},
+  "badge-focus-pro":{price:650,type:"badge",value:"Focus Pro"},
+  "badge-innovator":{price:700,type:"badge",value:"Innovator"},
+  "badge-mentor":{price:820,type:"badge",value:"Mentor"},
+  "avatar-frame-prism":{price:850,type:"avatar",value:"prism"},
+  "avatar-frame-carbon":{price:900,type:"avatar",value:"carbon"},
+  "avatar-frame-aurora":{price:980,type:"avatar",value:"aurora"}
 };
 
 async function handleStorePurchase(request,env,user){
