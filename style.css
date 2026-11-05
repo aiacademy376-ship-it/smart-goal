@@ -6288,3 +6288,26 @@ button, input, select, textarea { max-width: 100%; }
 .community-count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:var(--primary-soft);color:var(--primary);font-size:10px}
 .community-panel{padding:22px}.community-panel-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}.community-panel-heading h3{font-size:16px;font-weight:850}.community-panel-heading p,.community-note{margin-top:4px;color:var(--text-muted);font-size:11px;line-height:1.6}.community-results,.community-active-list{margin-top:18px}.community-note{padding:10px 12px;border-radius:10px;background:var(--surface-2)}
 @media(max-width:560px){.community-panel{padding:15px}.community-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.community-tab:last-child{grid-column:1/-1}.community-panel-heading{flex-direction:column}.community-panel-heading .card-action{align-self:flex-start}}
+
+
+/* Destructive settings actions: make the consequences visually clear. */
+.settings-panel .setting-row.settings-danger-row .setting-info strong,
+.settings-panel .setting-row.settings-danger-row .setting-info small {
+  color: #dc2626;
+}
+
+.settings-panel .setting-row.settings-danger-row .settings-danger-button {
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.45);
+}
+
+.settings-panel .setting-row.settings-danger-row .settings-danger-button:hover {
+  color: #fff;
+  border-color: #dc2626;
+  background: #dc2626;
+}
+
+.settings-panel .setting-row.settings-danger-row .settings-danger-button:focus-visible {
+  outline: 3px solid rgba(220, 38, 38, 0.28);
+  outline-offset: 2px;
+}
