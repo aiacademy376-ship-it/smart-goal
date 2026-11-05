@@ -9,6 +9,9 @@ on:
       - smartgoal/community-settings-refresh
       - smartgoal/full-localization-routing-quality
       - smartgoal/fix-route-init-selector
+  pull_request:
+    branches:
+      - main
 
 jobs:
   validate:
