@@ -9,6 +9,7 @@ on:
       - smartgoal/community-settings-refresh
       - smartgoal/full-localization-routing-quality
       - smartgoal/fix-route-init-selector
+      - smartgoal/uzbek-routes-and-native-ui
   pull_request:
     branches:
       - main
@@ -60,14 +61,21 @@ jobs:
           assert "aiacademy376-ship-it.github.io" in html and "smart-goal.pages.dev" in html, "GitHub Pages canonical redirect is missing"
 
           for route in (
-              'dashboard: "/"', 'goals: "/goals"', 'schedule: "/tasks"',
-              'planner: "/planner"', 'analytics: "/statistics"',
-              'achievements: "/achievements"', 'rewards: "/rewards"',
-              'community: "/community"', 'ai: "/ai"',
-              'notifications: "/notifications"', 'settings: "/settings"',
-              'profile: "/profile"'
+              'dashboard: "/"', 'goals: "/maqsadlar"', 'schedule: "/vazifalar"',
+              'planner: "/kun-tartibi"', 'analytics: "/statistika"',
+              'achievements: "/yutuqlar"', 'rewards: "/mukofotlar"',
+              'community: "/hamjamiyat"', 'ai: "/suniy-intellekt"',
+              'notifications: "/bildirishnomalar"', 'settings: "/sozlamalar"',
+              'profile: "/profil"'
           ):
-              assert route in script, f"Missing application route: {route}"
+              assert route in script, f"Missing Uzbek application route: {route}"
+          for legacy_route in (
+              '"/goals": "goals"', '"/tasks": "schedule"',
+              '"/statistics": "analytics"', '"/profile": "profile"'
+          ):
+              assert legacy_route in script, f"Missing legacy route alias: {legacy_route}"
+          assert 'const canonicalInitialPath = PAGE_ROUTES[currentPage] || "/"' in script, "Old URLs must canonicalize to Uzbek routes"
+          assert 'language: "uz"' in script, "Uzbek must remain the default interface language"
           assert 'window.addEventListener("popstate"' in script, "Browser back/forward routing is missing"
           assert '$$(".nav-link").forEach' in script, "Navigation state must use the multi-element selector"
           assert not re.search(r'(?<!\$)\$\("\.nav-link"\)\.forEach', script), "Navigation initialization uses a single-element selector"
@@ -86,10 +94,36 @@ jobs:
           assert "function translateUIString(value" in script, "Shared UI message translator is missing"
           assert "messageElement.textContent = translateUIString(message)" in script, "Toast messages bypass localization"
           assert "Maqsad topildi:" in script and "Vazifa topildi:" in script, "Dynamic search-result messages are not localized"
+
+          # Every store item name and description must have a RU and EN entry.
+          store_start = script.index("const STORE_ITEMS")
+          store_end = script.index("const ACHIEVEMENTS", store_start)
+          store_source = script[store_start:store_end]
+          for item in re.finditer(r'name:\s*"([^"]+)"[\s\S]*?description:\s*"([^"]+)"', store_source):
+              for label in item.groups():
+                  assert script.count('"' + label + '"') >= 3, (
+                      f"Reward catalog label is missing a RU or EN translation: {label}"
+                  )
+
+          for label in (
+              "SMARTGOAL INTELLIGENCE",
+              "AI maqsadlaringiz, vazifalaringiz va kun tartibingizni hisobga olib, amaliy maslahat beradi. Boshqa mavzularda ham bemalol so‘rashingiz mumkin.",
+              "AI siz yozgan tilda javob beradi.", "Suhbatni tozalash",
+              "Bugungi rejam", "Kun tartibim", "Vazifalarim", "Motivatsiya",
+              "Barcha bildirishnomalar", "Barchasini o‘qilgan qilish",
+              "Bildirishnomalar yo‘q", "Yangi xabarlar shu yerda paydo bo‘ladi.",
+              "Sotib olgan mahsulotlaringiz shu yerda saqlanadi."
+          ):
+              assert script.count(label) >= 3, (
+                  f"AI/notifications/rewards UI text is missing a RU or EN translation: {label}"
+              )
+          assert 'localizedCount(Number(match[1]), "goal")' in script, "AI context counts are not localized"
+          assert 'normalized.match(/^(\\d+) ta xabar' in script, "Notification counters are not localized"
+          assert 'normalized.match(/^(.+) — bugun bajarish rejalashtirilgan' in script, "Dynamic task notifications are not localized"
           for translated_label in (
               '"Boshlovchi"', '"Afsona"', '"Birinchi qadam"',
-              '"Kun tartibi ustasi"', '"Ocean mavzusi"',
-              '"Focus Pro"', '"AI javob yozmoqda..."',
+              '"Kun tartibi ustasi"', '"Okean mavzusi"',
+              '"Diqqat Pro belgisi"', '"AI javob yozmoqda..."',
               '"AI bilan bog‘lanib bo‘lmadi."'
           ):
               assert script.count(translated_label) >= 2, (
