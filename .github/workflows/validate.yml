@@ -9,6 +9,7 @@ on:
       - smartgoal/community-settings-refresh
       - smartgoal/full-localization-routing-quality
       - smartgoal/fix-route-init-selector
+      - smartgoal/uzbek-routes-and-native-ui
   pull_request:
     branches:
       - main
