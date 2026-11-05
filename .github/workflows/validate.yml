@@ -95,8 +95,8 @@ jobs:
           assert "Maqsad topildi:" in script and "Vazifa topildi:" in script, "Dynamic search-result messages are not localized"
           for translated_label in (
               '"Boshlovchi"', '"Afsona"', '"Birinchi qadam"',
-              '"Kun tartibi ustasi"', '"Ocean mavzusi"',
-              '"Focus Pro"', '"AI javob yozmoqda..."',
+              '"Kun tartibi ustasi"', '"Okean mavzusi"',
+              '"Diqqat Pro"', '"AI javob yozmoqda..."',
               '"AI bilan bog‘lanib bo‘lmadi."'
           ):
               assert script.count(translated_label) >= 2, (
