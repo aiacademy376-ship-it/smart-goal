@@ -3,6 +3,7 @@ name: SmartGoal validation
 on:
   push:
     branches:
+      - main
       - smartgoal/cloudflare-upgrade
 
 jobs:
