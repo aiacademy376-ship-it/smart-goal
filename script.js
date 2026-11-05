@@ -66,7 +66,7 @@
   });
 
   function resolvePageFromPath(pathname = window.location.pathname) {
-    const normalized = String(pathname || "/").replace(/\\/+$/, "") || "/";
+    const normalized = String(pathname || "/").replace(/\/+$/, "") || "/";
     return ROUTE_PAGES[normalized] || "dashboard";
   }
 
@@ -3681,6 +3681,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
     updateSidebarPoints();
     updateNotificationIndicators();
     updateCurrentDate();
+    const localizedPageTitle = (UI_TRANSLATIONS[settings.language] || {})[PAGE_TITLES[currentPage]] || PAGE_TITLES[currentPage];
+    document.title = localizedPageTitle + " | SmartGoal";
     refreshIcons(content);
     refreshIcons($("#sidebar-avatar"));
     refreshIcons($("#topbar-avatar"));
