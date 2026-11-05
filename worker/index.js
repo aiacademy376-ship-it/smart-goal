@@ -102,22 +102,14 @@ function validateOrigin(request, env) {
   }
 
   const origin = parsed.origin;
-  const configured = String(env.ALLOWED_ORIGINS || "https://smart-goal.pages.dev,https://aiacademy376-ship-it.github.io");
+  const configured = String(env.ALLOWED_ORIGINS || "https://smart-goal.pages.dev");
   const allowed = configured.split(",").map(value => {
     try { return new URL(value.trim()).origin; } catch { return ""; }
   }).filter(Boolean);
 
-  // Allow only HTTPS Cloudflare Pages preview hosts for this exact project.
-  // This supports hash-based and branch-based previews without opening CORS
-  // to arbitrary *.pages.dev projects or insecure origins.
-  const isSmartGoalPreview =
-    parsed.protocol === "https:" &&
-    !parsed.port &&
-    /^[a-z0-9-]+\.smart-goal\.pages\.dev$/i.test(parsed.hostname);
-
-  return allowed.includes(origin) || isSmartGoalPreview;
+  // Only the canonical SmartGoal site and explicitly configured origins may call the API.
+  return allowed.includes(origin);
 }
-
 async function enforceRateLimit(env, key, limit, windowSeconds) {
   const now = Math.floor(Date.now() / 1000);
   const windowStart = now - (now % windowSeconds);
