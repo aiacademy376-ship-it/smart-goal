@@ -2951,8 +2951,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
           </div>
 
           <div class="setting-row settings-danger-row">
-            <div class="setting-info"><strong>Ma’lumotlarni o‘chirish</strong><small>Vazifa, maqsad, kun tartibi va boshqa bo‘limlarni tanlab o‘chirish.</small></div>
-            <button class="secondary-button settings-danger-button" type="button" data-action="reset-data">${icon("trash-2")} Tozalash</button>
+            <div class="setting-info"><strong style="color:#dc2626">Ma’lumotlarni o‘chirish</strong><small style="color:#dc2626">Vazifa, maqsad, kun tartibi va boshqa bo‘limlarni tanlab o‘chirish.</small></div>
+            <button class="secondary-button settings-danger-button" style="color:#dc2626;border-color:rgba(220,38,38,.55)" type="button" data-action="reset-data">${icon("trash-2")} Tozalash</button>
           </div>
         </div>
       `;
@@ -2983,8 +2983,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
         </div>
 
         <div class="setting-row settings-reset-row settings-danger-row">
-          <div class="setting-info"><strong>Sozlamalarni asliga qaytarish</strong><small>Til, kun/tun, rang, matn hajmi, ovoz va animatsiyalar tiklanadi. XP, profil, rasm, maqsad va vazifalar saqlanadi.</small></div>
-          <button class="secondary-button settings-danger-button" type="button" data-action="reset-preferences">Asliga qaytarish</button>
+          <div class="setting-info"><strong style="color:#dc2626">Sozlamalarni asliga qaytarish</strong><small style="color:#dc2626">Til, kun/tun, rang, matn hajmi, ovoz va animatsiyalar tiklanadi. XP, profil, rasm, maqsad va vazifalar saqlanadi.</small></div>
+          <button class="secondary-button settings-danger-button" style="color:#dc2626;border-color:rgba(220,38,38,.55)" type="button" data-action="reset-preferences">Asliga qaytarish</button>
         </div>
 
         <div class="setting-row">
