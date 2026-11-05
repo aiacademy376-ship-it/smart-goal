@@ -885,7 +885,7 @@ export default {
         if (!await enforceRateLimit(env, rateKey, 60, 60)) return json({success:false,message:"Juda ko‘p profil ochildi. Biroz kuting."},429);
         const person = await env.DB.prepare("SELECT u.id,u.name,u.username,u.created_at,u.xp_balance,d.data_json FROM users u LEFT JOIN user_data d ON d.user_id=u.id WHERE u.username=? COLLATE NOCASE LIMIT 1").bind(username).first();
         if (!person) return json({success:false,message:"Foydalanuvchi topilmadi."},404);
-        let profileData={}; try { const parsed=JSON.parse(person.data_json||"{}"); profileData=parsed.profile||{}; profileData._spentXP=Number(parsed.spentXP||0); profileData._achievements=Array.isArray(parsed.achievements)?parsed.achievements:[]; profileData._inventory=Array.isArray(parsed.inventory)?parsed.inventory:[]; } catch {}
+        let profileData={}; try { const parsed=JSON.parse(person.data_json||"{}"); profileData=parsed.profile||{}; profileData._spentXP=Number(parsed.spentXP||0); profileData._achievements=Array.isArray(parsed.achievements)?parsed.achievements:[]; profileData._inventory=Array.isArray(parsed.inventory)?parsed.inventory:[]; profileData._memories=Array.isArray(parsed.memories)?parsed.memories.filter(item=>item&&item.visibility==="public").slice(0,8):[]; } catch {}
         const birthdatePublic=profileData.birthdatePublic===true;
         return json({success:true,profile:{
           id:person.id,name:person.name,username:person.username,xp:Number(person.xp_balance||0),spentXP:Number(profileData._spentXP||0),totalEarnedXP:Number(person.xp_balance||0)+Number(profileData._spentXP||0),createdAt:person.created_at,
@@ -893,7 +893,7 @@ export default {
           background:String(profileData.background||"default"),avatarFrame:String(profileData.avatarFrame||"default"),activeBadge:String(profileData.activeBadge||"").slice(0,30),
           birthdate:birthdatePublic?String(profileData.birthdate||""):null,
           customizationScore:[Boolean(profileData.avatar),Boolean(String(profileData.bio||"").trim()),profileData.background&&profileData.background!=="default",profileData.avatarFrame&&profileData.avatarFrame!=="default",Boolean(profileData.activeBadge)].filter(Boolean).length,
-          achievements:profileData._achievements.slice(0,50).map(item=>typeof item==="string"?item:{id:String(item?.id||""),name:String(item?.name||"").slice(0,80),icon:String(item?.icon||"award").slice(0,40)}),inventory:profileData._inventory.slice(0,100).map(item=>({id:String(item?.id||"").slice(0,80),type:String(item?.type||"").slice(0,30),value:String(item?.value||"").slice(0,80)}))
+          achievements:profileData._achievements.slice(0,50).map(item=>typeof item==="string"?item:{id:String(item?.id||""),name:String(item?.name||"").slice(0,80),icon:String(item?.icon||"award").slice(0,40)}),inventory:profileData._inventory.slice(0,100).map(item=>({id:String(item?.id||"").slice(0,80),type:String(item?.type||"").slice(0,30),value:String(item?.value||"").slice(0,80)})),memories:profileData._memories.map(item=>({title:String(item.title||"").slice(0,100),description:String(item.description||"").slice(0,300),date:String(item.date||"").slice(0,10),type:String(item.type||"memory").slice(0,20),image:String(item.image||"").slice(0,120000)}))
         }});
       }
 
