@@ -2637,7 +2637,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
 
   function formatAIMessage(value) {
     const decoded = String(value || "").replace(/\\([*_#])/g, "$1").replace(/&#(?:x([0-9a-f]{1,6})|(\\d+));/gi, (match, hex, decimal) => { const code = hex ? parseInt(hex, 16) : Number(decimal); return Number.isInteger(code) && code >= 0 && code <= 0x10ffff && !(code >= 0xd800 && code <= 0xdfff) ? String.fromCodePoint(code) : match; }).replace(/&nbsp;/gi, " ");
-    const source = escapeHTML(decoded).replace(/\r\n?/g, "\n").replace(/\n[ \t]*\*[ \t]*\n/g, "\n");
+    const source = escapeHTML(decoded).replace(/\r\n?/g, "\n").replace(/[ \t]*\*+[ \t]+(?=\d{1,2}:\d{2}\s*[-—])/g, "\n- ").replace(/\n[ \t]*\*[ \t]*\n/g, "\n");
     const inline = line => line
       .replace(/`([^`]+)`/g, "<code>$1</code>")
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
