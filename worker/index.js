@@ -686,7 +686,7 @@ async function handleTaskCompletion(request,env,user){
       const ledgerId=crypto.randomUUID();
       const batch=await env.DB.batch([
         env.DB.prepare("INSERT INTO xp_ledger (id,user_id,task_id,xp,award_date,reason,created_at) VALUES (?,?,?,?,?,?,?) ON CONFLICT(user_id,task_id) DO NOTHING RETURNING xp,created_at")
-          .bind(ledgerId,user.id,taskId,suggestedXP,completedLocal,("Task: "+title).slice(0,140),now),
+          .bind(ledgerId,user.id,completionId,suggestedXP,completedLocal,("Task: "+title).slice(0,140),now),
         env.DB.prepare("UPDATE users SET xp_balance=xp_balance+(SELECT xp FROM xp_ledger WHERE id=? AND created_at=? AND xp>0),updated_at=? WHERE id=? AND EXISTS(SELECT 1 FROM xp_ledger WHERE id=? AND created_at=? AND xp>0) RETURNING xp_balance")
           .bind(ledgerId,now,now,user.id,ledgerId,now)
       ]);
