@@ -7,6 +7,7 @@ on:
       - smartgoal/cloudflare-upgrade
       - smartgoal/production-integration
       - smartgoal/community-settings-refresh
+      - smartgoal/full-localization-routing-quality
 
 jobs:
   validate:
@@ -53,6 +54,26 @@ jobs:
           assert 'data-setting="language"' in script and 'data-setting="fontSize"' in script, "Language and font-size settings must remain available"
           assert 'data-action="edit-birthdate"' in script and 'name="username"' in script, "Profile and birthday editing must remain available"
           assert "aiacademy376-ship-it.github.io" in html and "smart-goal.pages.dev" in html, "GitHub Pages canonical redirect is missing"
+
+          for route in (
+              'dashboard: "/"', 'goals: "/goals"', 'schedule: "/tasks"',
+              'planner: "/planner"', 'analytics: "/statistics"',
+              'achievements: "/achievements"', 'rewards: "/rewards"',
+              'community: "/community"', 'ai: "/ai"',
+              'notifications: "/notifications"', 'settings: "/settings"',
+              'profile: "/profile"'
+          ):
+              assert route in script, f"Missing application route: {route}"
+          assert 'window.addEventListener("popstate"' in script, "Browser back/forward routing is missing"
+          assert 'window.history[method]' in script, "Client-side route history is missing"
+          for required_translation in (
+              '"Hisobingizga kiring"', '"Username yoki elektron pochta"',
+              '"Parolni unutdingizmi?"', '"ASOSIY"', '"RIVOJLANISH"',
+              '"SHAXSIY"', '"Hisobdan chiqish"', '"SmartGoal yuklanmoqda..."'
+          ):
+              assert script.count(required_translation) >= 2, (
+                  f"Missing Uzbek source translation pair: {required_translation}"
+              )
 
           assert "translationOriginalText = new WeakMap()" in script, "Language switching source-text cache is missing"
           assert 'name="estimatedMinutes"' in script and 'name="priority"' in script, "AI task-scoring inputs are missing"
