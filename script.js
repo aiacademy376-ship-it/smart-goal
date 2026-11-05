@@ -2915,6 +2915,14 @@ remove planner task block      <section class="card" style="margin-top:20px">
         </section>
       </div>
 
+      <section class="card profile-cosmetics-section" style="margin-top:20px">
+        <div class="card-header">
+          <div><h3 class="card-title">Profil bezaklari</h3><p class="card-description">Do‘kondan olgan maxsus buyumlaringiz va hozir ishlatayotgan bezaklaringiz.</p></div>
+          <button class="card-action" type="button" data-page="rewards">Do‘konga o‘tish</button>
+        </div>
+        ${renderCosmeticShowcase(data.inventory, profile, settings.colorTheme)}
+      </section>
+
       <section class="card" style="margin-top:20px">
         <div class="card-header">
           <h3 class="card-title">Olingan badge’lar</h3>
@@ -4283,6 +4291,92 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Tug‘ilgan sanani tekshiring.":"Check your date of birth."
   });
 
+
+  // Profil, avatar yuklash va mukofot vitrinasining to‘liq RU/EN tarjimalari.
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "PNG, JPG yoki WEBP. Rasm 2 MB dan kichik bo‘lsin.":"PNG, JPG или WEBP. Размер изображения — менее 2 МБ.",
+    "Rasm 2 MB dan kichik bo‘lishi kerak.":"Размер изображения должен быть меньше 2 МБ.",
+    "Profilni tahrirlash":"Редактировать профиль","Ism va familiya":"Имя и фамилия","Username":"Имя пользователя",
+    "3–20 belgi. Faqat lotin harflari, raqam, nuqta va pastki chiziq.":"3–20 символов. Только латинские буквы, цифры, точка и подчёркивание.",
+    "Biografiya":"О себе","O‘zingiz haqingizda qisqacha...":"Кратко расскажите о себе...",
+    "Tug‘ilgan kunim va yoshim profilimda hammaga ko‘rinsin":"Показывать всем мой день рождения и возраст в профиле",
+    "Profil rasmini olib tashlash":"Удалить фотографию профиля","Profil rasmini olib tashlash":"Удалить фотографию профиля",
+    "Bekor qilish":"Отмена","Saqlash":"Сохранить","Profil muvaffaqiyatli yangilandi.":"Профиль успешно обновлён.",
+    "Ism va familiyani to‘g‘ri kiriting.":"Введите корректные имя и фамилию.","Username formati noto‘g‘ri.":"Неверный формат имени пользователя.",
+    "Rasmni yuklashda xatolik yuz berdi.":"Не удалось загрузить изображение.","Rasm 2 MB dan kichik bo‘lishi kerak.":"Размер изображения должен быть меньше 2 МБ.",
+    "Profil statistikasi":"Статистика профиля","Jami ishlab topilgan XP":"Всего заработано XP","Do‘konda sarflangan XP ham qo‘shilgan":"Включая XP, потраченные в магазине",
+    "Sarflangan XP":"Потрачено XP","Bajarilgan vazifalar":"Выполненные задачи","Yutuqlar":"Достижения",
+    "Fon, avatar ramkasi va maxsus belgi":"Фон, рамка аватара и особый значок","Olingan badge’lar":"Полученные значки",
+    "Barcha yutuqlar":"Все достижения","Hali badge yo‘q":"Пока нет значков","Vazifalarni bajaring va yutuqlarni oching.":"Выполняйте задачи и открывайте достижения.",
+    "SIZNING DARAJANGIZ":"ВАШ УРОВЕНЬ","Profil bezagi":"Оформление профиля","Profil bezagi:":"Оформление профиля:",
+    "Do‘kondan olingan buyumlar":"Предметы из магазина","Sotib olingan bezaklar":"Купленные украшения",
+    "Hozircha maxsus buyumlar yo‘q.":"Пока нет особых предметов.","Hali ochilgan yutuqlar yo‘q.":"Пока нет открытых достижений.",
+    "Profil bezaklari":"Украшения профиля","Faol":"Используется","To‘plamda":"В коллекции",
+    "Profil foni":"Фон профиля","Avatar ramkasi":"Рамка аватара","Interfeys mavzusi":"Тема интерфейса","Maxsus belgi":"Особый значок",
+    "Foydalanuvchi profili":"Профиль пользователя","Profil yuklanmoqda...":"Загрузка профиля...","Yopish":"Закрыть",
+    "Yutuqlari":"Достижения","XP balansi":"Баланс XP","Jami olgan XP":"Всего заработано XP",
+    "Daraja":"Уровень","keyingi darajagacha":"до следующего уровня","Eng yuqori daraja":"Максимальный уровень",
+    "Ommaviy yutuqlar va esdaliklar":"Публичные достижения и воспоминания","Biografiya qo‘shilmagan.":"Описание пока не добавлено.",
+    "Profilni ulashish":"Поделиться профилем","Profilni ko‘rish":"Посмотреть профиль"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "PNG, JPG yoki WEBP. Rasm 2 MB dan kichik bo‘lsin.":"PNG, JPG or WEBP. Image must be smaller than 2 MB.",
+    "Rasm 2 MB dan kichik bo‘lishi kerak.":"Image must be smaller than 2 MB.",
+    "Profilni tahrirlash":"Edit profile","Ism va familiya":"Full name","Username":"Username",
+    "3–20 belgi. Faqat lotin harflari, raqam, nuqta va pastki chiziq.":"3–20 characters. Latin letters, numbers, periods and underscores only.",
+    "Biografiya":"Bio","O‘zingiz haqingizda qisqacha...":"A little about yourself...",
+    "Tug‘ilgan kunim va yoshim profilimda hammaga ko‘rinsin":"Show my birthday and age publicly on my profile",
+    "Profil rasmini olib tashlash":"Remove profile photo","Bekor qilish":"Cancel","Saqlash":"Save",
+    "Profil muvaffaqiyatli yangilandi.":"Profile updated successfully.","Ism va familiyani to‘g‘ri kiriting.":"Please enter a valid full name.",
+    "Username formati noto‘g‘ri.":"Invalid username format.","Rasmni yuklashda xatolik yuz berdi.":"There was an error uploading the image.",
+    "Profil statistikasi":"Profile statistics","Jami ishlab topilgan XP":"Total XP earned","Do‘konda sarflangan XP ham qo‘shilgan":"Includes XP spent in the shop",
+    "Sarflangan XP":"XP spent","Bajarilgan vazifalar":"Completed tasks","Yutuqlar":"Achievements",
+    "Fon, avatar ramkasi va maxsus belgi":"Background, avatar frame and special badge","Olingan badge’lar":"Earned badges",
+    "Barcha yutuqlar":"All achievements","Hali badge yo‘q":"No badges yet","Vazifalarni bajaring va yutuqlarni oching.":"Complete tasks to unlock achievements.",
+    "SIZNING DARAJANGIZ":"YOUR LEVEL","Profil bezagi":"Profile customization","Profil bezagi:":"Profile customization:",
+    "Do‘kondan olingan buyumlar":"Items from the shop","Sotib olingan bezaklar":"Purchased cosmetics",
+    "Hozircha maxsus buyumlar yo‘q.":"No special items yet.","Hali ochilgan yutuqlar yo‘q.":"No achievements unlocked yet.",
+    "Profil bezaklari":"Profile cosmetics","Faol":"Equipped","To‘plamda":"Owned",
+    "Profil foni":"Profile background","Avatar ramkasi":"Avatar frame","Interfeys mavzusi":"Interface theme","Maxsus belgi":"Special badge",
+    "Foydalanuvchi profili":"User profile","Profil yuklanmoqda...":"Loading profile...","Yopish":"Close",
+    "Yutuqlari":"Achievements","XP balansi":"XP balance","Jami olgan XP":"Total XP earned",
+    "Daraja":"Level","keyingi darajagacha":"to next level","Eng yuqori daraja":"Maximum level",
+    "Ommaviy yutuqlar va esdaliklar":"Public achievements and memories","Biografiya qo‘shilmagan.":"No bio added yet.",
+    "Profilni ulashish":"Share profile","Profilni ko‘rish":"View profile"
+  });
+
+  function renderCosmeticShowcase(items, profile = {}, activeTheme = "violet") {
+    const ownedItems = (Array.isArray(items) ? items : []).map(owned => {
+      const product = STORE_ITEMS.find(item => item.id === owned.id);
+      if (!product) return "";
+      const active = product.type === "background" ? profile.background === product.value
+        : product.type === "avatar" ? profile.avatarFrame === product.value
+        : product.type === "badge" ? profile.activeBadge === product.value
+        : product.type === "theme" ? activeTheme === product.value : false;
+      const category = ({background:"Profil foni",avatar:"Avatar ramkasi",badge:"Maxsus belgi",theme:"Interfeys mavzusi"})[product.type] || "Profil bezagi";
+      return `<article class="cosmetic-showcase-card ${active ? "is-equipped" : ""}">
+        <div class="cosmetic-showcase-icon">${icon(product.icon,30)}</div>
+        <div class="cosmetic-showcase-info"><small>${escapeHTML(translateUIString(category))}</small><strong>${escapeHTML(translateUIString(product.name))}</strong><p>${escapeHTML(translateUIString(product.description))}</p></div>
+        <span class="cosmetic-showcase-status">${active ? icon("check-circle",13)+" "+escapeHTML(translateUIString("Faol")) : escapeHTML(translateUIString("To‘plamda"))}</span>
+      </article>`;
+    }).filter(Boolean);
+    return ownedItems.length ? '<div class="cosmetic-showcase-grid">'+ownedItems.join("")+'</div>' : '<div class="cosmetic-showcase-empty">'+escapeHTML(translateUIString("Hozircha maxsus buyumlar yo‘q."))+'</div>';
+  }
+
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Profil bezaklari":"Украшения профиля",
+    "Do‘kondan olgan maxsus buyumlaringiz va hozir ishlatayotgan bezaklaringiz.":"Ваши особые покупки и украшения, которые сейчас используются.",
+    "Do‘konga o‘tish":"Перейти в магазин",
+    "Profil bezagi":"Оформление профиля","Level":"Уровень"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Profil bezaklari":"Profile cosmetics",
+    "Do‘kondan olgan maxsus buyumlaringiz va hozir ishlatayotgan bezaklaringiz.":"Your special shop purchases and the cosmetics currently equipped.",
+    "Do‘konga o‘tish":"Visit shop",
+    "Profil bezagi":"Profile customization","Level":"Level"
+  });
+
   function translateUIString(value, dictionary = UI_TRANSLATIONS[settings.language] || {}) {
     const raw = String(value ?? "");
     const normalized = raw.trim().replace(/\s+/g, " ");
@@ -4290,6 +4384,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
     if (dictionary[normalized] !== undefined) return dictionary[normalized];
 
     const language = settings.language;
+    const levelMatch = normalized.match(/^Level (\\d+)$/i);
+    if (levelMatch) return (language === "ru" ? "Уровень " : language === "en" ? "Level " : "Level ") + levelMatch[1];
     const ruForm = (count, forms) => {
       const n = Math.abs(count) % 100, last = n % 10;
       if (n > 10 && n < 20) return forms[2];
@@ -4876,15 +4972,12 @@ remove planner task block      <section class="card" style="margin-top:20px">
         const item = ACHIEVEMENTS.find(entry => entry.id === id);
         return item ? '<span class="public-showcase-chip">'+icon(item.icon,14)+' '+escapeHTML(item.name)+'</span>' : "";
       }).join("");
-      const inventory = (Array.isArray(p.inventory) ? p.inventory : []).map(raw => {
-        const item = STORE_ITEMS.find(entry => entry.id === raw.id);
-        return item ? '<span class="public-showcase-chip">'+icon(item.icon,14)+' '+escapeHTML(item.name)+'</span>' : "";
-      }).join("");
-      const showcase = '<section class="public-showcase"><h3>Yutuqlari</h3><div class="public-showcase-list">'+(achievements||'<small>Hali ochilgan yutuqlar yo‘q.</small>')+'</div><h3>Do‘kondan olingan buyumlar</h3><div class="public-showcase-list">'+(inventory||'<small>Hozircha maxsus buyumlar yo‘q.</small>')+'</div></section>';
+      const inventoryShowcase = renderCosmeticShowcase(p.inventory, p, p.colorTheme || "violet");
+      const showcase = '<section class="public-showcase"><h3>Yutuqlari</h3><div class="public-showcase-list">'+(achievements||'<small>Hali ochilgan yutuqlar yo‘q.</small>')+'</div><h3>Do‘kondan olingan buyumlar</h3>'+inventoryShowcase+'</section>';
       const publicMemories=(Array.isArray(p.memories)?p.memories:[]).map(memory=>`<article class="public-memory-card"><div><strong>${escapeHTML(memory.title||"Yutuq")}</strong><small>${escapeHTML(formatDate(memory.date||""))}</small></div>${memory.image?`<img src="${escapeHTML(memory.image)}" alt="${escapeHTML(memory.title||"Yutuq rasmi")}" loading="lazy" decoding="async">`:""}${memory.description?`<p>${escapeHTML(memory.description)}</p>`:""}</article>`).join("");
       const memoryShowcase=publicMemories?`<section class="public-showcase"><h3>Ommaviy yutuqlar va esdaliklar</h3><div class="public-memory-list">${publicMemories}</div></section>`:"";
       const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar'+avatarFrame+'">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p>'+badge+'<p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP balansi</small></div><div><strong>'+formatNumber(p.totalEarnedXP||p.xp)+'</strong><small>Jami olgan XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div></div>'+levelProgress+birthday+'<p class="card-description">Profil bezagi: '+formatNumber(p.customizationScore||0)+' / 5</p>'+showcase+memoryShowcase+'</div>';
-      const body = $("#modal-body"); if (body) body.innerHTML = html;
+      const body = $("#modal-body"); if (body) { body.innerHTML = html; translateVisibleUI(body); }
       refreshIcons();
     } catch (error) {
       const body = $("#modal-body"); if (body) body.innerHTML = '<div class="empty-state">'+escapeHTML(error.message||"Profilni ochib bo‘lmadi.")+'</div>';

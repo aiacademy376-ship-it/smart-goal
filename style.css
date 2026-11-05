@@ -6860,3 +6860,30 @@ select option:checked, .field-select option:checked { background:#eeeaff; color:
   .community-user-result .user-item-info { flex:1 1 calc(100% - 64px); min-width:0; }
   .community-user-result .card-action { margin-left:56px; }
 }
+
+
+/* Prominent profile cosmetics: make earned shop items visible at a glance. */
+.file-picker.file-picker-icon { display:flex; flex-direction:column; align-items:flex-start; gap:7px; }
+.file-picker.file-picker-icon > span { display:inline-flex; align-items:center; gap:9px; }
+.file-picker.file-picker-icon small { display:block; max-width:100%; line-height:1.55; color:var(--text-muted); }
+.profile-cosmetics-section .card-header > div { min-width:0; }
+.profile-cosmetics-section .card-description { margin-top:5px; }
+.cosmetic-showcase-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:13px; margin-top:14px; }
+.cosmetic-showcase-card { position:relative; display:flex; align-items:center; gap:13px; min-width:0; padding:15px; border:1px solid var(--border); border-radius:16px; background:var(--surface-2); }
+.cosmetic-showcase-card.is-equipped { border-color:var(--primary); background:var(--primary-soft); box-shadow:0 0 0 1px color-mix(in srgb,var(--primary) 16%,transparent); }
+.cosmetic-showcase-icon { width:54px; height:54px; flex:0 0 54px; display:grid; place-items:center; border-radius:15px; background:var(--surface); color:var(--primary); box-shadow:0 5px 18px rgba(20,25,50,.08); }
+.cosmetic-showcase-info { min-width:0; flex:1; }
+.cosmetic-showcase-info small { display:block; margin-bottom:4px; color:var(--text-muted); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+.cosmetic-showcase-info strong { display:block; color:var(--text); font-size:13px; line-height:1.35; overflow-wrap:anywhere; }
+.cosmetic-showcase-info p { margin:4px 0 0; color:var(--text-secondary); font-size:11px; line-height:1.5; }
+.cosmetic-showcase-status { display:inline-flex; align-items:center; gap:4px; flex:0 0 auto; align-self:flex-start; padding:5px 8px; border-radius:999px; background:var(--surface); color:var(--text-muted); font-size:9px; font-weight:800; }
+.is-equipped .cosmetic-showcase-status { color:var(--primary); }
+.cosmetic-showcase-empty { margin-top:12px; padding:20px; border:1px dashed var(--border-strong); border-radius:14px; color:var(--text-muted); text-align:center; font-size:12px; }
+.public-showcase .cosmetic-showcase-grid { grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); text-align:left; }
+.public-showcase .cosmetic-showcase-card { min-height:108px; }
+@media(max-width:520px) {
+  .cosmetic-showcase-grid,.public-showcase .cosmetic-showcase-grid { grid-template-columns:minmax(0,1fr); }
+  .cosmetic-showcase-card { padding:12px; gap:10px; }
+  .cosmetic-showcase-icon { width:48px; height:48px; flex-basis:48px; }
+  .cosmetic-showcase-status { font-size:8px; }
+}
