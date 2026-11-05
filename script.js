@@ -2197,7 +2197,7 @@
                   <button class="icon-button" type="button" data-action="delete-routine" data-id="${escapeHTML(item.id)}" aria-label="O‘chirish">${icon("trash-2",15)}</button>
                 </div>
               </article>`;
-          }).join("") : emptyState("Kun tartibi hali tuzilmagan","Masalan, 07:00 — uyg‘onish, 07:15 — badantarbiya kabi bandlar qo‘shing.","sunrise")}
+          }).join("") : emptyState(translateUIString("Kun tartibi hali tuzilmagan"),translateUIString("Masalan, 07:00 — uyg‘onish, 07:15 — badantarbiya kabi bandlar qo‘shing."),"sunrise")}
         </div>
         <div class="routine-ai">
           <div><strong>${icon("sparkles",16)} AI bilan kun tartibini tuzish</strong><small>Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing. Eslatmalar sahifa ochiq turganda ishlaydi.</small></div>
@@ -2210,8 +2210,8 @@
       </section>
 
 remove planner task block      <section class="card" style="margin-top:20px">
-        <div class="card-header"><div><h3 class="card-title">Maqsadlar asosida tavsiyalar</h3><p class="card-description">AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.</p></div><button class="card-action" type="button" data-action="generate-ai-plan">AI reja tuzsin</button></div>
-        <div id="ai-plan-output" class="card-description" style="white-space:pre-wrap;margin:12px 0"></div>
+        <div class="card-header"><div><h3 class="card-title">${translateUIString("Maqsadlar asosida tavsiyalar")}</h3><p class="card-description">${translateUIString("AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.")}</p></div><button class="card-action" type="button" data-action="generate-ai-plan">AI reja tuzsin</button></div>
+        <div id="ai-plan-output" class="ai-plan-output" aria-live="polite"></div>
         ${activeGoals.length ? activeGoals.map(goal => `<div class="goal-item"><div class="goal-item-header"><div><strong>${escapeHTML(goal.title)}</strong><small>${escapeHTML(goal.description || "Maqsadga erishish uchun muntazam ishlang.")}</small></div><span class="goal-percentage">${getGoalProgress(goal).progress}%</span></div><p class="card-description">Tavsiya: ushbu maqsad uchun bugun kamida bitta kichik vazifa belgilang.</p></div>`).join("") : emptyState("Faol maqsad yo‘q","Avval maqsad yarating.","target")}
       </section>
     `;
@@ -2637,7 +2637,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
 
   function formatAIMessage(value) {
     const decoded = String(value || "").replace(/\\([*_#])/g, "$1").replace(/&#(?:x([0-9a-f]{1,6})|(\\d+));/gi, (match, hex, decimal) => { const code = hex ? parseInt(hex, 16) : Number(decimal); return Number.isInteger(code) && code >= 0 && code <= 0x10ffff && !(code >= 0xd800 && code <= 0xdfff) ? String.fromCodePoint(code) : match; }).replace(/&nbsp;/gi, " ");
-    const source = escapeHTML(decoded).replace(/\r\n?/g, "\n");
+    const source = escapeHTML(decoded).replace(/\r\n?/g, "\n").replace(/[ \t]*\*+[ \t]+(?=\d{1,2}:\d{2}\s*[-—])/g, "\n- ").replace(/\n[ \t]*\*[ \t]*\n/g, "\n");
     const inline = line => line
       .replace(/`([^`]+)`/g, "<code>$1</code>")
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
@@ -2651,7 +2651,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
       if (!line) { flushParagraph(); closeList(); continue; }
       const heading = line.match(/^#{1,3}\s+(.+)$/);
       const ordered = line.match(/^\d+[.)]\s+(.+)$/);
-      const bullet = line.match(/^[-•]\s+(.+)$/);
+      const bullet = line.match(/^(?:[-•]|\*{1,2})\s+(.+)$/);
       if (heading) { flushParagraph(); closeList(); output.push("<h3>" + inline(heading[1]) + "</h3>"); continue; }
       if (ordered || bullet) {
         flushParagraph();
@@ -4379,7 +4379,76 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Profil bezagi":"Profile customization","Level":"Level"
   });
 
-  function translateUIString(value, dictionary = UI_TRANSLATIONS[settings.language] || {}) {
+  Object.assign(UI_TRANSLATIONS.ru, {
+  "Kun tartibi hali tuzilmagan":"Распорядок дня ещё не составлен",
+  "Masalan, 07:00 — uyg‘onish, 07:15 — badantarbiya kabi bandlar qo‘shing.":"Добавьте пункты, например: 07:00 — подъём, 07:15 — зарядка.",
+  "Bugungi bajarilish":"Выполнение за сегодня",
+  "bajarildi":"выполнено",
+  "o‘tkazildi":"пропущено",
+  "vaqt yetmadi":"не хватило времени",
+  "kutilmoqda":"ожидает выполнения",
+  "SIZNING SHAXSIY REJANGIZ":"ВАШ ЛИЧНЫЙ РАСПОРЯДОК",
+  "Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.":"Назначьте время каждому делу. Вы также можете составить план вместе с AI.",
+  "AI bilan kun tartibini tuzish":"Составить распорядок с AI",
+  "Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing. Eslatmalar sahifa ochiq turganda ishlaydi.":"Укажите время пробуждения, учёбы/работы и привычки. Напоминания работают, пока страница открыта.",
+  "Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"Например: я просыпаюсь в 07:00, иду в школу в 08:30 и возвращаюсь в 14:00. Вечером хочу учить английский.",
+  "AI maslahat olish":"Получить совет AI",
+  "Kun tartibi saqlandi.":"Распорядок дня сохранён.",
+  "Kun tartibiga yangi band":"Новый пункт распорядка",
+  "Kun tartibini tahrirlash":"Изменить распорядок",
+  "Nima qilasiz?":"Что будете делать?",
+  "Davomiyligi (daqiqa)":"Продолжительность (мин.)",
+  "Qisqa izoh (ixtiyoriy)":"Краткое описание (необязательно)",
+  "Masalan: Uyg‘onish":"Например: Подъём",
+  "Masalan: Suv ichish va xonani shamollatish":"Например: Выпить воды и проветрить комнату",
+  "Vaqt va mashg‘ulot nomini to‘g‘ri kiriting.":"Укажите корректное время и название занятия.",
+  "Bu vaqtga boshqa mashg‘ulot belgilangan. Boshqa vaqt tanlang.":"На это время уже запланировано другое занятие. Выберите другое время.",
+  "Kun tartibi bandi":"Пункт распорядка дня",
+  "Bajarildi":"Выполнено",
+  "O‘tkazib yuborildi":"Пропущено",
+  "Vaqt yetmadi":"Не хватило времени",
+  "Kutilmoqda":"Ожидает выполнения",
+  "AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.":"AI проанализирует ваши цели и задачи и составит практичный план.",
+  "Tavsiya: ushbu maqsad uchun bugun kamida bitta kichik vazifa belgilang.":"Совет: запланируйте сегодня хотя бы одну небольшую задачу для этой цели.",
+  "Faol maqsad yo‘q":"Нет активных целей",
+  "Avval maqsad yarating.":"Сначала создайте цель."
+});
+Object.assign(UI_TRANSLATIONS.en, {
+  "Kun tartibi hali tuzilmagan":"Your daily routine hasn't been created yet",
+  "Masalan, 07:00 — uyg‘onish, 07:15 — badantarbiya kabi bandlar qo‘shing.":"Add routine items such as 07:00 — wake up and 07:15 — exercise.",
+  "Bugungi bajarilish":"Today's completion",
+  "bajarildi":"completed",
+  "o‘tkazildi":"skipped",
+  "vaqt yetmadi":"ran out of time",
+  "kutilmoqda":"upcoming",
+  "SIZNING SHAXSIY REJANGIZ":"YOUR PERSONAL ROUTINE",
+  "Har bir ish uchun vaqt belgilang. Rejangizni AI bilan ham birga tuzishingiz mumkin.":"Set a time for each activity. You can also build your plan with AI.",
+  "AI bilan kun tartibini tuzish":"Build your routine with AI",
+  "Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing. Eslatmalar sahifa ochiq turganda ishlaydi.":"Enter your wake-up time, study/work schedule and habits. Reminders work while the page is open.",
+  "Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"For example: I wake up at 07:00, leave for school at 08:30 and return at 14:00. I want to study English in the evening.",
+  "AI maslahat olish":"Get AI advice",
+  "Kun tartibi saqlandi.":"Daily routine saved.",
+  "Kun tartibiga yangi band":"Add a routine item",
+  "Kun tartibini tahrirlash":"Edit routine",
+  "Nima qilasiz?":"What will you do?",
+  "Davomiyligi (daqiqa)":"Duration (minutes)",
+  "Qisqa izoh (ixtiyoriy)":"Short description (optional)",
+  "Masalan: Uyg‘onish":"For example: Wake up",
+  "Masalan: Suv ichish va xonani shamollatish":"For example: Drink water and air out the room",
+  "Vaqt va mashg‘ulot nomini to‘g‘ri kiriting.":"Enter a valid time and activity name.",
+  "Bu vaqtga boshqa mashg‘ulot belgilangan. Boshqa vaqt tanlang.":"Another activity is already scheduled for this time. Choose a different time.",
+  "Kun tartibi bandi":"Routine item",
+  "Bajarildi":"Completed",
+  "O‘tkazib yuborildi":"Skipped",
+  "Vaqt yetmadi":"Ran out of time",
+  "Kutilmoqda":"Upcoming",
+  "AI maqsad va vazifalaringizni tahlil qilib, amaliy reja tuzadi.":"AI analyzes your goals and tasks to create a practical plan.",
+  "Tavsiya: ushbu maqsad uchun bugun kamida bitta kichik vazifa belgilang.":"Tip: schedule at least one small task for this goal today.",
+  "Faol maqsad yo‘q":"No active goals",
+  "Avval maqsad yarating.":"Create a goal first."
+});
+
+function translateUIString(value, dictionary = UI_TRANSLATIONS[settings.language] || {}) {
     const raw = String(value ?? "");
     const normalized = raw.trim().replace(/\s+/g, " ");
     if (dictionary[raw] !== undefined) return dictionary[raw];
