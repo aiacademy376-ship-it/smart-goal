@@ -2122,7 +2122,7 @@
         </div>
         <div class="routine-ai">
           <div><strong>${icon("sparkles",16)} AI bilan kun tartibini tuzish</strong><small>Uyg‘onish vaqtingiz, o‘qish/ish jadvalingiz va odatlaringizni yozing. Eslatmalar sahifa ochiq turganda ishlaydi.</small></div>
-          <textarea id="routine-ai-prompt" class="field-textarea" rows="2" maxlength="700" placeholder="Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman."></textarea>
+          <textarea id="routine-ai-prompt" class="field-textarea" rows="2" maxlength="700" placeholder="Masalan: 07:00 da uyg‘onaman, 08:00 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman."></textarea>
           <button class="primary-button" type="button" data-action="generate-routine">${icon("sparkles",15)} Menga kun tartibi tuz</button>
           <button class="secondary-button" type="button" data-action="generate-routine-advice">${icon("message-circle-heart",15)} AI maslahat olish</button>
           <div id="routine-ai-advice-output" class="daily-ai-advice-output" aria-live="polite"></div>
@@ -3287,10 +3287,10 @@ remove planner task block      <section class="card" style="margin-top:20px">
   const translationOriginalAttributes = new WeakMap();
 
   Object.assign(UI_TRANSLATIONS.ru, {
-    "Masalan: 20 bet kitob o‘qish":"Например: прочитать 20 страниц книги","Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.":"Кратко опишите задачу. Например: прочитать 20 страниц и записать 3 главные мысли.","Qaysi maqsadga tegishli?":"К какой цели относится?","Maqsadsiz vazifa":"Без привязки к цели","Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"Например: просыпаюсь в 07:00, ухожу в школу в 08:30, возвращаюсь в 14:00. Вечером хочу учить английский."
+    "Masalan: 20 bet kitob o‘qish":"Например: прочитать 20 страниц книги","Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.":"Кратко опишите задачу. Например: прочитать 20 страниц и записать 3 главные мысли.","Qaysi maqsadga tegishli?":"К какой цели относится?","Maqsadsiz vazifa":"Без привязки к цели","Masalan: 07:00 da uyg‘onaman, 08:00 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"Например: просыпаюсь в 07:00, ухожу в школу в 08:00, возвращаюсь в 14:00. Вечером хочу учить английский."
   });
   Object.assign(UI_TRANSLATIONS.en, {
-    "Masalan: 20 bet kitob o‘qish":"Example: read 20 pages of a book","Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.":"Briefly describe what you will do. Example: read 20 pages and write down 3 key ideas.","Qaysi maqsadga tegishli?":"Which goal is this linked to?","Maqsadsiz vazifa":"No linked goal","Masalan: 07:00 da uyg‘onaman, 08:30 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"Example: I wake up at 7:00, leave for school at 8:30, return at 14:00, and want to study English in the evening."
+    "Masalan: 20 bet kitob o‘qish":"Example: read 20 pages of a book","Nimani bajarishingizni qisqacha yozing. Masalan: 20 bet o‘qib, 3 ta muhim fikrni yozib chiqish.":"Briefly describe what you will do. Example: read 20 pages and write down 3 key ideas.","Qaysi maqsadga tegishli?":"Which goal is this linked to?","Maqsadsiz vazifa":"No linked goal","Masalan: 07:00 da uyg‘onaman, 08:00 da maktabga ketaman, 14:00 da qaytaman. Kechqurun ingliz tili o‘rganmoqchiman.":"Example: I wake up at 7:00, leave for school at 8:00, return at 14:00, and want to study English in the evening."
   });
 
   Object.assign(UI_TRANSLATIONS.ru, {
