@@ -60,14 +60,21 @@ jobs:
           assert "aiacademy376-ship-it.github.io" in html and "smart-goal.pages.dev" in html, "GitHub Pages canonical redirect is missing"
 
           for route in (
-              'dashboard: "/"', 'goals: "/goals"', 'schedule: "/tasks"',
-              'planner: "/planner"', 'analytics: "/statistics"',
-              'achievements: "/achievements"', 'rewards: "/rewards"',
-              'community: "/community"', 'ai: "/ai"',
-              'notifications: "/notifications"', 'settings: "/settings"',
-              'profile: "/profile"'
+              'dashboard: "/"', 'goals: "/maqsadlar"', 'schedule: "/vazifalar"',
+              'planner: "/kun-tartibi"', 'analytics: "/statistika"',
+              'achievements: "/yutuqlar"', 'rewards: "/mukofotlar"',
+              'community: "/hamjamiyat"', 'ai: "/suniy-intellekt"',
+              'notifications: "/bildirishnomalar"', 'settings: "/sozlamalar"',
+              'profile: "/profil"'
           ):
-              assert route in script, f"Missing application route: {route}"
+              assert route in script, f"Missing Uzbek application route: {route}"
+          for legacy_route in (
+              '"/goals": "goals"', '"/tasks": "schedule"',
+              '"/statistics": "analytics"', '"/profile": "profile"'
+          ):
+              assert legacy_route in script, f"Missing legacy route alias: {legacy_route}"
+          assert 'const canonicalInitialPath = PAGE_ROUTES[currentPage] || "/"' in script, "Old URLs must canonicalize to Uzbek routes"
+          assert 'language: "uz"' in script, "Uzbek must remain the default interface language"
           assert 'window.addEventListener("popstate"' in script, "Browser back/forward routing is missing"
           assert '$$(".nav-link").forEach' in script, "Navigation state must use the multi-element selector"
           assert not re.search(r'(?<!\$)\$\("\.nav-link"\)\.forEach', script), "Navigation initialization uses a single-element selector"
