@@ -4363,6 +4363,20 @@ remove planner task block      <section class="card" style="margin-top:20px">
     return ownedItems.length ? '<div class="cosmetic-showcase-grid">'+ownedItems.join("")+'</div>' : '<div class="cosmetic-showcase-empty">'+escapeHTML(translateUIString("Hozircha maxsus buyumlar yo‘q."))+'</div>';
   }
 
+
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Profil bezaklari":"Украшения профиля",
+    "Do‘kondan olgan maxsus buyumlaringiz va hozir ishlatayotgan bezaklaringiz.":"Ваши особые покупки и украшения, которые сейчас используются.",
+    "Do‘konga o‘tish":"Перейти в магазин",
+    "Profil bezagi":"Оформление профиля","Level":"Уровень"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Profil bezaklari":"Profile cosmetics",
+    "Do‘kondan olgan maxsus buyumlaringiz va hozir ishlatayotgan bezaklaringiz.":"Your special shop purchases and the cosmetics currently equipped.",
+    "Do‘konga o‘tish":"Visit shop",
+    "Profil bezagi":"Profile customization","Level":"Level"
+  });
+
   function translateUIString(value, dictionary = UI_TRANSLATIONS[settings.language] || {}) {
     const raw = String(value ?? "");
     const normalized = raw.trim().replace(/\s+/g, " ");
@@ -4370,6 +4384,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
     if (dictionary[normalized] !== undefined) return dictionary[normalized];
 
     const language = settings.language;
+    const levelMatch = normalized.match(/^Level (\\d+)$/i);
+    if (levelMatch) return (language === "ru" ? "Уровень " : language === "en" ? "Level " : "Level ") + levelMatch[1];
     const ruForm = (count, forms) => {
       const n = Math.abs(count) % 100, last = n % 10;
       if (n > 10 && n < 20) return forms[2];
@@ -4961,7 +4977,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
       const publicMemories=(Array.isArray(p.memories)?p.memories:[]).map(memory=>`<article class="public-memory-card"><div><strong>${escapeHTML(memory.title||"Yutuq")}</strong><small>${escapeHTML(formatDate(memory.date||""))}</small></div>${memory.image?`<img src="${escapeHTML(memory.image)}" alt="${escapeHTML(memory.title||"Yutuq rasmi")}" loading="lazy" decoding="async">`:""}${memory.description?`<p>${escapeHTML(memory.description)}</p>`:""}</article>`).join("");
       const memoryShowcase=publicMemories?`<section class="public-showcase"><h3>Ommaviy yutuqlar va esdaliklar</h3><div class="public-memory-list">${publicMemories}</div></section>`:"";
       const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar'+avatarFrame+'">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p>'+badge+'<p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP balansi</small></div><div><strong>'+formatNumber(p.totalEarnedXP||p.xp)+'</strong><small>Jami olgan XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div></div>'+levelProgress+birthday+'<p class="card-description">Profil bezagi: '+formatNumber(p.customizationScore||0)+' / 5</p>'+showcase+memoryShowcase+'</div>';
-      const body = $("#modal-body"); if (body) body.innerHTML = html;
+      const body = $("#modal-body"); if (body) { body.innerHTML = html; translateVisibleUI(body); }
       refreshIcons();
     } catch (error) {
       const body = $("#modal-body"); if (body) body.innerHTML = '<div class="empty-state">'+escapeHTML(error.message||"Profilni ochib bo‘lmadi.")+'</div>';
