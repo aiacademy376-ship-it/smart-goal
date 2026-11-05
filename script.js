@@ -402,18 +402,47 @@
 
   const priorityLabel = value => ({low:{uz:"Past",ru:"Низкий",en:"Low"},medium:{uz:"O‘rta",ru:"Средний",en:"Medium"},high:{uz:"Yuqori",ru:"Высокий",en:"High"}}[value] || {uz:"O‘rta",ru:"Средний",en:"Medium"})[settings.language] || "O‘rta";
 
+  const DATE_NAMES = {
+    uz: {
+      months: ["yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr"],
+      weekdays: ["yakshanba", "dushanba", "seshanba", "chorshanba", "payshanba", "juma", "shanba"]
+    },
+    ru: {
+      months: ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"],
+      weekdays: ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"]
+    },
+    en: {
+      months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      weekdays: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    }
+  };
+
+  const formatLocalizedDate = (date, includeWeekday = false) => {
+    const language = settings.language in DATE_NAMES ? settings.language : "uz";
+    const names = DATE_NAMES[language];
+    const day = date.getDate();
+    const month = names.months[date.getMonth()];
+    const year = date.getFullYear();
+
+    if (language === "uz") {
+      const result = `${day}-${month} ${year}-yil`;
+      return includeWeekday ? `${year}-yil ${day}-${month}, ${names.weekdays[date.getDay()]}` : result;
+    }
+    if (language === "ru") {
+      const result = `${day} ${month} ${year} г.`;
+      return includeWeekday ? `${names.weekdays[date.getDay()]}, ${result}` : result;
+    }
+    const result = `${month} ${day}, ${year}`;
+    return includeWeekday ? `${names.weekdays[date.getDay()]}, ${result}` : result;
+  };
+
   const formatDate = value => {
     if (!value) return "Sana belgilanmagan";
 
     const date = new Date(`${value}T00:00:00`);
-
     if (Number.isNaN(date.getTime())) return "Sana belgilanmagan";
 
-    return date.toLocaleDateString(getLocale(), {
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    });
+    return formatLocalizedDate(date);
   };
 
   const getLocale = () => ({
@@ -4630,12 +4659,7 @@ function translateUIString(value, dictionary = UI_TRANSLATIONS[settings.language
     const element = $("#current-date");
     if (!element) return;
 
-    element.textContent = new Date().toLocaleDateString(getLocale(), {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    });
+    element.textContent = formatLocalizedDate(new Date(), true);
   }
 
   /* -------------------- EVENT HANDLING -------------------- */
