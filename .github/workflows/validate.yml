@@ -65,6 +65,8 @@ jobs:
           ):
               assert route in script, f"Missing application route: {route}"
           assert 'window.addEventListener("popstate"' in script, "Browser back/forward routing is missing"
+          assert '$(".nav-link").forEach' in script, "Navigation state must use the multi-element selector"
+          assert '$(".nav-link").forEach' not in script, "Navigation initialization uses a single-element selector"
           assert 'window.history[method]' in script, "Client-side route history is missing"
           for required_translation in (
               '"Hisobingizga kiring"', '"Username yoki elektron pochta"',
