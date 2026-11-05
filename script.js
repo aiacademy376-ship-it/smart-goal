@@ -3949,6 +3949,9 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Qidiruvni yopish": "Close search"
   });
 
+  Object.assign(UI_TRANSLATIONS.ru, { "Kirish va ro'yxatdan o'tish": "Вход и регистрация" });
+  Object.assign(UI_TRANSLATIONS.en, { "Kirish va ro'yxatdan o'tish": "Sign in and sign up" });
+
   const translationOriginalText = new WeakMap();
   const translationOriginalAttributes = new WeakMap();
 
