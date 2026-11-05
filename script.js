@@ -3677,6 +3677,17 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Quruvchi belgisi": "Builder badge"
   });
 
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Sotib olgan mahsulotlaringiz shu yerda saqlanadi.": "Купленные вами товары будут храниться здесь.",
+    "Bugungi vazifa": "Задача на сегодня",
+    "Bugun bajarish rejalashtirilgan.": "Запланировано на сегодня."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Sotib olgan mahsulotlaringiz shu yerda saqlanadi.": "Your purchased items will be stored here.",
+    "Bugungi vazifa": "Today's task",
+    "Bugun bajarish rejalashtirilgan.": "Scheduled for today."
+  });
+
   const translationOriginalText = new WeakMap();
   const translationOriginalAttributes = new WeakMap();
 
@@ -4015,6 +4026,23 @@ remove planner task block      <section class="card" style="margin-top:20px">
     if (dictionary[normalized] !== undefined) return dictionary[normalized];
 
     const language = settings.language;
+    const ruForm = (count, forms) => {
+      const n = Math.abs(count) % 100, last = n % 10;
+      if (n > 10 && n < 20) return forms[2];
+      if (last > 1 && last < 5) return forms[1];
+      if (last === 1) return forms[0];
+      return forms[2];
+    };
+    const localizedCount = (count, kind) => {
+      if (language === "uz") return count + " " + ({goal:"faol maqsad",task:"bajarilmagan vazifa",routine:"kun tartibi bandi"}[kind]);
+      if (language === "en") return count + " " + ({goal:count===1?"active goal":"active goals",task:count===1?"unfinished task":"unfinished tasks",routine:count===1?"routine item":"routine items"}[kind]);
+      const forms = {
+        goal:["активная цель","активные цели","активных целей"],
+        task:["невыполненная задача","невыполненные задачи","невыполненных задач"],
+        routine:["пункт распорядка дня","пункта распорядка дня","пунктов распорядка дня"]
+      };
+      return count + " " + ruForm(count, forms[kind]);
+    };
     let match = normalized.match(/^Maqsad topildi:\s*(.+)$/);
     if (match) return language === "ru" ? "Найдена цель: " + match[1] : language === "en" ? "Goal found: " + match[1] : raw;
     match = normalized.match(/^Vazifa topildi:\s*(.+)$/);
@@ -4024,20 +4052,26 @@ remove planner task block      <section class="card" style="margin-top:20px">
       const itemName = dictionary[match[1]] || match[1];
       return language === "ru" ? itemName + " успешно куплен!" : language === "en" ? itemName + " purchased successfully!" : raw;
     }
-    match = normalized.match(/^(\\d+) faol maqsad$/);
-    if (match) return language === "ru" ? match[1] + " активных целей" : language === "en" ? match[1] + " active goals" : raw;
-    match = normalized.match(/^(\\d+) bajarilmagan vazifa$/);
-    if (match) return language === "ru" ? match[1] + " невыполненных задач" : language === "en" ? match[1] + " unfinished tasks" : raw;
-    match = normalized.match(/^(\\d+) kun tartibi bandi$/);
-    if (match) return language === "ru" ? match[1] + " пунктов распорядка" : language === "en" ? match[1] + " routine items" : raw;
-    match = normalized.match(/^(\\d+) ta xabar · (\\d+) ta o‘qilmagan$/);
-    if (match) return language === "ru" ? match[1] + " сообщ. · " + match[2] + " непрочитано" : language === "en" ? match[1] + " messages · " + match[2] + " unread" : raw;
-    match = normalized.match(/^Tabriklaymiz! Siz (.+)-darajaga ko‘tarildingiz\\.$/);
+    match = normalized.match(/^(\d+) faol maqsad$/);
+    if (match) return localizedCount(Number(match[1]), "goal");
+    match = normalized.match(/^(\d+) bajarilmagan vazifa$/);
+    if (match) return localizedCount(Number(match[1]), "task");
+    match = normalized.match(/^(\d+) kun tartibi bandi$/);
+    if (match) return localizedCount(Number(match[1]), "routine");
+    match = normalized.match(/^(\d+) ta xabar · (\d+) ta o‘qilmagan$/);
+    if (match) {
+      const messages = Number(match[1]), unread = Number(match[2]);
+      if (language === "en") return messages + (messages === 1 ? " message" : " messages") + " · " + unread + " unread";
+      return messages + " " + ruForm(messages, ["сообщение","сообщения","сообщений"]) + " · " + unread + " " + ruForm(unread, ["непрочитанное","непрочитанных","непрочитанных"]);
+    }
+    match = normalized.match(/^Tabriklaymiz! Siz (.+)-darajaga ko‘tarildingiz\.$/);
     if (match) return language === "ru" ? "Поздравляем! Вы достигли " + match[1] + "-го уровня." : language === "en" ? "Congratulations! You reached level " + match[1] + "." : raw;
-    match = normalized.match(/^“(.+)” maqsadini bajardingiz\\.$/);
+    match = normalized.match(/^“(.+)” maqsadini bajardingiz\.$/);
     if (match) return language === "ru" ? "Вы выполнили цель «" + match[1] + "»." : language === "en" ? "You completed the goal “" + match[1] + "”." : raw;
-    match = normalized.match(/^Siz “(.+)” yutug‘ini qo‘lga kiritdingiz\\.$/);
+    match = normalized.match(/^Siz “(.+)” yutug‘ini qo‘lga kiritdingiz\.$/);
     if (match) return language === "ru" ? "Вы получили достижение «" + match[1] + "»." : language === "en" ? "You earned the “" + match[1] + "” achievement." : raw;
+    match = normalized.match(/^(.+) — bugun bajarish rejalashtirilgan\.$/);
+    if (match) return language === "ru" ? match[1] + " — запланировано на сегодня." : language === "en" ? match[1] + " — scheduled for today." : raw;
     return raw;
   }
 
