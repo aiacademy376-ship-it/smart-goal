@@ -81,7 +81,7 @@
   function resolvePageFromPath(pathname = window.location.pathname) {
     let normalized = String(pathname || "/");
     try { normalized = decodeURIComponent(normalized); } catch {}
-    normalized = normalized.replace(/\\/+$/, "") || "/";
+    normalized = normalized.replace(/\/+$/, "") || "/";
     return ROUTE_PAGES[normalized] || "dashboard";
   }
 
