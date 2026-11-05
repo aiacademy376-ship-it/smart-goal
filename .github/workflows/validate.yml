@@ -82,7 +82,10 @@ jobs:
               )
 
           assert "translationOriginalText = new WeakMap()" in script, "Language switching source-text cache is missing"
-          assert 'trimmed.replace(/\\s+/g, " ")' in script, "Whitespace-safe translation lookup is missing"
+          assert 'raw.trim().replace(/\\s+/g, " ")' in script, "Whitespace-safe translation lookup is missing"
+          assert "function translateUIString(value" in script, "Shared UI message translator is missing"
+          assert "messageElement.textContent = translateUIString(message)" in script, "Toast messages bypass localization"
+          assert "Maqsad topildi:" in script and "Vazifa topildi:" in script, "Dynamic search-result messages are not localized"
           for translated_label in (
               '"Boshlovchi"', '"Afsona"', '"Birinchi qadam"',
               '"Kun tartibi ustasi"', '"Ocean mavzusi"',
