@@ -76,6 +76,16 @@ jobs:
               )
 
           assert "translationOriginalText = new WeakMap()" in script, "Language switching source-text cache is missing"
+          assert 'trimmed.replace(/\\s+/g, " ")' in script, "Whitespace-safe translation lookup is missing"
+          for translated_label in (
+              '"Boshlovchi"', '"Afsona"', '"Birinchi qadam"',
+              '"Kun tartibi ustasi"', '"Ocean mavzusi"',
+              '"Focus Pro"', '"AI javob yozmoqda..."',
+              '"AI bilan bog‘lanib bo‘lmadi."'
+          ):
+              assert script.count(translated_label) >= 2, (
+                  f"Missing RU/EN translation for UI label: {translated_label}"
+              )
           assert 'name="estimatedMinutes"' in script and 'name="priority"' in script, "AI task-scoring inputs are missing"
           assert "async function generateDailyAdvice()" in script, "Personal AI coaching action is missing"
           assert "async function generateRoutine()" in script, "AI routine builder is missing"
