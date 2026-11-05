@@ -8,6 +8,7 @@ on:
       - smartgoal/production-integration
       - smartgoal/community-settings-refresh
       - smartgoal/full-localization-routing-quality
+      - smartgoal/fix-route-init-selector
 
 jobs:
   validate:
