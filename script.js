@@ -1825,7 +1825,7 @@
             <div class="card-header">
               <div>
                 <h3 class="card-title">Bugungi kun tartibim</h3>
-                <p class="card-description">${routineToday.completedPercent}% bajarildi · ${routineToday.missedPercent}% bajarilmadi · ${completedToday}/${todayTasks.length} ta band</p>
+                <p class="card-description">${routineToday.completedPercent}% bajarildi · ${routineToday.missedPercent}% bajarilmadi · ${routineToday.completed}/${routineToday.total} ta band</p>
               </div>
               <button class="card-action" type="button" data-page="planner">Batafsil</button>
             </div>
