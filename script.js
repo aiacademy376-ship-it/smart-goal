@@ -3657,7 +3657,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
   }
 
   function syncNavigationState() {
-    $(".nav-link").forEach(button => {
+    $$(".nav-link").forEach(button => {
       button.classList.toggle("active", button.dataset.page === currentPage);
     });
 
