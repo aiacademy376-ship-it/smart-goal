@@ -3063,7 +3063,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
           </div>
 
           <div class="setting-row settings-reset-row">
-            <div class="setting-info"><strong style="color:#dc2626">Sozlamalarni asliga qaytarish</strong><small style="color:#dc2626">Til, kun/tun rejimi, rang mavzusi, matn hajmi, ovoz va animatsiyalar tiklanadi.</small></div>
+            <div class="setting-info"><strong style="color:#dc2626">Sozlamalarni asliga qaytarish</strong><small style="color:#dc2626">Til, kun/tun rejimi, rang mavzusi, matn o‘lchami, ovoz va animatsiyalarni asl holatiga qaytarish.</small></div>
             <button class="secondary-button" style="color:#dc2626;border-color:rgba(220,38,38,.55)" type="button" data-action="reset-preferences">Asliga qaytarish</button>
           </div>
         </div>
@@ -3195,7 +3195,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     openModal(
       "Qaysi ma’lumotlarni o‘chirmoqchisiz?",
       `
-        <p>O‘chiriladigan bo‘limlarni tanlang. XP balansi, daraja uchun yig‘ilgan XP va do‘kondan sotib olingan barcha buyumlar hech qachon o‘chirilmaydi.</p>
+        <p>O‘chiriladigan bo‘limlarni tanlang va o‘chiring. XP balansingiz, daraja uchun yig‘ilgan XP va do‘kondan sotib olingan barcha buyumlar bundan mustasno.</p>
         <div class="data-delete-options">
           <label><input type="checkbox" data-delete-scope="all" value="all"> <strong>Barchasi</strong></label>
           <label><input type="checkbox" data-delete-scope value="tasks"> Vazifalar</label>
@@ -3759,19 +3759,19 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Vazifa, maqsad, kun tartibi va boshqa bo‘limlarni tanlab o‘chirish.": "Выберите задачи, цели, распорядок и другие разделы для удаления.",
     "Tozalash": "Очистить",
     "Sozlamalarni asliga qaytarish": "Сбросить настройки",
-    "Til, kun/tun rejimi, rang mavzusi, matn hajmi, ovoz va animatsiyalar tiklanadi.": "Будут сброшены язык, дневная/ночная тема, цветовая схема, размер текста, звук и анимация.",
+    "Til, kun/tun rejimi, rang mavzusi, matn o‘lchami, ovoz va animatsiyalarni asl holatiga qaytarish.": "Будут сброшены язык, дневная/ночная тема, цветовая схема, размер текста, звук и анимация.",
     "Asliga qaytarish": "Сбросить",
     "Til va shaxsiy ma’lumotlar.": "Язык и личные данные.",
     "SmartGoal tilini tanlang.": "Выберите язык SmartGoal.",
     "O‘zbekcha": "Узбекский",
     "O‘zgartirish": "Изменить",
-    "O‘chiriladigan bo‘limlarni tanlang. XP balansi, daraja uchun yig‘ilgan XP va do‘kondan sotib olingan barcha buyumlar hech qachon o‘chirilmaydi.": "Выберите разделы для удаления. Баланс XP, накопленный для уровня XP и все товары, купленные в магазине, никогда не удаляются.",
+    "O‘chiriladigan bo‘limlarni tanlang va o‘chiring. XP balansingiz, daraja uchun yig‘ilgan XP va do‘kondan sotib olingan barcha buyumlar bundan mustasno.": "Выберите разделы и удалите их. Баланс XP, накопленный для уровня, и все товары, купленные в магазине, не затрагиваются.",
     "Kun tartibi va bajarilish tarixi": "Распорядок и история выполнения",
     "Rejalar": "Планы",
     "Saqlangan eslatmalar": "Сохранённые заметки",
     "Faollik tarixi": "История активности",
     "Tanlanganlarni o‘chirish": "Удалить выбранное",
-    "Til, kun/tun rejimi, rang mavzusi, matn hajmi, ovoz va animatsiyalar standart holatga qaytariladi.": "Язык, дневная/ночная тема, цвета, размер текста, звук и анимация будут возвращены к значениям по умолчанию.",
+    "Til, kun/tun rejimi, rang mavzusi, matn o‘lchami, ovoz va animatsiyalarni asl holatiga qaytarish.": "Язык, дневная/ночная тема, цвета, размер текста, звук и анимация будут возвращены к значениям по умолчанию.",
     "Tiklash": "Восстановить",
     "Profil yuklanmoqda...": "Загрузка профиля...",
     "Yutuqlari": "Достижения",
@@ -3843,19 +3843,19 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Vazifa, maqsad, kun tartibi va boshqa bo‘limlarni tanlab o‘chirish.": "Choose tasks, goals, routine and other sections to delete.",
     "Tozalash": "Clear",
     "Sozlamalarni asliga qaytarish": "Reset settings",
-    "Til, kun/tun rejimi, rang mavzusi, matn hajmi, ovoz va animatsiyalar tiklanadi.": "Language, light/dark mode, colors, text size, sound and motion will be reset.",
+    "Til, kun/tun rejimi, rang mavzusi, matn o‘lchami, ovoz va animatsiyalarni asl holatiga qaytarish.": "Language, light/dark mode, color theme, text size, sound and animations will be restored to their defaults.",
     "Asliga qaytarish": "Reset",
     "Til va shaxsiy ma’lumotlar.": "Language and personal information.",
     "SmartGoal tilini tanlang.": "Choose the SmartGoal language.",
     "O‘zbekcha": "Uzbek",
     "O‘zgartirish": "Change",
-    "O‘chiriladigan bo‘limlarni tanlang. XP balansi, daraja uchun yig‘ilgan XP va do‘kondan sotib olingan barcha buyumlar hech qachon o‘chirilmaydi.": "Choose which sections to delete. Your XP balance, XP earned toward levels and all purchased shop items are never deleted.",
+    "O‘chiriladigan bo‘limlarni tanlang va o‘chiring. XP balansingiz, daraja uchun yig‘ilgan XP va do‘kondan sotib olingan barcha buyumlar bundan mustasno.": "Select the sections you want to delete. Your XP balance, XP earned toward your level, and all items purchased from the shop are excluded.",
     "Kun tartibi va bajarilish tarixi": "Routine and completion history",
     "Rejalar": "Plans",
     "Saqlangan eslatmalar": "Saved notes",
     "Faollik tarixi": "Activity history",
     "Tanlanganlarni o‘chirish": "Delete selected",
-    "Til, kun/tun rejimi, rang mavzusi, matn hajmi, ovoz va animatsiyalar standart holatga qaytariladi.": "Language, light/dark mode, colors, text size, sound and motion will be restored to defaults.",
+    "Til, kun/tun rejimi, rang mavzusi, matn o‘lchami, ovoz va animatsiyalarni asl holatiga qaytarish.": "Language, light/dark mode, colors, text size, sound and motion will be restored to defaults.",
     "Tiklash": "Restore",
     "Profil yuklanmoqda...": "Loading profile...",
     "Yutuqlari": "Achievements",
@@ -4826,7 +4826,7 @@ function translateUIString(value, dictionary = UI_TRANSLATIONS[settings.language
         break;
 
       case "reset-preferences":
-        openModal("Sozlamalarni asliga qaytarish", "<p>Til, kun/tun rejimi, rang mavzusi, matn hajmi, ovoz va animatsiyalar standart holatga qaytariladi.</p>", '<button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button><button class="primary-button" type="button" data-action="confirm-reset-preferences">Tiklash</button>');
+        openModal("Sozlamalarni asliga qaytarish", "<p>Til, kun/tun rejimi, rang mavzusi, matn o‘lchami, ovoz va animatsiyalarni asl holatiga qaytarish.</p>", '<button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button><button class="primary-button" type="button" data-action="confirm-reset-preferences">Tiklash</button>');
         break;
       case "confirm-reset-preferences":
         settings = { ...settings, language: DEFAULT_SETTINGS.language, theme: DEFAULT_SETTINGS.theme, colorTheme: DEFAULT_SETTINGS.colorTheme, fontSize: DEFAULT_SETTINGS.fontSize, sound: DEFAULT_SETTINGS.sound, reducedMotion: DEFAULT_SETTINGS.reducedMotion };
