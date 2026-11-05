@@ -392,7 +392,7 @@ function detectMessageLanguage(value, fallback = "auto") {
 function preventScheduleOverlaps(answer){
   const lines=String(answer||"").split("\n");
   let previousEnd=-1,changed=false;
-  const pattern=/^(\\s*(?:(?:[-*])\\s*)?(?:\\d+[.)]\\s*)?)(\\d{1,2}):([0-5]\\d)(\\s*[–—-]\\s*)(.*?)(?:\\s*\\((\\d{1,3})\\s*(?:daqiqa|minut|minutes|mins?)\\))?(\\s*)$/iu;
+  const pattern=/^(\s*(?:(?:[-*])\s*)?(?:\d+[.)]\s*)?)(\d{1,2}):([0-5]\d)(\s*[–—-]\s*)(.*?)(?:\s*\((\d{1,3})\s*(?:daqiqa|minut|minutes|mins?)\))?(\s*)$/iu;
   for(let i=0;i<lines.length;i++){
     const match=lines[i].match(pattern);
     if(!match||!match[6])continue;
