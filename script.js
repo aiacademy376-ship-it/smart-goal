@@ -4247,7 +4247,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
     if (match) return language === "ru" ? "Показать ещё " + match[1] + " задач" : language === "en" ? "Show " + match[1] + " more tasks" : raw;
     match = normalized.match(/^Yana (\d+) ta xotirani ko‘rsatish$/);
     if (match) return language === "ru" ? "Показать ещё " + match[1] + " воспоминаний" : language === "en" ? "Show " + match[1] + " more memories" : raw;
-    match = normalized.match(/^Profil bezagi: (\d+) \\/ 5$/);
+    match = normalized.match(/^Profil bezagi: (\d+) /);
     if (match) return language === "ru" ? "Оформление профиля: " + match[1] + " / 5" : language === "en" ? "Profile customization: " + match[1] + " / 5" : raw;
     return raw;
   }
