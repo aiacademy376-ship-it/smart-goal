@@ -718,7 +718,7 @@
       return;
     }
 
-    messageElement.textContent = message;
+    messageElement.textContent = translateUIString(message);
     translateVisibleUI(toast);
     toast.classList.remove("hidden", "toast-error");
 
@@ -3627,6 +3627,91 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "AI vazifani baholay olmadi.":"AI could not evaluate the task.","XP hisoblashda xatolik.":"Error calculating XP.","Bu mahsulot sizda allaqachon mavjud.":"You already own this item.","Xarid vaqtida xatolik yuz berdi.":"An error occurred during purchase.","AI javob yozmoqda...":"AI is typing...","AI bilan bog‘lanib bo‘lmadi.":"Could not connect to AI.","AI bo‘sh javob qaytardi. Qayta urinib ko‘ring.":"AI returned an empty response. Please try again.","AI hozircha javob bera olmadi.":"AI could not respond right now.","AI reja tuzishda xatolik yuz berdi.":"An error occurred while creating the AI plan.","AI reja formatini tushunib bo‘lmadi. Qayta urinib ko‘ring.":"Could not understand the AI plan format. Please try again.","AI yaratgan vaqtlar noto‘g‘ri formatda.":"AI returned times in an invalid format.","Mavjud bandlaringiz saqlandi, AI yangi mashg‘ulotlarni qo‘shdi.":"Your existing items were kept and AI added new activities."
   });
 
+  // Translate exact and data-driven UI messages (for example, a goal title inside a toast).
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Bu xarid uchun ochkolaringiz yetarli emas.":"Недостаточно очков для этой покупки.",
+    "XP yechishda xatolik yuz berdi.":"Ошибка при списании XP.",
+    "Parol 8–128 belgi bo‘lishi kerak.":"Пароль должен содержать от 8 до 128 символов.",
+    "Xush kelibsiz!":"Добро пожаловать!",
+    "Vazifa nomini kiriting.":"Введите название задачи.",
+    "Bugun shu mazmundagi vazifa uchun XP avval berilgan.":"Сегодня за задачу с таким содержанием XP уже начислялись.",
+    "AI vazifani tekshirdi, lekin bu safar XP ajratilmadi.":"AI проверил задачу, но в этот раз XP не начислены.",
+    "Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.":"Задача снова открыта. Ранее начисленные XP не возвращаются.",
+    "Mahsulot profilingizga qo‘llandi.":"Предмет применён к вашему профилю.",
+    "Bajarilgan band va uning XP bahosi o‘zgartirilmaydi.":"Выполненный пункт и начисленные XP нельзя изменить.",
+    "Kun tartibi bandi serverga saqlanmadi. Internetni tekshirib qayta urinib ko‘ring.":"Не удалось сохранить пункт распорядка на сервере. Проверьте интернет и повторите попытку.",
+    "Kun tartibi saqlandi.":"Распорядок сохранён.",
+    "Ilova ichidagi eslatmalar yoqildi. Brauzer xabarlari bloklangan.":"Внутренние напоминания включены. Уведомления браузера заблокированы.",
+    "Ilova ichidagi eslatmalar yoqildi. Brauzer xabarlariga ruxsat berilmadi.":"Внутренние напоминания включены. Разрешение на уведомления браузера не предоставлено.",
+    "Sarlavha kiriting.":"Введите заголовок.",
+    "Profil va yutuqlar uchun jami 8 tagacha rasm saqlash mumkin.":"Для профиля и достижений можно сохранить до 8 изображений.",
+    "Zaxira fayli tayyorlandi.":"Резервная копия подготовлена.",
+    "Fayl hajmi 5 MB dan oshmasligi kerak.":"Размер файла не должен превышать 5 МБ.",
+    "Ma’lumotlar tiklandi.":"Данные восстановлены.",
+    "Bu SmartGoal zaxira fayli emas yoki buzilgan.":"Это не резервная копия SmartGoal или файл повреждён.",
+    "Kun tartibidan band o‘chirildi.":"Пункт распорядка удалён.",
+    "Maqsad o‘chirildi.":"Цель удалена.",
+    "Vazifa o‘chirildi.":"Задача удалена.",
+    "Profil havolasi nusxalandi.":"Ссылка на профиль скопирована.",
+    "Havolani nusxalab bo‘lmadi.":"Не удалось скопировать ссылку.",
+    "Xotira o‘chirildi.":"Воспоминание удалено.",
+    "Rang mavzusi o‘zgartirildi.":"Цветовая тема изменена.",
+    "Interfeys sozlamalari asliga qaytarildi.":"Настройки интерфейса сброшены.",
+    "Parolni tiklash backend ulanganda qo‘shiladi.":"Восстановление пароля появится после подключения серверной части.",
+    "Tug‘ilgan sanani tekshiring.":"Проверьте дату рождения."
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Bu xarid uchun ochkolaringiz yetarli emas.":"Not enough points for this purchase.",
+    "XP yechishda xatolik yuz berdi.":"An error occurred while deducting XP.",
+    "Parol 8–128 belgi bo‘lishi kerak.":"Password must be 8–128 characters.",
+    "Xush kelibsiz!":"Welcome!",
+    "Vazifa nomini kiriting.":"Enter a task title.",
+    "Bugun shu mazmundagi vazifa uchun XP avval berilgan.":"XP has already been awarded today for a task with similar content.",
+    "AI vazifani tekshirdi, lekin bu safar XP ajratilmadi.":"AI reviewed the task, but no XP was awarded this time.",
+    "Vazifa qayta ochildi. Avval berilgan XP qaytarib olinmaydi.":"Task reopened. Previously awarded XP will not be refunded.",
+    "Mahsulot profilingizga qo‘llandi.":"Item applied to your profile.",
+    "Bajarilgan band va uning XP bahosi o‘zgartirilmaydi.":"A completed routine item and its XP award cannot be changed.",
+    "Kun tartibi bandi serverga saqlanmadi. Internetni tekshirib qayta urinib ko‘ring.":"The routine item could not be saved to the server. Check your connection and try again.",
+    "Kun tartibi saqlandi.":"Daily routine saved.",
+    "Ilova ichidagi eslatmalar yoqildi. Brauzer xabarlari bloklangan.":"In-app reminders are enabled. Browser notifications are blocked.",
+    "Ilova ichidagi eslatmalar yoqildi. Brauzer xabarlariga ruxsat berilmadi.":"In-app reminders are enabled. Browser notification permission was not granted.",
+    "Sarlavha kiriting.":"Enter a title.",
+    "Profil va yutuqlar uchun jami 8 tagacha rasm saqlash mumkin.":"You can save up to 8 images for your profile and achievements.",
+    "Zaxira fayli tayyorlandi.":"Backup file is ready.",
+    "Fayl hajmi 5 MB dan oshmasligi kerak.":"File size must not exceed 5 MB.",
+    "Ma’lumotlar tiklandi.":"Data restored.",
+    "Bu SmartGoal zaxira fayli emas yoki buzilgan.":"This is not a SmartGoal backup file or it is corrupted.",
+    "Kun tartibidan band o‘chirildi.":"Routine item deleted.",
+    "Maqsad o‘chirildi.":"Goal deleted.",
+    "Vazifa o‘chirildi.":"Task deleted.",
+    "Profil havolasi nusxalandi.":"Profile link copied.",
+    "Havolani nusxalab bo‘lmadi.":"Could not copy the link.",
+    "Xotira o‘chirildi.":"Memory deleted.",
+    "Rang mavzusi o‘zgartirildi.":"Color theme updated.",
+    "Interfeys sozlamalari asliga qaytarildi.":"Interface settings were reset.",
+    "Parolni tiklash backend ulanganda qo‘shiladi.":"Password recovery will be added when the backend is connected.",
+    "Tug‘ilgan sanani tekshiring.":"Check your date of birth."
+  });
+
+  function translateUIString(value, dictionary = UI_TRANSLATIONS[settings.language] || {}) {
+    const raw = String(value ?? "");
+    const normalized = raw.trim().replace(/\s+/g, " ");
+    if (dictionary[raw] !== undefined) return dictionary[raw];
+    if (dictionary[normalized] !== undefined) return dictionary[normalized];
+
+    const language = settings.language;
+    let match = normalized.match(/^Maqsad topildi:\s*(.+)$/);
+    if (match) return language === "ru" ? "Найдена цель: " + match[1] : language === "en" ? "Goal found: " + match[1] : raw;
+    match = normalized.match(/^Vazifa topildi:\s*(.+)$/);
+    if (match) return language === "ru" ? "Найдена задача: " + match[1] : language === "en" ? "Task found: " + match[1] : raw;
+    match = normalized.match(/^(.+) muvaffaqiyatli xarid qilindi!$/);
+    if (match) {
+      const itemName = dictionary[match[1]] || match[1];
+      return language === "ru" ? itemName + " успешно куплен!" : language === "en" ? itemName + " purchased successfully!" : raw;
+    }
+    return raw;
+  }
+
   function translateVisibleUI(root = document.body) {
     if (!root) return;
     const dictionary = UI_TRANSLATIONS[settings.language] || {};
@@ -3641,8 +3726,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
       // HTML line wrapping can insert indentation/newlines inside a text node.
       // Normalize whitespace before dictionary lookup so the same phrase is
       // translated consistently regardless of its markup formatting.
-      const normalized = trimmed.replace(/\s+/g, " ");
-      node.nodeValue = original.replace(trimmed, dictionary[trimmed] || dictionary[normalized] || trimmed);
+      const translated = translateUIString(trimmed, dictionary);
+      node.nodeValue = original.replace(trimmed, translated);
     }
     root.querySelectorAll("input[placeholder],textarea[placeholder],button[aria-label],button[title],[data-ai-prompt]").forEach(element => {
       let originals = translationOriginalAttributes.get(element);
