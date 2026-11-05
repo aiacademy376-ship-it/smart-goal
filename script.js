@@ -2529,54 +2529,16 @@ remove planner task block      <section class="card" style="margin-top:20px">
   function renderCommunity() {
     setTimeout(loadCommunityRelations, 0);
     setTimeout(loadCommunityLeaderboard, 0);
-    return `
-      ${pageHeader(
-        "HAMJAMIYAT",
-        "Foydalanuvchilar",
-        "Username orqali boshqa foydalanuvchilarni toping."
-      )}
-
-      <section class="card">
-        <div class="form-field">
-          <label class="field-label" for="community-search">Username bo‘yicha qidirish</label>
-          <div class="input-wrap">
-            ${icon("search")}
-            <input id="community-search" type="search" placeholder="@username">
-          </div>
-          <small>Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.</small>
-        </div>
-
-        <div id="community-results" style="margin-top:20px">
-          ${emptyState("Qidiruvga tayyor", "Username kiriting. Haqiqiy foydalanuvchilar ro‘yxati backend bilan ulanadi.", "users")}
-        </div>
-      </section>
-
-      <section class="card community-leaderboard-card" style="margin-top:20px">
-        <div class="card-header"><div><h3 class="card-title">Eng faol foydalanuvchilar</h3><p class="card-description">Jami ishlab topilgan XP bo‘yicha reyting.</p></div><button class="card-action" type="button" data-action="refresh-leaderboard">Yangilash</button></div>
-        <div id="community-leaderboard">${communityLeaderboard.length ? communityLeaderboard.map(user=>`<div class="leaderboard-row"><span class="leaderboard-rank">#${user.rank}</span><div class="leaderboard-user"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username)}"><strong>${escapeHTML(user.name)}</strong></button><small>@${escapeHTML(user.username)} · Level ${getRank(Number(user.totalEarnedXP||0)).level}</small></div><strong class="leaderboard-xp">${formatNumber(user.totalEarnedXP)} XP</strong></div>`).join("") : emptyState("Reyting yuklanmoqda","Eng faol foydalanuvchilar ro‘yxati olinmoqda.","trophy")}</div>
-      </section>
-
-      <section class="card" style="margin-top:20px">
-        <div class="card-header">
-          <h3 class="card-title">Do‘stlik so‘rovlari</h3>
-          <button class="card-action" type="button" data-action="refresh-friends">Yangilash</button>
-        </div>
-        <div id="community-relations">
-          ${emptyState("Yuklanmoqda...", "Do‘stlik ma’lumotlari olinmoqda.", "users")}
-        </div>
-      </section>
-
-      <section class="card" style="margin-top:20px">
-        <h3 class="card-title">Sizning darajangiz</h3>
-        <p class="card-description">Boshqalar profilingizni ko‘rganda darajangiz va yutuqlaringizni ko‘rishi mumkin bo‘ladi.</p>
-        <div class="profile-meta">
-          <span>${icon("at-sign")} @${escapeHTML(data.profile.username || "username")}</span>
-          <span>${icon("award")} Level ${getRank().level} · ${escapeHTML(getRank().name)}</span>
-        </div>
-      </section>
-    `;
+    return pageHeader("HAMJAMIYAT","Hamjamiyat","Foydalanuvchilarni toping, so‘rovlarni boshqaring va hamjamiyat faolligini kuzating.") +
+      '<section class="community-hub"><nav class="community-tabs" aria-label="Hamjamiyat bo‘limlari">' +
+      '<button class="community-tab active" type="button" data-community-tab="search">' + icon("search",16) + ' Qidiruv</button>' +
+      '<button class="community-tab" type="button" data-community-tab="requests">' + icon("user-round-plus",16) + ' So‘rovlar <span class="community-count">' + (communityRelations.incoming.length+communityRelations.outgoing.length) + '</span></button>' +
+      '<button class="community-tab" type="button" data-community-tab="active">' + icon("activity",16) + ' Faol foydalanuvchilar</button></nav>' +
+      '<div class="community-panel" data-community-panel="search"><div class="community-panel-heading"><div><h3>Foydalanuvchi qidirish</h3><p>Username orqali SmartGoal foydalanuvchilarini toping.</p></div></div>' +
+      '<div class="form-field"><label class="field-label" for="community-search">Username</label><div class="input-wrap">' + icon("search") + '<input id="community-search" type="search" placeholder="@username" autocomplete="off"></div><small>Kamida 3 ta belgi kiriting.</small></div><div id="community-results" class="community-results">' + emptyState("Qidiruvga tayyor","Username kiriting va foydalanuvchilarni toping.","users") + '</div></div>' +
+      '<div class="community-panel hidden" data-community-panel="requests"><div class="community-panel-heading"><div><h3>Do‘stlik so‘rovlari</h3><p>Kelgan va yuborilgan so‘rovlaringizni boshqaring.</p></div><button class="card-action" type="button" data-action="refresh-friends">' + icon("refresh-cw",14) + ' Yangilash</button></div><div id="community-relations">' + emptyState("Yuklanmoqda...","Do‘stlik ma’lumotlari olinmoqda.","users") + '</div></div>' +
+      '<div class="community-panel hidden" data-community-panel="active"><div class="community-panel-heading"><div><h3>Faol foydalanuvchilar</h3><p>Hamjamiyatdagi eng faol a’zolar XP natijasi bo‘yicha.</p></div><button class="card-action" type="button" data-action="refresh-leaderboard">' + icon("refresh-cw",14) + ' Yangilash</button></div><div id="community-leaderboard" class="community-active-list">' + (communityLeaderboard.length ? communityLeaderboard.map(user => '<div class="leaderboard-row"><span class="leaderboard-rank">#' + user.rank + '</span><div class="leaderboard-user"><button class="user-profile-link" type="button" data-action="view-profile" data-username="' + escapeHTML(user.username) + '"><strong>' + escapeHTML(user.name) + '</strong></button><small>@' + escapeHTML(user.username) + ' · Level ' + getRank(Number(user.totalEarnedXP||0)).level + '</small></div><strong class="leaderboard-xp">' + formatNumber(user.totalEarnedXP) + ' XP</strong></div>').join("") : emptyState("Ro‘yxat yuklanmoqda","Faol a’zolar ro‘yxati olinmoqda.","activity")) + '</div><p class="community-note">Bu ro‘yxat XP reytingiga asoslangan; haqiqiy onlayn holat keyingi bosqichda qo‘shiladi.</p></div></section>';
   }
-
   /* -------------------- AI PAGE -------------------- */
 
   function formatAIMessage(value) {
@@ -3018,6 +2980,11 @@ remove planner task block      <section class="card" style="margin-top:20px">
         <div class="setting-row">
           <div class="setting-info"><strong>Username</strong><small>@${escapeHTML(data.profile.username || "username")}</small></div>
           <button class="secondary-button" type="button" data-action="edit-profile">Tahrirlash</button>
+        </div>
+
+        <div class="setting-row settings-reset-row">
+          <div class="setting-info"><strong>Sozlamalarni asliga qaytarish</strong><small>Til, kun/tun, rang, matn hajmi, ovoz va animatsiyalar tiklanadi. XP, profil, rasm, maqsad va vazifalar saqlanadi.</small></div>
+          <button class="secondary-button" type="button" data-action="reset-preferences">Asliga qaytarish</button>
         </div>
 
         <div class="setting-row">
@@ -3467,6 +3434,13 @@ remove planner task block      <section class="card" style="margin-top:20px">
     const storeCategory = event.target.closest("[data-store-filter]");
     if (storeCategory) { storeFilter = storeCategory.dataset.storeFilter || "all"; render(); return; }
 
+    const communityTab = event.target.closest("[data-community-tab]");
+    if (communityTab) {
+      const selected = communityTab.dataset.communityTab;
+      document.querySelectorAll("[data-community-tab]").forEach(button => button.classList.toggle("active", button === communityTab));
+      document.querySelectorAll("[data-community-panel]").forEach(panel => panel.classList.toggle("hidden", panel.dataset.communityPanel !== selected));
+      return;
+    }
     const settingsTab = event.target.closest("[data-settings-tab]");
     if (settingsTab) {
       currentSettingsTab = settingsTab.dataset.settingsTab;
@@ -3631,6 +3605,14 @@ remove planner task block      <section class="card" style="margin-top:20px">
         settings.reducedMotion = !settings.reducedMotion;
         saveSettings();
         render();
+        break;
+
+      case "reset-preferences":
+        openModal("Sozlamalarni asliga qaytarish", "<p>Faqat interfeys sozlamalari tiklanadi. XP, profil ma’lumotlari va rasmi, maqsadlar, vazifalar, kun tartibi, yutuqlar va xaridlar o‘zgarmaydi.</p>", '<button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button><button class="primary-button" type="button" data-action="confirm-reset-preferences">Tiklash</button>');
+        break;
+      case "confirm-reset-preferences":
+        settings = { ...settings, language: DEFAULT_SETTINGS.language, theme: DEFAULT_SETTINGS.theme, colorTheme: DEFAULT_SETTINGS.colorTheme, fontSize: DEFAULT_SETTINGS.fontSize, sound: DEFAULT_SETTINGS.sound, reducedMotion: DEFAULT_SETTINGS.reducedMotion };
+        saveSettings(); closeModal(); currentSettingsTab = "general"; render(); showToast("Interfeys sozlamalari asliga qaytarildi.");
         break;
 
       case "export-data":
