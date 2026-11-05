@@ -476,7 +476,6 @@
   let aiRequestInFlight = false;
   let registerRetryTimer = null;
   let lastTranslatedLanguage = null;
-  let communityRelations = { incoming: [], outgoing: [], friends: [] };
   let communityLeaderboard = [];
   const taskActionsInFlight = new Set();
   const purchaseActionsInFlight = new Set();
@@ -2559,24 +2558,24 @@ remove planner task block      <section class="card" style="margin-top:20px">
   /* -------------------- COMMUNITY PAGE -------------------- */
 
   function renderCommunity() {
-    setTimeout(loadCommunityRelations, 0);
     setTimeout(loadCommunityLeaderboard, 0);
     return `
-      ${pageHeader("HAMJAMIYAT", "Foydalanuvchilar", "Foydalanuvchilar bilan bog‘laning va natijalaringizni ulashing.")}
+      ${pageHeader("HAMJAMIYAT", "Foydalanuvchilar", "Foydalanuvchilarni qidiring, faol a’zolarni ko‘ring va profillarini oching.")}
       <section class="card community-hub">
         <nav class="community-tabs" aria-label="Hamjamiyat bo‘limlari">
           <button class="community-tab active" type="button" data-community-tab="search">${icon("search",16)} Qidiruv</button>
-          <button class="community-tab" type="button" data-community-tab="requests">${icon("user-round-plus",16)} So‘rovlar <span class="community-count">${communityRelations.incoming.length+communityRelations.outgoing.length}</span></button>
           <button class="community-tab" type="button" data-community-tab="active">${icon("activity",16)} Faol foydalanuvchilar</button>
         </nav>
         <div class="community-panel" data-community-panel="search">
-          <div class="form-field"><label class="field-label" for="community-search">Username bo‘yicha qidirish</label><div class="input-wrap">${icon("search")}<input id="community-search" type="search" placeholder="@username"></div><small>Kamida 3 ta belgi kiriting. Username boshidan mos keladigan foydalanuvchilar ko‘rsatiladi.</small></div>
-          <div id="community-results" style="margin-top:20px">${emptyState("Qidiruvga tayyor", "Username kiriting. Haqiqiy foydalanuvchilar ro‘yxati backend orqali topiladi.", "users")}</div>
+          <div class="form-field"><label class="field-label" for="community-search">Username bo‘yicha qidirish</label><div class="input-wrap">${icon("search")}<input id="community-search" type="search" placeholder="@username" autocomplete="off"></div><small>Kamida 3 ta belgi kiriting. Mos foydalanuvchilarni tanlab, profilini ko‘rishingiz mumkin.</small></div>
+          <div id="community-results" class="community-results">${emptyState("Qidiruvga tayyor", "Username kiriting. Foydalanuvchilar ro‘yxati server orqali topiladi.", "users")}</div>
         </div>
-        <div class="community-panel hidden" data-community-panel="requests"><div class="community-panel-heading"><div><h3>Do‘stlik so‘rovlari</h3><p>Kelgan va yuborilgan so‘rovlaringizni boshqaring.</p></div><button class="card-action" type="button" data-action="refresh-friends">${icon("refresh-cw",14)} Yangilash</button></div><div id="community-relations">${emptyState("Yuklanmoqda...","Do‘stlik ma’lumotlari olinmoqda.","users")}</div></div>
-        <div class="community-panel hidden" data-community-panel="active"><div class="community-panel-heading"><div><h3>Faol foydalanuvchilar</h3><p>Hamjamiyatdagi eng faol a’zolar XP natijasi bo‘yicha.</p></div><button class="card-action" type="button" data-action="refresh-leaderboard">${icon("refresh-cw",14)} Yangilash</button></div><div id="community-leaderboard" class="community-active-list">${communityLeaderboard.length ? communityLeaderboard.map(user=>`<div class="leaderboard-row"><span class="leaderboard-rank">#${user.rank}</span><div class="leaderboard-user"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username)}"><strong>${escapeHTML(user.name)}</strong></button><small>@${escapeHTML(user.username)} · Level ${getRank(Number(user.totalEarnedXP||0)).level}</small></div><strong class="leaderboard-xp">${formatNumber(user.totalEarnedXP)} XP</strong></div>`).join("") : emptyState("Ro‘yxat yuklanmoqda","Faol a’zolar ro‘yxati olinmoqda.","activity")}</div><p class="community-note">Bu ro‘yxat XP reytingiga asoslangan; haqiqiy onlayn holat keyingi bosqichda qo‘shiladi.</p></div>
+        <div class="community-panel hidden" data-community-panel="active">
+          <div class="community-panel-heading"><div><h3>Faol foydalanuvchilar</h3><p>Hamjamiyatdagi eng faol a’zolar XP natijasi bo‘yicha.</p></div><button class="card-action" type="button" data-action="refresh-leaderboard">${icon("refresh-cw",14)} Yangilash</button></div>
+          <div id="community-leaderboard" class="community-active-list">${communityLeaderboard.length ? communityLeaderboard.map(user=>`<div class="leaderboard-row"><span class="leaderboard-rank">#${user.rank}</span><div class="leaderboard-user"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username)}"><strong>${escapeHTML(user.name)}</strong></button><small>@${escapeHTML(user.username)} · Level ${getRank(Number(user.totalEarnedXP||0)).level}</small></div><strong class="leaderboard-xp">${formatNumber(user.totalEarnedXP)} XP</strong></div>`).join("") : emptyState("Ro‘yxat yuklanmoqda","Faol a’zolar ro‘yxati olinmoqda.","activity")}</div>
+          <p class="community-note">Reyting jami ishlab topilgan XP asosida tuzilgan.</p>
+        </div>
       </section>
-      <section class="card" style="margin-top:20px"><h3 class="card-title">Sizning darajangiz</h3><p class="card-description">Boshqalar profilingizni ko‘rganda darajangiz va yutuqlaringizni ko‘rishi mumkin bo‘ladi.</p><div class="profile-meta"><span>${icon("at-sign")} @${escapeHTML(data.profile.username || "username")}</span><span>${icon("award")} Level ${getRank().level} · ${escapeHTML(getRank().name)}</span></div></section>
     `;
   }
 
@@ -3000,6 +2999,11 @@ remove planner task block      <section class="card" style="margin-top:20px">
             <div class="setting-info"><strong>Ma’lumotlarni o‘chirish</strong><small>Vazifa, maqsad, kun tartibi va boshqa bo‘limlarni tanlab o‘chirish.</small></div>
             <button class="secondary-button" type="button" data-action="reset-data">${icon("trash-2")} Tozalash</button>
           </div>
+
+          <div class="setting-row settings-reset-row">
+            <div class="setting-info"><strong>Sozlamalarni asliga qaytarish</strong><small>Til, kun/tun rejimi, rang mavzusi, matn hajmi, ovoz va animatsiyalar tiklanadi.</small></div>
+            <button class="secondary-button" type="button" data-action="reset-preferences">Asliga qaytarish</button>
+          </div>
         </div>
       `;
     }
@@ -3028,10 +3032,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
           <button class="secondary-button" type="button" data-action="edit-profile">Tahrirlash</button>
         </div>
 
-        <div class="setting-row settings-reset-row">
-          <div class="setting-info"><strong>Sozlamalarni asliga qaytarish</strong><small>Til, kun/tun, rang, matn hajmi, ovoz va animatsiyalar tiklanadi. XP, profil, rasm, maqsad va vazifalar saqlanadi.</small></div>
-          <button class="secondary-button" type="button" data-action="reset-preferences">Asliga qaytarish</button>
-        </div>
+        
 
         <div class="setting-row">
           <div class="setting-info"><strong>Tug‘ilgan sana</strong><small>${data.profile.birthdate ? escapeHTML(formatDate(data.profile.birthdate)) : "Kiritilmagan"}</small></div>
@@ -3220,11 +3221,11 @@ remove planner task block      <section class="card" style="margin-top:20px">
   const UI_TRANSLATIONS = {
     ru: {
       "Bosh sahifa":"Главная","Maqsadlarim":"Мои цели","Vazifalar":"Задачи","Rejalashtiruvchi":"Планировщик","Statistika":"Статистика","Yutuqlarim":"Мои достижения","Mukofotlar do‘koni":"Магазин наград","Hamjamiyat":"Сообщество","Smart AI":"Smart AI","Bildirishnomalar":"Уведомления","Sozlamalar":"Настройки","Mening profilim":"Мой профиль",
-      "Maqsad qo‘shish":"Добавить цель","Yangi maqsad":"Новая цель","Vazifa qo‘shish":"Добавить задачу","Yangi vazifa":"Новая задача","Saqlash":"Сохранить","Bekor qilish":"Отмена","O‘chirish":"Удалить","Tahrirlash":"Изменить","Bugungi vazifalar":"Задачи на сегодня","Barcha vazifalar":"Все задачи","Maqsadlar":"Цели","Faol maqsadlar":"Активные цели","Yakunlangan":"Завершено","O‘rtacha progress":"Средний прогресс","Jami XP":"Всего XP","Bu haftadagi XP":"XP за неделю","Bajarilgan vazifalar":"Выполненные задачи","Bajarilish foizi":"Процент выполнения","Kun tartibim":"Мой распорядок дня","Band qo‘shish":"Добавить пункт","Menga kun tartibi tuz":"Составить распорядок","Vaqtida eslatib tur":"Напоминать вовремя","Yutuq qo‘shish":"Добавить достижение","Shaxsiy xotiralar":"Личные воспоминания","Xarid":"Купить","Qo‘llash":"Применить","XP yetarli emas":"Недостаточно XP","Yorug‘":"Светлая","Qorong‘i":"Тёмная","Qurilma bo‘yicha":"Как на устройстве","Umumiy sozlamalar":"Общие настройки","Interfeys tili":"Язык интерфейса","Profilni tahrirlash":"Редактировать профиль","Username":"Имя пользователя","Tug‘ilgan sana":"Дата рождения","Qisqa mazmuni":"Краткое описание","Vazifa nomi":"Название задачи","Qaysi kuni bajariladi?":"Когда выполнить?","Vaqt":"Время","Nima qilasiz?":"Что будете делать?","Do‘st bo‘lish":"Добавить в друзья","Do‘stlar":"Друзья","Foydalanuvchilar":"Пользователи","Qidirilmoqda...":"Поиск...","Foydalanuvchi topilmadi":"Пользователь не найден","Kunlik reja":"План на день","AI reja tuzsin":"Пусть AI составит план","Maqsadlar asosida tavsiyalar":"Рекомендации по целям","Shaxsiy yordamchi":"Личный помощник","AI bilan suhbat":"Чат с AI","Profil statistikasi":"Статистика профиля","Sizning darajangiz":"Ваш уровень","Kolleksiyangiz hozircha bo‘sh":"Коллекция пока пуста"
+      "Maqsad qo‘shish":"Добавить цель","Yangi maqsad":"Новая цель","Vazifa qo‘shish":"Добавить задачу","Yangi vazifa":"Новая задача","Saqlash":"Сохранить","Bekor qilish":"Отмена","O‘chirish":"Удалить","Tahrirlash":"Изменить","Bugungi vazifalar":"Задачи на сегодня","Barcha vazifalar":"Все задачи","Maqsadlar":"Цели","Faol maqsadlar":"Активные цели","Yakunlangan":"Завершено","O‘rtacha progress":"Средний прогресс","Jami XP":"Всего XP","Bu haftadagi XP":"XP за неделю","Bajarilgan vazifalar":"Выполненные задачи","Bajarilish foizi":"Процент выполнения","Kun tartibim":"Мой распорядок дня","Band qo‘shish":"Добавить пункт","Menga kun tartibi tuz":"Составить распорядок","Vaqtida eslatib tur":"Напоминать вовремя","Yutuq qo‘shish":"Добавить достижение","Shaxsiy xotiralar":"Личные воспоминания","Xarid":"Купить","Qo‘llash":"Применить","XP yetarli emas":"Недостаточно XP","Yorug‘":"Светлая","Qorong‘i":"Тёмная","Qurilma bo‘yicha":"Как на устройстве","Umumiy sozlamalar":"Общие настройки","Interfeys tili":"Язык интерфейса","Profilni tahrirlash":"Редактировать профиль","Username":"Имя пользователя","Tug‘ilgan sana":"Дата рождения","Qisqa mazmuni":"Краткое описание","Vazifa nomi":"Название задачи","Qaysi kuni bajariladi?":"Когда выполнить?","Vaqt":"Время","Nima qilasiz?":"Что будете делать?","Foydalanuvchilar":"Пользователи","Qidirilmoqda...":"Поиск...","Foydalanuvchi topilmadi":"Пользователь не найден","Kunlik reja":"План на день","AI reja tuzsin":"Пусть AI составит план","Maqsadlar asosida tavsiyalar":"Рекомендации по целям","Shaxsiy yordamchi":"Личный помощник","AI bilan suhbat":"Чат с AI","Profil statistikasi":"Статистика профиля","Sizning darajangiz":"Ваш уровень","Kolleksiyangiz hozircha bo‘sh":"Коллекция пока пуста"
     },
     en: {
       "Bosh sahifa":"Home","Maqsadlarim":"My goals","Vazifalar":"Tasks","Rejalashtiruvchi":"Planner","Statistika":"Statistics","Yutuqlarim":"My achievements","Mukofotlar do‘koni":"Rewards shop","Hamjamiyat":"Community","Smart AI":"Smart AI","Bildirishnomalar":"Notifications","Sozlamalar":"Settings","Mening profilim":"My profile",
-      "Maqsad qo‘shish":"Add goal","Yangi maqsad":"New goal","Vazifa qo‘shish":"Add task","Yangi vazifa":"New task","Saqlash":"Save","Bekor qilish":"Cancel","O‘chirish":"Delete","Tahrirlash":"Edit","Bugungi vazifalar":"Today's tasks","Barcha vazifalar":"All tasks","Maqsadlar":"Goals","Faol maqsadlar":"Active goals","Yakunlangan":"Completed","O‘rtacha progress":"Average progress","Jami XP":"Total XP","Bu haftadagi XP":"XP this week","Bajarilgan vazifalar":"Completed tasks","Bajarilish foizi":"Completion rate","Kun tartibim":"My daily routine","Band qo‘shish":"Add item","Menga kun tartibi tuz":"Build my routine","Vaqtida eslatib tur":"Remind me on time","Yutuq qo‘shish":"Add achievement","Shaxsiy xotiralar":"Personal memories","Xarid":"Buy","Qo‘llash":"Apply","XP yetarli emas":"Not enough XP","Yorug‘":"Light","Qorong‘i":"Dark","Qurilma bo‘yicha":"System default","Umumiy sozlamalar":"General settings","Interfeys tili":"Interface language","Profilni tahrirlash":"Edit profile","Username":"Username","Tug‘ilgan sana":"Birthday","Qisqa mazmuni":"Short description","Vazifa nomi":"Task title","Qaysi kuni bajariladi?":"Due date","Vaqt":"Time","Nima qilasiz?":"What will you do?","Do‘st bo‘lish":"Add friend","Do‘stlar":"Friends","Foydalanuvchilar":"Users","Qidirilmoqda...":"Searching...","Foydalanuvchi topilmadi":"User not found","Kunlik reja":"Daily plan","AI reja tuzsin":"Generate AI plan","Maqsadlar asosida tavsiyalar":"Goal-based suggestions","Shaxsiy yordamchi":"Personal assistant","AI bilan suhbat":"Chat with AI","Profil statistikasi":"Profile statistics","Sizning darajangiz":"Your level","Kolleksiyangiz hozircha bo‘sh":"Your collection is empty"
+      "Maqsad qo‘shish":"Add goal","Yangi maqsad":"New goal","Vazifa qo‘shish":"Add task","Yangi vazifa":"New task","Saqlash":"Save","Bekor qilish":"Cancel","O‘chirish":"Delete","Tahrirlash":"Edit","Bugungi vazifalar":"Today's tasks","Barcha vazifalar":"All tasks","Maqsadlar":"Goals","Faol maqsadlar":"Active goals","Yakunlangan":"Completed","O‘rtacha progress":"Average progress","Jami XP":"Total XP","Bu haftadagi XP":"XP this week","Bajarilgan vazifalar":"Completed tasks","Bajarilish foizi":"Completion rate","Kun tartibim":"My daily routine","Band qo‘shish":"Add item","Menga kun tartibi tuz":"Build my routine","Vaqtida eslatib tur":"Remind me on time","Yutuq qo‘shish":"Add achievement","Shaxsiy xotiralar":"Personal memories","Xarid":"Buy","Qo‘llash":"Apply","XP yetarli emas":"Not enough XP","Yorug‘":"Light","Qorong‘i":"Dark","Qurilma bo‘yicha":"System default","Umumiy sozlamalar":"General settings","Interfeys tili":"Interface language","Profilni tahrirlash":"Edit profile","Username":"Username","Tug‘ilgan sana":"Birthday","Qisqa mazmuni":"Short description","Vazifa nomi":"Task title","Qaysi kuni bajariladi?":"Due date","Vaqt":"Time","Nima qilasiz?":"What will you do?","Foydalanuvchilar":"Users","Qidirilmoqda...":"Searching...","Foydalanuvchi topilmadi":"User not found","Kunlik reja":"Daily plan","AI reja tuzsin":"Generate AI plan","Maqsadlar asosida tavsiyalar":"Goal-based suggestions","Shaxsiy yordamchi":"Personal assistant","AI bilan suhbat":"Chat with AI","Profil statistikasi":"Profile statistics","Sizning darajangiz":"Your level","Kolleksiyangiz hozircha bo‘sh":"Your collection is empty"
     }
   };
 
@@ -3508,15 +3509,6 @@ remove planner task block      <section class="card" style="margin-top:20px">
       case "view-profile":
         openPublicProfile(actionElement.dataset.username);
         break;
-      case "send-friend-request":
-        sendFriendRequest(actionElement.dataset.userId);
-        break;
-      case "respond-friend":
-        respondFriendRequest(actionElement.dataset.requestId, actionElement.dataset.decision);
-        break;
-      case "refresh-friends":
-        loadCommunityRelations();
-        break;
       case "refresh-leaderboard":
         loadCommunityLeaderboard();
         break;
@@ -3656,7 +3648,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
         break;
 
       case "reset-preferences":
-        openModal("Sozlamalarni asliga qaytarish", "<p>Faqat interfeys sozlamalari tiklanadi. XP, profil ma’lumotlari va rasmi, maqsadlar, vazifalar, kun tartibi, yutuqlar va xaridlar o‘zgarmaydi.</p>", '<button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button><button class="primary-button" type="button" data-action="confirm-reset-preferences">Tiklash</button>');
+        openModal("Sozlamalarni asliga qaytarish", "<p>Til, kun/tun rejimi, rang mavzusi, matn hajmi, ovoz va animatsiyalar standart holatga qaytariladi.</p>", '<button class="secondary-button" type="button" data-action="close-modal">Bekor qilish</button><button class="primary-button" type="button" data-action="confirm-reset-preferences">Tiklash</button>');
         break;
       case "confirm-reset-preferences":
         settings = { ...settings, language: DEFAULT_SETTINGS.language, theme: DEFAULT_SETTINGS.theme, colorTheme: DEFAULT_SETTINGS.colorTheme, fontSize: DEFAULT_SETTINGS.fontSize, sound: DEFAULT_SETTINGS.sound, reducedMotion: DEFAULT_SETTINGS.reducedMotion };
@@ -3871,11 +3863,6 @@ remove planner task block      <section class="card" style="margin-top:20px">
       const avatarFrame = ["premium","gold","neon","crystal","flame","prism","carbon","aurora"].includes(p.avatarFrame) ? " avatar-frame-"+p.avatarFrame : "";
       const badge = p.activeBadge ? '<span class="profile-active-badge">'+icon("award",13)+' '+escapeHTML(p.activeBadge)+'</span>' : "";
       const birthday = p.birthdate ? '<div class="profile-public-stat">'+icon("cake")+" "+escapeHTML(formatDate(p.birthdate))+'</div>' : "";
-      const isSelf=p.username===data.profile.username;
-      const isFriend=(communityRelations.friends||[]).some(friend=>friend.id===p.id);
-      const outgoingRequest=(communityRelations.outgoing||[]).find(request=>request.userId===p.id);
-      const incomingRequest=(communityRelations.incoming||[]).find(request=>request.userId===p.id);
-      const friendAction=isSelf?"":isFriend?'<span class="profile-active-badge">'+icon("users",13)+' Do‘stingiz</span>':outgoingRequest?'<span class="profile-active-badge">So‘rov yuborilgan</span>':incomingRequest?'<button class="primary-button" type="button" data-action="respond-friend" data-request-id="'+escapeHTML(incomingRequest.id)+'" data-decision="accept">So‘rovni qabul qilish</button>':'<button class="primary-button" type="button" data-action="send-friend-request" data-user-id="'+escapeHTML(p.id)+'">'+icon("user-plus",15)+' Do‘stlik so‘rovi yuborish</button>';
       const levelProgress='<section class="public-profile-level"><div class="public-profile-level-head"><strong>Level '+rank.level+' · '+escapeHTML(rank.name)+'</strong><span>'+Math.round(rank.progress)+'%</span></div><div class="progress-track"><div class="progress-fill" style="width:'+rank.progress+'%"></div></div><small>'+(rank.next?formatNumber(rank.remaining)+' XP keyingi darajagacha':'Eng yuqori daraja')+'</small></section>';
       const achievements = (Array.isArray(p.achievements) ? p.achievements : []).map(raw => {
         const id = typeof raw === "string" ? raw : raw.id;
@@ -3889,7 +3876,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
       const showcase = '<section class="public-showcase"><h3>Yutuqlari</h3><div class="public-showcase-list">'+(achievements||'<small>Hali ochilgan yutuqlar yo‘q.</small>')+'</div><h3>Do‘kondan olingan buyumlar</h3><div class="public-showcase-list">'+(inventory||'<small>Hozircha maxsus buyumlar yo‘q.</small>')+'</div></section>';
       const publicMemories=(Array.isArray(p.memories)?p.memories:[]).map(memory=>`<article class="public-memory-card"><div><strong>${escapeHTML(memory.title||"Yutuq")}</strong><small>${escapeHTML(formatDate(memory.date||""))}</small></div>${memory.image?`<img src="${escapeHTML(memory.image)}" alt="${escapeHTML(memory.title||"Yutuq rasmi")}" loading="lazy" decoding="async">`:""}${memory.description?`<p>${escapeHTML(memory.description)}</p>`:""}</article>`).join("");
       const memoryShowcase=publicMemories?`<section class="public-showcase"><h3>Ommaviy yutuqlar va esdaliklar</h3><div class="public-memory-list">${publicMemories}</div></section>`:"";
-      const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar'+avatarFrame+'">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p>'+badge+'<p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP balansi</small></div><div><strong>'+formatNumber(p.totalEarnedXP||p.xp)+'</strong><small>Jami olgan XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div></div>'+levelProgress+birthday+'<p class="card-description">Profil bezagi: '+formatNumber(p.customizationScore||0)+' / 5</p>'+showcase+memoryShowcase+friendAction+'</div>';
+      const html = '<div class="public-profile-cover" style="background:'+(covers[p.background]||covers.default)+'"></div><div class="public-profile-body"><div class="public-profile-avatar'+avatarFrame+'">'+avatar+'</div><h2>'+escapeHTML(p.name)+'</h2><p class="profile-username">@'+escapeHTML(p.username)+'</p>'+badge+'<p class="profile-bio">'+escapeHTML(p.bio||"Biografiya qo‘shilmagan.")+'</p><div class="public-profile-stats"><div><strong>'+formatNumber(p.xp)+'</strong><small>XP balansi</small></div><div><strong>'+formatNumber(p.totalEarnedXP||p.xp)+'</strong><small>Jami olgan XP</small></div><div><strong>'+rank.level+'</strong><small>Daraja</small></div></div>'+levelProgress+birthday+'<p class="card-description">Profil bezagi: '+formatNumber(p.customizationScore||0)+' / 5</p>'+showcase+memoryShowcase+'</div>';
       const body = $("#modal-body"); if (body) body.innerHTML = html;
       refreshIcons();
     } catch (error) {
@@ -3902,135 +3889,29 @@ remove planner task block      <section class="card" style="margin-top:20px">
     const results = $("#community-results");
     const sequence = ++communitySearchSequence;
     if (!results) return;
-
-    if (!query) {
-      results.innerHTML = emptyState("Qidiruvga tayyor", "Username kiriting.", "users");
-      return;
-    }
-    if (query.length < 3) {
-      results.innerHTML = emptyState("Yana belgi kiriting", "Qidiruv uchun kamida 3 ta belgi kerak.", "search");
-      return;
-    }
-
+    if (!query) { results.innerHTML = emptyState("Qidiruvga tayyor", "Username kiriting.", "users"); return; }
+    if (query.length < 3) { results.innerHTML = emptyState("Yana belgi kiriting", "Qidiruv uchun kamida 3 ta belgi kerak.", "search"); return; }
     results.innerHTML = emptyState("Qidirilmoqda...", "Foydalanuvchilar tekshirilmoqda.", "loader-circle");
-
     try {
-      const response = await apiFetch("/api/users/search?username=" + encodeURIComponent(query), {
-        method: "GET",
-        credentials: "include",
-        headers: { "Accept": "application/json" }
-      });
+      const response = await apiFetch("/api/users/search?username=" + encodeURIComponent(query), { method:"GET", credentials:"include", headers:{"Accept":"application/json"} });
       const result = await response.json().catch(() => ({}));
       if (sequence !== communitySearchSequence) return;
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || "Qidiruv vaqtida xatolik yuz berdi.");
-      }
-
+      if (!response.ok || !result.success) throw new Error(result.message || "Qidiruv vaqtida xatolik yuz berdi.");
       const users = Array.isArray(result.users) ? result.users : [];
-      await loadCommunityRelations();
-      if (sequence !== communitySearchSequence) return;
-      if (!users.length) {
-        results.innerHTML = emptyState("Foydalanuvchi topilmadi", "Bu username bilan boshlanadigan foydalanuvchi yo‘q.", "user-search");
-        return;
-      }
-
+      if (!users.length) { results.innerHTML = emptyState("Foydalanuvchi topilmadi", "Bu username bilan boshlanadigan foydalanuvchi yo‘q.", "user-search"); return; }
       results.innerHTML = users.map(user => `
-        <div class="user-item">
+        <div class="user-item community-user-result">
           <span class="avatar avatar-medium">${icon("user-round")}</span>
           <div class="user-item-info">
             <button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(user.username || "")}"><strong>${escapeHTML(user.name || "Foydalanuvchi")}</strong></button>
             <small>@${escapeHTML(user.username || "")} · Level ${getRank(Number(user.totalEarnedXP||user.xp||0)).level} · ${formatNumber(user.totalEarnedXP??user.xp??0)} XP jami${user.username === data.profile.username ? " · Sizning profilingiz" : ""}</small>
           </div>
-          ${user.username === data.profile.username
-            ? `<span class="user-rank">Siz</span>`
-            : communityRelations.friends.some(item => item.username === user.username)
-              ? `<span class="user-rank">Do‘st</span>`
-              : communityRelations.outgoing.some(item => item.username === user.username)
-                ? `<span class="user-rank">So‘rov yuborilgan</span>`
-                : (() => {
-                    const incoming = communityRelations.incoming.find(item => item.username === user.username);
-                    return incoming
-                      ? `<button class="card-action" type="button" data-action="respond-friend" data-request-id="${escapeHTML(incoming.id)}" data-decision="accept">So‘rovni qabul qilish</button>`
-                      : `<button class="card-action" type="button" data-action="send-friend-request" data-user-id="${escapeHTML(user.id)}">Do‘st bo‘lish</button>`;
-                  })()}
-        </div>
-      `).join("");
+          <button class="card-action" type="button" data-action="view-profile" data-username="${escapeHTML(user.username || "")}">Profilni ko‘rish</button>
+        </div>`).join("");
       refreshIcons();
     } catch (error) {
       if (sequence !== communitySearchSequence) return;
       results.innerHTML = emptyState("Qidiruv ishlamadi", escapeHTML(error.message || "Server bilan bog‘lanib bo‘lmadi."), "alert-circle");
-    }
-  }
-
-  async function loadCommunityRelations() {
-    const container = $("#community-relations");
-    if (!container) return;
-    try {
-      const response = await apiFetch("/api/friends", { credentials: "include" });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.success) throw new Error(result.message || "Do‘stlar ro‘yxatini yuklab bo‘lmadi.");
-      const incoming = Array.isArray(result.incoming) ? result.incoming : [];
-      const outgoing = Array.isArray(result.outgoing) ? result.outgoing : [];
-      const friends = Array.isArray(result.friends) ? result.friends : [];
-      communityRelations = { incoming, outgoing, friends };
-      const section = (title, rows, renderRow, empty) => `
-        <div style="margin-top:14px">
-          <h4>${escapeHTML(title)}</h4>
-          ${rows.length ? rows.map(renderRow).join("") : `<p class="card-description">${escapeHTML(empty)}</p>`}
-        </div>`;
-      container.innerHTML =
-        section("Kelgan so‘rovlar", incoming, item => `
-          <div class="user-item">
-            <div class="user-item-info"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(item.username)}"><strong>${escapeHTML(item.name)}</strong></button><small>@${escapeHTML(item.username)}</small></div>
-            <button class="card-action" data-action="respond-friend" data-request-id="${escapeHTML(item.id)}" data-decision="accept">Qabul qilish</button>
-            <button class="card-action" data-action="respond-friend" data-request-id="${escapeHTML(item.id)}" data-decision="decline">Rad etish</button>
-          </div>`, "Hozircha kelgan so‘rov yo‘q.") +
-        section("Yuborilgan so‘rovlar", outgoing, item => `
-          <div class="user-item"><div class="user-item-info"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(item.username)}"><strong>${escapeHTML(item.name)}</strong></button><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Kutilmoqda</span></div>`, "Yuborilgan so‘rov yo‘q.") +
-        section("Do‘stlaringiz", friends, item => `
-          <div class="user-item"><div class="user-item-info"><button class="user-profile-link" type="button" data-action="view-profile" data-username="${escapeHTML(item.username)}"><strong>${escapeHTML(item.name)}</strong></button><small>@${escapeHTML(item.username)}</small></div><span class="user-rank">Do‘st</span></div>`, "Hali do‘stlar yo‘q.");
-    } catch (error) {
-      communityRelations = { incoming: [], outgoing: [], friends: [] };
-      container.innerHTML = emptyState("Do‘stlar yuklanmadi", error.message || "Server bilan aloqa uzildi.", "alert-circle");
-    }
-    refreshIcons();
-  }
-
-  async function sendFriendRequest(userId) {
-    try {
-      const response = await apiFetch("/api/friends/request", {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId })
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.success) throw new Error(result.message || "So‘rov yuborilmadi.");
-      showToast(result.message || "Do‘stlik so‘rovi yuborildi.");
-      const profileButton = document.querySelector("#modal-body [data-action='send-friend-request']");
-      if (profileButton && profileButton.dataset.userId === userId) { profileButton.disabled=true; profileButton.textContent="So‘rov yuborildi"; }
-      await loadCommunityRelations();
-      const input = $("#community-search");
-      if (input?.value) searchCommunityUsers(input.value);
-    } catch (error) {
-      showToast(error.message || "So‘rov yuborilmadi.", "error");
-    }
-  }
-
-  async function respondFriendRequest(requestId, decision) {
-    try {
-      const response = await apiFetch("/api/friends/respond", {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId, decision })
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || !result.success) throw new Error(result.message || "Amal bajarilmadi.");
-      showToast(result.message || "So‘rov yangilandi.");
-      const profileRequestButton=document.querySelector("#modal-body [data-request-id]");
-      if(profileRequestButton && profileRequestButton.dataset.requestId===requestId){profileRequestButton.disabled=true;profileRequestButton.textContent=decision==="accept"?"Do‘stingiz":"So‘rov rad etildi";}
-      await loadCommunityRelations();
-    } catch (error) {
-      showToast(error.message || "Amal bajarilmadi.", "error");
     }
   }
 

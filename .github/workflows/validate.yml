@@ -6,6 +6,7 @@ on:
       - main
       - smartgoal/cloudflare-upgrade
       - smartgoal/production-integration
+      - smartgoal/community-settings-refresh
 
 jobs:
   validate:
