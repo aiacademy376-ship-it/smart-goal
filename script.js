@@ -2746,9 +2746,9 @@ remove planner task block      <section class="card" style="margin-top:20px">
       )}
 
       <section class="card">
-        <div class="card-header">
-          <h3 class="card-title">Barcha bildirishnomalar</h3>
-          <button class="card-action" type="button" data-action="mark-all-read">Barchasini o‘qilgan qilish</button>
+        <div class="card-header notification-toolbar">
+          <div><h3 class="card-title">Barcha bildirishnomalar</h3><p class="card-description">${data.notifications.length} ta xabar · ${unreadCount()} ta o‘qilmagan</p></div>
+          <button class="primary-button" type="button" data-action="mark-all-read" ${unreadCount()?"":"disabled"}>${icon("check-check",16)} Barchasini o‘qilgan qilish</button>
         </div>
 
         <div class="notification-list">
