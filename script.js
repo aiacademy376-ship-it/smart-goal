@@ -101,7 +101,7 @@
   const STORE_ITEMS = [
     {
       id: "theme-ocean",
-      name: "Ocean mavzusi",
+      name: "Okean mavzusi",
       description: "Profilingiz va interfeysingiz uchun sokin ko‘k rang.",
       type: "theme",
       value: "ocean",
@@ -110,7 +110,7 @@
     },
     {
       id: "theme-emerald",
-      name: "Emerald mavzusi",
+      name: "Zumrad mavzusi",
       description: "Yashil va nafis ko‘rinish.",
       type: "theme",
       value: "emerald",
@@ -119,7 +119,7 @@
     },
     {
       id: "theme-sunset",
-      name: "Sunset mavzusi",
+      name: "Shafaq mavzusi",
       description: "Iliq ranglardagi maxsus interfeys.",
       type: "theme",
       value: "sunset",
@@ -128,7 +128,7 @@
     },
     {
       id: "theme-rose",
-      name: "Rose mavzusi",
+      name: "Atirgul mavzusi",
       description: "Nafis pushti ranglar uyg‘unligi.",
       type: "theme",
       value: "rose",
@@ -137,7 +137,7 @@
     },
     {
       id: "background-midnight",
-      name: "Midnight fon",
+      name: "Yarim tun foni",
       description: "Profil uchun qoramtir, maxsus fon.",
       type: "background",
       value: "midnight",
@@ -146,7 +146,7 @@
     },
     {
       id: "background-galaxy",
-      name: "Galaxy fon",
+      name: "Galaktika foni",
       description: "Maxsus kosmik profil foni.",
       type: "background",
       value: "galaxy",
@@ -155,7 +155,7 @@
     },
     {
       id: "background-royal",
-      name: "Royal fon",
+      name: "Qirollik foni",
       description: "Noyob premium profil dizayni.",
       type: "background",
       value: "royal",
@@ -164,7 +164,7 @@
     },
     {
       id: "badge-focus",
-      name: "Focus badge",
+      name: "Diqqat belgisi",
       description: "Diqqat va intizom ramzi.",
       type: "badge",
       value: "focus",
@@ -173,7 +173,7 @@
     },
     {
       id: "badge-diamond",
-      name: "Diamond badge",
+      name: "Olmos belgisi",
       description: "Maxsus premium belgi.",
       type: "badge",
       value: "diamond",
@@ -191,7 +191,7 @@
     },
     {
       id: "background-sakura",
-      name: "Sakura profil foni",
+      name: "Gilos gullari profil foni",
       description: "Profilingizga nozik va yorqin uslub.",
       type: "background",
       value: "sakura",
@@ -200,7 +200,7 @@
     },
     {
       id: "background-nebula",
-      name: "Nebula profil foni",
+      name: "Tumanlik profil foni",
       description: "Yulduzli kosmik bezak.",
       type: "background",
       value: "nebula",
@@ -209,7 +209,7 @@
     },
     {
       id: "badge-builder",
-      name: "Builder belgisi",
+      name: "Quruvchi belgisi",
       description: "Har kuni o‘z ustida ishlaydiganlar uchun.",
       type: "badge",
       value: "builder",
@@ -227,7 +227,7 @@
     },
     {
       id: "avatar-premium",
-      name: "Premium avatar ramkasi",
+      name: "Maxsus avatar ramkasi",
       description: "Profil rasmingiz uchun maxsus ramka.",
       type: "avatar",
       value: "premium",
@@ -236,7 +236,7 @@
     },
     {
       id: "background-aurora",
-      name: "Aurora profil foni",
+      name: "Shimol yog‘dusi profil foni",
       description: "Yashil va binafsha shimol yog‘dusi uslubidagi fon.",
       type: "background",
       value: "aurora",
@@ -254,7 +254,7 @@
     },
     {
       id: "background-sunrise",
-      name: "Sunrise profil foni",
+      name: "Quyosh chiqishi profil foni",
       description: "Yangi kun va yangi maqsadlar uchun iliq fon.",
       type: "background",
       value: "sunrise",
@@ -263,7 +263,7 @@
     },
     {
       id: "badge-scholar",
-      name: "Scholar belgisi",
+      name: "Olim belgisi",
       description: "Bilim va muntazam o‘rganish ramzi.",
       type: "badge",
       value: "Scholar",
@@ -272,7 +272,7 @@
     },
     {
       id: "badge-explorer",
-      name: "Explorer belgisi",
+      name: "Kashfiyotchi belgisi",
       description: "Yangi ko‘nikmalarni sinab ko‘rish ramzi.",
       type: "badge",
       value: "Explorer",
@@ -288,20 +288,20 @@
       price: 420,
       icon: "zap"
     },
-    { id: "theme-lavender", name: "Lavender mavzusi", description: "Yumshoq lavanda ranglaridagi interfeys.", type: "theme", value: "lavender", price: 150, icon: "flower" },
-    { id: "theme-mint", name: "Mint mavzusi", description: "Yengil va tetiklantiruvchi yashil ranglar.", type: "theme", value: "mint", price: 180, icon: "sprout" },
-    { id: "background-coral", name: "Coral profil foni", description: "Iliq marjon ranglari bilan o‘ziga xos profil.", type: "background", value: "coral", price: 520, icon: "sun" },
-    { id: "background-ember", name: "Ember profil foni", description: "Chuqur ranglar va olovli aksentlar.", type: "background", value: "ember", price: 720, icon: "flame" },
-    { id: "badge-streak", name: "Streak belgisi", description: "Muntazamlik va davomiy harakat ramzi.", type: "badge", value: "Streak", price: 360, icon: "calendar-check" },
-    { id: "badge-creator", name: "Creator belgisi", description: "Yangi g‘oyalarni amaliy natijaga aylantiruvchilar uchun.", type: "badge", value: "Creator", price: 480, icon: "lightbulb" },
-    { id: "avatar-frame-crystal", name: "Crystal avatar ramkasi", description: "Profil rasmingiz uchun billurdek yorqin ramka.", type: "avatar", value: "crystal", price: 620, icon: "diamond" },
-    { id: "avatar-frame-flame", name: "Flame avatar ramkasi", description: "Profilingizga jo‘shqin va yorqin uslub.", type: "avatar", value: "flame", price: 760, icon: "flame" },
-    { id: "theme-graphite", name: "Graphite mavzusi", description: "Minimal va jiddiy grafit ranglar.", type: "theme", value: "graphite", price: 220, icon: "layers" },
-    { id: "theme-ice", name: "Ice mavzusi", description: "Sovuq moviy va oq ranglar uyg‘unligi.", type: "theme", value: "ice", price: 240, icon: "snowflake" },
-    { id: "theme-amber", name: "Amber mavzusi", description: "Iliq oltin ranglar bilan yorqin interfeys.", type: "theme", value: "amber", price: 260, icon: "sun-medium" },
+    { id: "theme-lavender", name: "Lavanda mavzusi", description: "Yumshoq lavanda ranglaridagi interfeys.", type: "theme", value: "lavender", price: 150, icon: "flower" },
+    { id: "theme-mint", name: "Yalpiz mavzusi", description: "Yengil va tetiklantiruvchi yashil ranglar.", type: "theme", value: "mint", price: 180, icon: "sprout" },
+    { id: "background-coral", name: "Marjon profil foni", description: "Iliq marjon ranglari bilan o‘ziga xos profil.", type: "background", value: "coral", price: 520, icon: "sun" },
+    { id: "background-ember", name: "Cho‘g‘ profil foni", description: "Chuqur ranglar va olovli aksentlar.", type: "background", value: "ember", price: 720, icon: "flame" },
+    { id: "badge-streak", name: "Ketma-ketlik belgisi", description: "Muntazamlik va davomiy harakat ramzi.", type: "badge", value: "Streak", price: 360, icon: "calendar-check" },
+    { id: "badge-creator", name: "Ijodkor belgisi", description: "Yangi g‘oyalarni amaliy natijaga aylantiruvchilar uchun.", type: "badge", value: "Creator", price: 480, icon: "lightbulb" },
+    { id: "avatar-frame-crystal", name: "Billur avatar ramkasi", description: "Profil rasmingiz uchun billurdek yorqin ramka.", type: "avatar", value: "crystal", price: 620, icon: "diamond" },
+    { id: "avatar-frame-flame", name: "Olov avatar ramkasi", description: "Profilingizga jo‘shqin va yorqin uslub.", type: "avatar", value: "flame", price: 760, icon: "flame" },
+    { id: "theme-graphite", name: "Grafit mavzusi", description: "Minimal va jiddiy grafit ranglar.", type: "theme", value: "graphite", price: 220, icon: "layers" },
+    { id: "theme-ice", name: "Muz mavzusi", description: "Sovuq moviy va oq ranglar uyg‘unligi.", type: "theme", value: "ice", price: 240, icon: "snowflake" },
+    { id: "theme-amber", name: "Qahrabo mavzusi", description: "Iliq oltin ranglar bilan yorqin interfeys.", type: "theme", value: "amber", price: 260, icon: "sun-medium" },
     { id: "background-ocean", name: "Ocean profil foni", description: "Chuqur dengiz ranglaridagi profil foni.", type: "background", value: "ocean", price: 560, icon: "waves" },
-    { id: "background-mountain", name: "Mountain profil foni", description: "Tog‘ manzarasidan ilhomlangan fon.", type: "background", value: "mountain", price: 590, icon: "mountain" },
-    { id: "background-aurora-night", name: "Aurora Night fon", description: "Tungi osmon va shimol yog‘dusi ranglari.", type: "background", value: "aurora-night", price: 780, icon: "moon-star" },
+    { id: "background-mountain", name: "Tog‘ profil foni", description: "Tog‘ manzarasidan ilhomlangan fon.", type: "background", value: "mountain", price: 590, icon: "mountain" },
+    { id: "background-aurora-night", name: "Shimol yog‘dusi tungi foni", description: "Tungi osmon va shimol yog‘dusi ranglari.", type: "background", value: "aurora-night", price: 780, icon: "moon-star" },
     { id: "badge-focus-pro", name: "Focus Pro belgisi", description: "Chuqur diqqat va samarali mehnat ramzi.", type: "badge", value: "Focus Pro", price: 650, icon: "focus" },
     { id: "badge-innovator", name: "Innovator belgisi", description: "Yangi yechimlar yaratuvchilar uchun.", type: "badge", value: "Innovator", price: 700, icon: "lightbulb" },
     { id: "badge-mentor", name: "Mentor belgisi", description: "Bilimini boshqalar bilan ulashuvchilar uchun.", type: "badge", value: "Mentor", price: 820, icon: "graduation-cap" },
@@ -3294,10 +3294,10 @@ remove planner task block      <section class="card" style="margin-top:20px">
   });
 
   Object.assign(UI_TRANSLATIONS.ru, {
-    "Ocean mavzusi":"Тема Ocean","Emerald mavzusi":"Тема Emerald","Sunset mavzusi":"Тема Sunset","Rose mavzusi":"Тема Rose","Sky mavzusi":"Тема Sky","Midnight fon":"Фон Midnight","Galaxy fon":"Фон Galaxy","Royal fon":"Фон Royal","Sakura profil foni":"Фон профиля Sakura","Nebula profil foni":"Фон профиля Nebula","Focus badge":"Значок Focus","Diamond badge":"Значок Diamond","Builder belgisi":"Значок Builder","Oltin avatar ramkasi":"Золотая рамка аватара","Premium avatar ramkasi":"Премиальная рамка аватара","Profilingiz va interfeysingiz uchun sokin ko‘k rang.":"Спокойный синий цвет для профиля и интерфейса.","Yashil va nafis ko‘rinish.":"Элегантная зелёная тема.","Iliq ranglardagi maxsus interfeys.":"Особая тёплая цветовая тема.","Nafis pushti ranglar uyg‘unligi.":"Нежная розовая цветовая гамма.","Profil uchun qoramtir, maxsus fon.":"Особый тёмный фон профиля.","Maxsus kosmik profil foni.":"Космический фон профиля.","Noyob premium profil dizayni.":"Уникальный премиальный дизайн профиля.","Diqqat va intizom ramzi.":"Символ концентрации и дисциплины.","Maxsus premium belgi.":"Особый премиальный значок.","Profil rasmingiz uchun oltin bezak.":"Золотое оформление фотографии профиля.","Profil rasmingiz uchun maxsus ramka.":"Особая рамка для фотографии профиля.","Yashil va nafis ko‘rinish.":"Элегантная зелёная тема.","Sokin moviy ranglar.":"Спокойные голубые оттенки.","Qo‘lga kiritilgan":"Получено","Hali ochilmagan":"Ещё не открыто","Oddiy":"Обычный","Muhim":"Важное","Juda muhim":"Очень важно","Past":"Низкий","O‘rta":"Средний","Yuqori":"Высокий","Bajarish sanasi":"Дата выполнения","Taxminiy bajarish vaqti":"Примерное время выполнения","Qo‘shimcha sozlama (ixtiyoriy)":"Дополнительные настройки (необязательно)"
+    "Okean mavzusi":"Тема Ocean","Zumrad mavzusi":"Тема Emerald","Shafaq mavzusi":"Тема Sunset","Atirgul mavzusi":"Тема Rose","Sky mavzusi":"Тема Sky","Yarim tun foni":"Фон Midnight","Galaktika foni":"Фон Galaxy","Qirollik foni":"Фон Royal","Gilos gullari profil foni":"Фон профиля Sakura","Tumanlik profil foni":"Фон профиля Nebula","Diqqat belgisi":"Значок Focus","Olmos belgisi":"Значок Diamond","Quruvchi belgisi":"Значок Builder","Oltin avatar ramkasi":"Золотая рамка аватара","Maxsus avatar ramkasi":"Премиальная рамка аватара","Profilingiz va interfeysingiz uchun sokin ko‘k rang.":"Спокойный синий цвет для профиля и интерфейса.","Yashil va nafis ko‘rinish.":"Элегантная зелёная тема.","Iliq ranglardagi maxsus interfeys.":"Особая тёплая цветовая тема.","Nafis pushti ranglar uyg‘unligi.":"Нежная розовая цветовая гамма.","Profil uchun qoramtir, maxsus fon.":"Особый тёмный фон профиля.","Maxsus kosmik profil foni.":"Космический фон профиля.","Noyob premium profil dizayni.":"Уникальный премиальный дизайн профиля.","Diqqat va intizom ramzi.":"Символ концентрации и дисциплины.","Maxsus premium belgi.":"Особый премиальный значок.","Profil rasmingiz uchun oltin bezak.":"Золотое оформление фотографии профиля.","Profil rasmingiz uchun maxsus ramka.":"Особая рамка для фотографии профиля.","Yashil va nafis ko‘rinish.":"Элегантная зелёная тема.","Sokin moviy ranglar.":"Спокойные голубые оттенки.","Qo‘lga kiritilgan":"Получено","Hali ochilmagan":"Ещё не открыто","Oddiy":"Обычный","Muhim":"Важное","Juda muhim":"Очень важно","Past":"Низкий","O‘rta":"Средний","Yuqori":"Высокий","Bajarish sanasi":"Дата выполнения","Taxminiy bajarish vaqti":"Примерное время выполнения","Qo‘shimcha sozlama (ixtiyoriy)":"Дополнительные настройки (необязательно)"
   });
   Object.assign(UI_TRANSLATIONS.en, {
-    "Ocean mavzusi":"Ocean theme","Emerald mavzusi":"Emerald theme","Sunset mavzusi":"Sunset theme","Rose mavzusi":"Rose theme","Sky mavzusi":"Sky theme","Midnight fon":"Midnight background","Galaxy fon":"Galaxy background","Royal fon":"Royal background","Sakura profil foni":"Sakura profile background","Nebula profil foni":"Nebula profile background","Focus badge":"Focus badge","Diamond badge":"Diamond badge","Builder belgisi":"Builder badge","Oltin avatar ramkasi":"Gold avatar frame","Premium avatar ramkasi":"Premium avatar frame","Profilingiz va interfeysingiz uchun sokin ko‘k rang.":"A calm blue look for your profile and interface.","Yashil va nafis ko‘rinish.":"An elegant green theme.","Iliq ranglardagi maxsus interfeys.":"A special warm-colored interface.","Nafis pushti ranglar uyg‘unligi.":"An elegant blend of pink tones.","Profil uchun qoramtir, maxsus fon.":"A special dark profile background.","Maxsus kosmik profil foni.":"A special cosmic profile background.","Noyob premium profil dizayni.":"A unique premium profile design.","Diqqat va intizom ramzi.":"A symbol of focus and discipline.","Maxsus premium belgi.":"A special premium badge.","Profil rasmingiz uchun oltin bezak.":"A gold decoration for your profile photo.","Profil rasmingiz uchun maxsus ramka.":"A special frame for your profile photo.","Qo‘lga kiritilgan":"Unlocked","Hali ochilmagan":"Not unlocked yet","Oddiy":"Normal","Muhim":"Important","Juda muhim":"Very important","Past":"Low","O‘rta":"Medium","Yuqori":"High","Bajarish sanasi":"Due date","Taxminiy bajarish vaqti":"Estimated time","Qo‘shimcha sozlama (ixtiyoriy)":"Additional settings (optional)"
+    "Okean mavzusi":"Ocean theme","Zumrad mavzusi":"Emerald theme","Shafaq mavzusi":"Sunset theme","Atirgul mavzusi":"Rose theme","Sky mavzusi":"Sky theme","Yarim tun foni":"Midnight background","Galaktika foni":"Galaxy background","Qirollik foni":"Royal background","Gilos gullari profil foni":"Sakura profile background","Tumanlik profil foni":"Nebula profile background","Diqqat belgisi":"Diqqat belgisi","Olmos belgisi":"Olmos belgisi","Quruvchi belgisi":"Builder badge","Oltin avatar ramkasi":"Gold avatar frame","Maxsus avatar ramkasi":"Premium avatar frame","Profilingiz va interfeysingiz uchun sokin ko‘k rang.":"A calm blue look for your profile and interface.","Yashil va nafis ko‘rinish.":"An elegant green theme.","Iliq ranglardagi maxsus interfeys.":"A special warm-colored interface.","Nafis pushti ranglar uyg‘unligi.":"An elegant blend of pink tones.","Profil uchun qoramtir, maxsus fon.":"A special dark profile background.","Maxsus kosmik profil foni.":"A special cosmic profile background.","Noyob premium profil dizayni.":"A unique premium profile design.","Diqqat va intizom ramzi.":"A symbol of focus and discipline.","Maxsus premium belgi.":"A special premium badge.","Profil rasmingiz uchun oltin bezak.":"A gold decoration for your profile photo.","Profil rasmingiz uchun maxsus ramka.":"A special frame for your profile photo.","Qo‘lga kiritilgan":"Unlocked","Hali ochilmagan":"Not unlocked yet","Oddiy":"Normal","Muhim":"Important","Juda muhim":"Very important","Past":"Low","O‘rta":"Medium","Yuqori":"High","Bajarish sanasi":"Due date","Taxminiy bajarish vaqti":"Estimated time","Qo‘shimcha sozlama (ixtiyoriy)":"Additional settings (optional)"
   });
 
   Object.assign(UI_TRANSLATIONS.ru, {
@@ -3326,8 +3326,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
   });
 
   Object.assign(UI_TRANSLATIONS.ru, {
-    "Aurora profil foni":"Фон профиля Aurora","Forest profil foni":"Лесной фон профиля","Sunrise profil foni":"Фон профиля Sunrise",
-    "Scholar belgisi":"Значок Scholar","Explorer belgisi":"Значок Explorer","Neon avatar ramkasi":"Неоновая рамка аватара",
+    "Shimol yog‘dusi profil foni":"Фон профиля Aurora","Forest profil foni":"Лесной фон профиля","Quyosh chiqishi profil foni":"Фон профиля Sunrise",
+    "Olim belgisi":"Значок Scholar","Kashfiyotchi belgisi":"Значок Explorer","Neon avatar ramkasi":"Неоновая рамка аватара",
     "Yashil va binafsha shimol yog‘dusi uslubidagi fon.":"Фон в стиле северного сияния.",
     "Tabiat ranglaridagi sokin profil foni.":"Спокойный фон профиля в природных тонах.",
     "Yangi kun va yangi maqsadlar uchun iliq fon.":"Тёплый фон для нового дня и новых целей.",
@@ -3337,8 +3337,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Eslatmalar sahifa ochiq turganda ishlaydi.":"Напоминания работают, пока страница открыта."
   });
   Object.assign(UI_TRANSLATIONS.en, {
-    "Aurora profil foni":"Aurora profile background","Forest profil foni":"Forest profile background","Sunrise profil foni":"Sunrise profile background",
-    "Scholar belgisi":"Scholar badge","Explorer belgisi":"Explorer badge","Neon avatar ramkasi":"Neon avatar frame",
+    "Shimol yog‘dusi profil foni":"Aurora profile background","Forest profil foni":"Forest profile background","Quyosh chiqishi profil foni":"Sunrise profile background",
+    "Olim belgisi":"Scholar badge","Kashfiyotchi belgisi":"Explorer badge","Neon avatar ramkasi":"Neon avatar frame",
     "Yashil va binafsha shimol yog‘dusi uslubidagi fon.":"A green and violet northern-lights inspired background.",
     "Tabiat ranglaridagi sokin profil foni.":"A calm nature-inspired profile background.",
     "Yangi kun va yangi maqsadlar uchun iliq fon.":"A warm background for a fresh day and new goals.",
@@ -3485,11 +3485,11 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Yulduzli kosmik bezak.":"Космическое оформление со звёздами.",
     "Har kuni o'z ustida ishlaydiganlar uchun.":"Для тех, кто каждый день работает над собой.",
     "Yumshoq lavanda ranglaridagi interfeys.":"Интерфейс в мягких лавандовых тонах.",
-    "Coral profil foni":"Коралловый фон профиля",
+    "Marjon profil foni":"Коралловый фон профиля",
     "Iliq marjon ranglari bilan o'ziga xos profil.":"Уникальный профиль в тёплых коралловых тонах.",
-    "Ember profil foni":"Огненный фон профиля",
+    "Cho‘g‘ profil foni":"Огненный фон профиля",
     "Chuqur ranglar va olovli aksentlar.":"Глубокие цвета и огненные акценты.",
-    "Creator belgisi":"Значок Creator",
+    "Ijodkor belgisi":"Значок Creator",
     "Yangi g'oyalarni amaliy natijaga aylantiruvchilar uchun.":"Для тех, кто превращает идеи в реальные результаты.",
     "Profil rasmingiz uchun billurdek yorqin ramka.":"Яркая кристальная рамка для фото профиля.",
     "Profilingizga jo'shqin va yorqin uslub.":"Энергичный и яркий стиль для вашего профиля.",
@@ -3497,9 +3497,9 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Iliq oltin ranglar bilan yorqin interfeys.":"Яркий интерфейс с тёплыми золотыми оттенками.",
     "Ocean profil foni":"Океанический фон профиля",
     "Chuqur dengiz ranglaridagi profil foni.":"Фон профиля в глубоких морских оттенках.",
-    "Mountain profil foni":"Горный фон профиля",
+    "Tog‘ profil foni":"Горный фон профиля",
     "Tog' manzarasidan ilhomlangan fon.":"Фон, вдохновлённый горными пейзажами.",
-    "Aurora Night fon":"Фон «Северное сияние — ночь»",
+    "Shimol yog‘dusi tungi foni":"Фон «Северное сияние — ночь»",
     "Tungi osmon va shimol yog'dusi ranglari.":"Цвета ночного неба и северного сияния.",
     "Focus Pro belgisi":"Значок Focus Pro",
     "Innovator belgisi":"Значок Innovator",
@@ -3590,11 +3590,11 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Yulduzli kosmik bezak.":"A starry cosmic design.",
     "Har kuni o'z ustida ishlaydiganlar uchun.":"For people who work on themselves every day.",
     "Yumshoq lavanda ranglaridagi interfeys.":"An interface in soft lavender tones.",
-    "Coral profil foni":"Coral profile background",
+    "Marjon profil foni":"Coral profile background",
     "Iliq marjon ranglari bilan o'ziga xos profil.":"A distinctive profile in warm coral tones.",
-    "Ember profil foni":"Ember profile background",
+    "Cho‘g‘ profil foni":"Ember profile background",
     "Chuqur ranglar va olovli aksentlar.":"Deep colors with fiery accents.",
-    "Creator belgisi":"Creator badge",
+    "Ijodkor belgisi":"Creator badge",
     "Yangi g'oyalarni amaliy natijaga aylantiruvchilar uchun.":"For people who turn new ideas into practical results.",
     "Profil rasmingiz uchun billurdek yorqin ramka.":"A brilliant crystal frame for your profile photo.",
     "Profilingizga jo'shqin va yorqin uslub.":"A bold, vibrant style for your profile.",
@@ -3602,9 +3602,9 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Iliq oltin ranglar bilan yorqin interfeys.":"A bright interface with warm golden tones.",
     "Ocean profil foni":"Ocean profile background",
     "Chuqur dengiz ranglaridagi profil foni.":"A profile background in deep ocean tones.",
-    "Mountain profil foni":"Mountain profile background",
+    "Tog‘ profil foni":"Mountain profile background",
     "Tog' manzarasidan ilhomlangan fon.":"A background inspired by mountain scenery.",
-    "Aurora Night fon":"Aurora Night background",
+    "Shimol yog‘dusi tungi foni":"Aurora Night background",
     "Tungi osmon va shimol yog'dusi ranglari.":"Night-sky and aurora colors.",
     "Focus Pro belgisi":"Focus Pro badge",
     "Innovator belgisi":"Innovator badge",
@@ -3635,14 +3635,14 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Focus Pro":"Focus Pro",
     "Boshlovchi":"Новичок","Izlanuvchi":"Исследователь","Harakatdagi":"В движении","Intiluvchan":"Целеустремлённый","Tirishqoq":"Усердный","Mahoratli":"Опытный","Strateg":"Стратег","Yetakchi":"Лидер","Usta":"Мастер","Afsona":"Легенда",
     "Birinchi qadam":"Первый шаг","Birinchi vazifangizni bajaring.":"Выполните свою первую задачу.","Harakat boshlandi":"Начало положено","5 ta vazifani bajaring.":"Выполните 5 задач.","Tinimsiz harakat":"Постоянное движение","10 ta vazifani bajaring.":"Выполните 10 задач.","Maqsad sari":"К цели","Birinchi maqsadingizni yakunlang.":"Завершите свою первую цель.","Maqsadlar ustasi":"Мастер целей","3 ta maqsadni yakunlang.":"Завершите 3 цели.","500 ochko to‘plang.":"Наберите 500 очков.","Minglik marrasi":"Рубеж в тысячу","1000 ochko to‘plang.":"Наберите 1000 очков.","Barqaror intizom":"Стабильная дисциплина","25 ta vazifani bajaring.":"Выполните 25 задач.","Mehnat chempioni":"Чемпион труда","50 ta vazifani bajaring.":"Выполните 50 задач.","Yuz qadam":"Сто шагов","100 ta vazifani bajaring.":"Выполните 100 задач.","Katta orzular":"Большие мечты","5 ta maqsad yarating.":"Создайте 5 целей.","Rejalar me’mori":"Архитектор планов","10 ta maqsad yarating.":"Создайте 10 целей.","Birinchi marralar":"Первые рубежи","250 XP to‘plang.":"Наберите 250 XP.","Kuchli salohiyat":"Большой потенциал","2500 XP to‘plang.":"Наберите 2500 XP.","Afsonaviy natija":"Легендарный результат","5000 XP to‘plang.":"Наберите 5000 XP.","Kun tartibi ustasi":"Мастер распорядка","Kun tartibiga 10 ta band kiriting.":"Добавьте 10 пунктов в распорядок.",
-    "Ocean mavzusi":"Тема Ocean","Emerald mavzusi":"Тема Emerald","Sunset mavzusi":"Тема Sunset","Rose mavzusi":"Тема Rose","Midnight fon":"Фон Midnight","Galaxy fon":"Фон Galaxy","Royal fon":"Фон Royal","Focus badge":"Значок Focus","Diamond badge":"Значок Diamond","Sky mavzusi":"Тема Sky","Sakura profil foni":"Фон профиля Sakura","Nebula profil foni":"Фон профиля Nebula","Builder belgisi":"Значок Builder","Oltin avatar ramkasi":"Золотая рамка аватара","Premium avatar ramkasi":"Премиум-рамка аватара","Forest profil foni":"Лесной фон профиля","Sunrise profil foni":"Фон профиля Sunrise","Scholar belgisi":"Значок Scholar","Explorer belgisi":"Значок Explorer","Lavender mavzusi":"Тема Lavender","Mint mavzusi":"Тема Mint","Streak belgisi":"Значок Streak","Crystal avatar ramkasi":"Кристальная рамка аватара","Flame avatar ramkasi":"Огненная рамка аватара","Graphite mavzusi":"Тема Graphite","Ice mavzusi":"Тема Ice","Amber mavzusi":"Тема Amber","Prism avatar ramkasi":"Рамка аватара Prism",
+    "Okean mavzusi":"Тема Ocean","Zumrad mavzusi":"Тема Emerald","Shafaq mavzusi":"Тема Sunset","Atirgul mavzusi":"Тема Rose","Yarim tun foni":"Фон Midnight","Galaktika foni":"Фон Galaxy","Qirollik foni":"Фон Royal","Diqqat belgisi":"Значок Focus","Olmos belgisi":"Значок Diamond","Sky mavzusi":"Тема Sky","Gilos gullari profil foni":"Фон профиля Sakura","Tumanlik profil foni":"Фон профиля Nebula","Quruvchi belgisi":"Значок Builder","Oltin avatar ramkasi":"Золотая рамка аватара","Maxsus avatar ramkasi":"Премиум-рамка аватара","Forest profil foni":"Лесной фон профиля","Quyosh chiqishi profil foni":"Фон профиля Sunrise","Olim belgisi":"Значок Scholar","Kashfiyotchi belgisi":"Значок Explorer","Lavanda mavzusi":"Тема Lavender","Yalpiz mavzusi":"Тема Mint","Ketma-ketlik belgisi":"Значок Streak","Billur avatar ramkasi":"Кристальная рамка аватара","Olov avatar ramkasi":"Огненная рамка аватара","Grafit mavzusi":"Тема Graphite","Muz mavzusi":"Тема Ice","Qahrabo mavzusi":"Тема Amber","Prism avatar ramkasi":"Рамка аватара Prism",
     "AI vazifani baholay olmadi.":"AI не смог оценить задачу.","XP hisoblashda xatolik.":"Ошибка при начислении XP.","Bu mahsulot sizda allaqachon mavjud.":"Этот предмет у вас уже есть.","Xarid vaqtida xatolik yuz berdi.":"Ошибка при покупке.","AI javob yozmoqda...":"AI печатает...","AI bilan bog‘lanib bo‘lmadi.":"Не удалось связаться с AI.","AI bo‘sh javob qaytardi. Qayta urinib ko‘ring.":"AI вернул пустой ответ. Попробуйте ещё раз.","AI hozircha javob bera olmadi.":"AI пока не смог ответить.","AI reja tuzishda xatolik yuz berdi.":"Ошибка при создании плана AI.","AI reja formatini tushunib bo‘lmadi. Qayta urinib ko‘ring.":"Не удалось распознать формат плана AI. Попробуйте ещё раз.","AI yaratgan vaqtlar noto‘g‘ri formatda.":"AI вернул время в неверном формате.","Mavjud bandlaringiz saqlandi, AI yangi mashg‘ulotlarni qo‘shdi.":"Существующие пункты сохранены, AI добавил новые занятия."
   });
   Object.assign(UI_TRANSLATIONS.en, {
     "Focus Pro":"Focus Pro",
     "Boshlovchi":"Beginner","Izlanuvchi":"Explorer","Harakatdagi":"On the move","Intiluvchan":"Driven","Tirishqoq":"Persistent","Mahoratli":"Skilled","Strateg":"Strategist","Yetakchi":"Leader","Usta":"Master","Afsona":"Legend",
     "Birinchi qadam":"First step","Birinchi vazifangizni bajaring.":"Complete your first task.","Harakat boshlandi":"Momentum started","5 ta vazifani bajaring.":"Complete 5 tasks.","Tinimsiz harakat":"Steady progress","10 ta vazifani bajaring.":"Complete 10 tasks.","Maqsad sari":"Toward a goal","Birinchi maqsadingizni yakunlang.":"Complete your first goal.","Maqsadlar ustasi":"Goal master","3 ta maqsadni yakunlang.":"Complete 3 goals.","500 ochko to‘plang.":"Earn 500 points.","Minglik marrasi":"The thousand mark","1000 ochko to‘plang.":"Earn 1,000 points.","Barqaror intizom":"Consistent discipline","25 ta vazifani bajaring.":"Complete 25 tasks.","Mehnat chempioni":"Work champion","50 ta vazifani bajaring.":"Complete 50 tasks.","Yuz qadam":"One hundred steps","100 ta vazifani bajaring.":"Complete 100 tasks.","Katta orzular":"Big dreams","5 ta maqsad yarating.":"Create 5 goals.","Rejalar me’mori":"Architect of plans","10 ta maqsad yarating.":"Create 10 goals.","Birinchi marralar":"First milestones","250 XP to‘plang.":"Earn 250 XP.","Kuchli salohiyat":"Great potential","2500 XP to‘plang.":"Earn 2,500 XP.","Afsonaviy natija":"Legendary result","5000 XP to‘plang.":"Earn 5,000 XP.","Kun tartibi ustasi":"Routine master","Kun tartibiga 10 ta band kiriting.":"Add 10 items to your daily routine.",
-    "Ocean mavzusi":"Ocean theme","Emerald mavzusi":"Emerald theme","Sunset mavzusi":"Sunset theme","Rose mavzusi":"Rose theme","Midnight fon":"Midnight background","Galaxy fon":"Galaxy background","Royal fon":"Royal background","Focus badge":"Focus badge","Diamond badge":"Diamond badge","Sky mavzusi":"Sky theme","Sakura profil foni":"Sakura profile background","Nebula profil foni":"Nebula profile background","Builder belgisi":"Builder badge","Oltin avatar ramkasi":"Gold avatar frame","Premium avatar ramkasi":"Premium avatar frame","Forest profil foni":"Forest profile background","Sunrise profil foni":"Sunrise profile background","Scholar belgisi":"Scholar badge","Explorer belgisi":"Explorer badge","Lavender mavzusi":"Lavender theme","Mint mavzusi":"Mint theme","Streak belgisi":"Streak badge","Crystal avatar ramkasi":"Crystal avatar frame","Flame avatar ramkasi":"Flame avatar frame","Graphite mavzusi":"Graphite theme","Ice mavzusi":"Ice theme","Amber mavzusi":"Amber theme","Prism avatar ramkasi":"Prism avatar frame",
+    "Okean mavzusi":"Ocean theme","Zumrad mavzusi":"Emerald theme","Shafaq mavzusi":"Sunset theme","Atirgul mavzusi":"Rose theme","Yarim tun foni":"Midnight background","Galaktika foni":"Galaxy background","Qirollik foni":"Royal background","Diqqat belgisi":"Diqqat belgisi","Olmos belgisi":"Olmos belgisi","Sky mavzusi":"Sky theme","Gilos gullari profil foni":"Sakura profile background","Tumanlik profil foni":"Nebula profile background","Quruvchi belgisi":"Builder badge","Oltin avatar ramkasi":"Gold avatar frame","Maxsus avatar ramkasi":"Premium avatar frame","Forest profil foni":"Forest profile background","Quyosh chiqishi profil foni":"Sunrise profile background","Olim belgisi":"Scholar badge","Kashfiyotchi belgisi":"Explorer badge","Lavanda mavzusi":"Lavender theme","Yalpiz mavzusi":"Mint theme","Ketma-ketlik belgisi":"Streak badge","Billur avatar ramkasi":"Crystal avatar frame","Olov avatar ramkasi":"Flame avatar frame","Grafit mavzusi":"Graphite theme","Muz mavzusi":"Ice theme","Qahrabo mavzusi":"Amber theme","Prism avatar ramkasi":"Prism avatar frame",
     "AI vazifani baholay olmadi.":"AI could not evaluate the task.","XP hisoblashda xatolik.":"Error calculating XP.","Bu mahsulot sizda allaqachon mavjud.":"You already own this item.","Xarid vaqtida xatolik yuz berdi.":"An error occurred during purchase.","AI javob yozmoqda...":"AI is typing...","AI bilan bog‘lanib bo‘lmadi.":"Could not connect to AI.","AI bo‘sh javob qaytardi. Qayta urinib ko‘ring.":"AI returned an empty response. Please try again.","AI hozircha javob bera olmadi.":"AI could not respond right now.","AI reja tuzishda xatolik yuz berdi.":"An error occurred while creating the AI plan.","AI reja formatini tushunib bo‘lmadi. Qayta urinib ko‘ring.":"Could not understand the AI plan format. Please try again.","AI yaratgan vaqtlar noto‘g‘ri formatda.":"AI returned times in an invalid format.","Mavjud bandlaringiz saqlandi, AI yangi mashg‘ulotlarni qo‘shdi.":"Your existing items were kept and AI added new activities."
   });
 
