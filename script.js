@@ -2428,7 +2428,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
               <strong>${escapeHTML(memory.title)}</strong>
               ${memory.image ? `<img class="memory-image" src="${escapeHTML(memory.image)}" alt="${escapeHTML(memory.title)}" loading="lazy" decoding="async">` : ""}
               <p>${escapeHTML(memory.description || "")}</p>
-              <small>${escapeHTML(formatDate(memory.date))}</small>
+              <small>${escapeHTML(formatDate(memory.date))} · ${memory.visibility === "public" ? "Hammaga ko‘rinadi" : "Faqat menga ko‘rinadi"}</small>
             </div>
             <button class="icon-button" type="button" data-action="delete-memory" data-id="${escapeHTML(memory.id)}">${icon("trash-2", 14)}</button>
           </article>
@@ -2465,8 +2465,13 @@ remove planner task block      <section class="card" style="margin-top:20px">
           </div>
           <div class="form-field full-width">
             <label class="field-label">Yutuq rasmi (ixtiyoriy)</label>
-            <input class="field-input" type="file" name="image" accept="image/png,image/jpeg,image/webp">
+            <label class="file-picker"><span>${icon("image-plus",18)} Rasm tanlash</span><input type="file" name="image" accept="image/png,image/jpeg,image/webp"><small>PNG, JPG yoki WEBP · 4 MB gacha</small></label>
             <small>Sertifikat yoki esdalik rasmini qo‘shing. Rasm avtomatik kichraytiriladi.</small>
+          </div>
+          <div class="form-field full-width">
+            <label class="field-label" for="memory-visibility">Kimlar ko‘ra oladi?</label>
+            <select class="field-select" id="memory-visibility" name="visibility"><option value="private">Faqat men</option><option value="public">Hammaga ochiq</option></select>
+            <small>Shaxsiy xotiralar odatiy holatda faqat sizga ko‘rinadi.</small>
           </div>
         </form>
       `,
@@ -2499,7 +2504,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
       description: String(fd.get("description") || "").trim(),
       type: String(fd.get("type") || "memory"),
       date: String(fd.get("date") || today()),
-      image
+      image,
+      visibility: String(fd.get("visibility") || "private") === "public" ? "public" : "private"
     });
     data.memories = data.memories.slice(0,100);
 
