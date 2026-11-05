@@ -389,6 +389,29 @@ function detectMessageLanguage(value, fallback = "auto") {
   return "auto";
 }
 
+function preventScheduleOverlaps(answer){
+  const lines=String(answer||"").split("\n");
+  let previousEnd=-1,changed=false;
+  const pattern=/^(\\s*(?:(?:[-*])\\s*)?(?:\\d+[.)]\\s*)?)(\\d{1,2}):([0-5]\\d)(\\s*[–—-]\\s*)(.*?)(?:\\s*\\((\\d{1,3})\\s*(?:daqiqa|minut|minutes|mins?)\\))?(\\s*)$/iu;
+  for(let i=0;i<lines.length;i++){
+    const match=lines[i].match(pattern);
+    if(!match||!match[6])continue;
+    let start=Number(match[2])*60+Number(match[3]);
+    const duration=Math.max(1,Number(match[6]));
+    if(start<previousEnd){
+      start=previousEnd;
+      changed=true;
+    }
+    if(start>=1440)continue;
+    const hh=String(Math.floor(start/60)).padStart(2,"0");
+    const mm=String(start%60).padStart(2,"0");
+    lines[i]=match[1]+hh+":"+mm+match[4]+match[5]+" ("+duration+" daqiqa)"+match[7];
+    previousEnd=start+duration;
+  }
+  return changed?lines.join("\n"):String(answer||"");
+}
+
+
 async function handleAI(request,env,user){
   if(!env.AI)return json({success:false,message:"Smart AI binding sozlanmagan."},503);
   const body=await readJson(request),action=String(body.action||"chat");
@@ -458,7 +481,7 @@ async function handleAI(request,env,user){
       messages.push({role:"user",content:message});
     }
   }
-  try{return json({success:true,answer:await runSmartAI(env,messages,{max_tokens:action==="plan"||action==="routine"?1100:650})});}
+  try{const rawAnswer=await runSmartAI(env,messages,{max_tokens:action==="plan"||action==="routine"?1100:650});const isPlanning=action==="plan"||(action==="chat"&&/(bugun|bugungi|kunlik).{0,50}(reja|plan|jadval)|(reja|plan|jadval).{0,50}(bugun|bugungi|kun)/iu.test(String(body.message||"")));return json({success:true,answer:isPlanning?preventScheduleOverlaps(rawAnswer):rawAnswer});}
   catch(error){console.error("SmartGoal AI error:",{name:error?.name||"Error",message:String(error?.message||error||"Unknown AI error").slice(0,500),cause:error?.cause?String(error.cause).slice(0,300):undefined});return json({success:false,message:error?.message||"AI bilan bog‘lanib bo‘lmadi."},503);}
 }
 function extractFirstJsonObject(value){
