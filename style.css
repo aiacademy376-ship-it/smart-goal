@@ -6440,3 +6440,7 @@ input[type=file]::file-selector-button { margin-right:10px; padding:10px 14px; b
 [data-color-theme="graphite"] { --primary:#536174; --primary-hover:#3f4d60; --primary-soft:#e9edf2; }
 [data-color-theme="ice"] { --primary:#2586c8; --primary-hover:#176da9; --primary-soft:#e5f5ff; }
 [data-color-theme="amber"] { --primary:#c58a21; --primary-hover:#a66f12; --primary-soft:#fff4dc; }
+
+.avatar-frame-prism { box-shadow:0 0 0 3px #b48cff,0 0 0 6px #65d8e8,0 0 16px rgba(101,216,232,.5); }
+.avatar-frame-carbon { box-shadow:0 0 0 4px #344054,0 0 0 6px #8a98a9; }
+.avatar-frame-aurora { box-shadow:0 0 0 3px #5fc7a8,0 0 0 6px #8b70d7,0 0 18px rgba(95,199,168,.45); }
