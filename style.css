@@ -6436,3 +6436,7 @@ input[type=file]::file-selector-button { margin-right:10px; padding:10px 14px; b
 @media (prefers-reduced-motion:reduce) {
  *,*::before,*::after { scroll-behavior:auto!important; animation-duration:.01ms!important; transition-duration:.01ms!important; }
 }
+
+[data-color-theme="graphite"] { --primary:#536174; --primary-hover:#3f4d60; --primary-soft:#e9edf2; }
+[data-color-theme="ice"] { --primary:#2586c8; --primary-hover:#176da9; --primary-soft:#e5f5ff; }
+[data-color-theme="amber"] { --primary:#c58a21; --primary-hover:#a66f12; --primary-soft:#fff4dc; }
