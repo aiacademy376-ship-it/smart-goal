@@ -9,6 +9,12 @@ const json = (body, status = 200, headers = {}) =>
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
+      "access-control-allow-origin": "https://smart-goal.pages.dev",
+      "access-control-allow-credentials": "true",
+      "access-control-allow-methods": "GET, POST, PUT, OPTIONS",
+      "access-control-allow-headers": "Content-Type, Authorization",
+      "access-control-max-age": "86400",
+      "vary": "Origin",
       "cache-control": "no-store",
       "x-content-type-options": "nosniff",
       "referrer-policy": "no-referrer",
@@ -30,7 +36,7 @@ function cookieValue(request, name) {
 
 function cookieHeader(value, maxAge) {
   return SESSION_COOKIE + "=" + value +
-    "; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=" + maxAge;
+    "; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=" + maxAge;
 }
 
 function randomToken() {
@@ -142,8 +148,10 @@ async function createSession(env, userId) {
 }
 
 async function authenticatedUser(request, env) {
-  const token = cookieValue(request, SESSION_COOKIE);
-  if (!token) return null;
+  const authorization=request.headers.get("Authorization")||"";
+  const bearer=authorization.match(/^Bearer\s+(.+)$/i);
+  const token=bearer?bearer[1].trim():cookieValue(request,SESSION_COOKIE);
+  if(!token)return null;
 
   const tokenHash = await sha256(token);
   const row = await env.DB.prepare(
@@ -228,7 +236,7 @@ async function handleRegister(request, env) {
   ).bind(id, JSON.stringify({ profile: { name, username, email, birthdate, age, ageBand }, goals: [], tasks: [], habits: [], activity: [], achievements: [], inventory: [], notifications: [], memories: [] }), now).run();
 
   const token = await createSession(env, id);
-  return json({ success: true, user: { id, name, username, email, birthdate, ageBand, createdAt: now } }, 201, {
+  return json({ success: true, token, user: { id, name, username, email, birthdate, ageBand, createdAt: now } }, 201, {
     "set-cookie": cookieHeader(token, SESSION_TTL_SECONDS)
   });
 }
@@ -257,7 +265,7 @@ async function handleLogin(request, env) {
   }
 
   const token = await createSession(env, user.id);
-  return json({ success: true, user: publicUser(user) }, 200, {
+  return json({ success: true, token, user: publicUser(user) }, 200, {
     "set-cookie": cookieHeader(token, SESSION_TTL_SECONDS)
   });
 }
@@ -802,6 +810,7 @@ async function handleSpendXP(request,env,user){
 
 export default {
   async fetch(request, env) {
+    if(request.method==="OPTIONS")return new Response(null,{status:204,headers:{"access-control-allow-origin":"https://smart-goal.pages.dev","access-control-allow-credentials":"true","access-control-allow-methods":"GET, POST, PUT, OPTIONS","access-control-allow-headers":"Content-Type, Authorization","access-control-max-age":"86400","vary":"Origin"}});
     try {
       if (!env.DB) return json({ success: false, message: "D1 binding DB sozlanmagan." }, 500);
       if (!validateOrigin(request, env)) return json({ success: false, message: "Bu sahifa manzilidan kirishga ruxsat yo‘q. SmartGoal’ning asosiy sahifasini oching." }, 403);
