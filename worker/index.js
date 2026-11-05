@@ -514,7 +514,7 @@ async function handleAI(request,env,user){
   }
   else{
     const message=String(body.message||"").trim();if(!message||message.length>500)return json({success:false,message:"Xabar 1–500 belgi bo‘lishi kerak."},400);
-    const planningIntent=/(bugun|bugungi|kunlik).{0,50}(reja|plan|jadval)|(reja|plan|jadval).{0,50}(bugun|bugungi|kun)/iu.test(message);
+    const planningIntent=/(bugun|bugungi|kunlik).{0,50}(reja|plan|jadval)|(reja|plan|jadval).{0,50}(bugun|bugungi|kun)|maqsadlar?.{0,80}(bugungi|bugun).{0,80}(vazifa|ish).{0,40}(tahlil|reja)/iu.test(message);
     if(planningIntent){
       const planLanguage={uz:"Faqat o‘zbek lotin yozuvida javob ber.",ru:"Отвечай только на русском языке.",en:"Reply only in English."}[language];
       messages=[
@@ -527,7 +527,7 @@ async function handleAI(request,env,user){
       messages.push({role:"user",content:message});
     }
   }
-  try{const rawAnswer=await runSmartAI(env,messages,{max_tokens:action==="plan"||action==="routine"?1100:650});const isPlanning=action==="plan"||(action==="chat"&&/(bugun|bugungi|kunlik).{0,50}(reja|plan|jadval)|(reja|plan|jadval).{0,50}(bugun|bugungi|kun)/iu.test(String(body.message||"")));let answer=isPlanning?preventScheduleOverlaps(rawAnswer):rawAnswer;if(isPlanning)answer=enforcePlanningFacts(answer,context);return json({success:true,answer});}
+  try{const rawAnswer=await runSmartAI(env,messages,{max_tokens:action==="plan"||action==="routine"?1100:650});const isPlanning=action==="plan"||(action==="chat"&&/(bugun|bugungi|kunlik).{0,50}(reja|plan|jadval)|(reja|plan|jadval).{0,50}(bugun|bugungi|kun)|maqsadlar?.{0,80}(bugungi|bugun).{0,80}(vazifa|ish).{0,40}(tahlil|reja)/iu.test(String(body.message||"")));let answer=isPlanning?preventScheduleOverlaps(rawAnswer):rawAnswer;if(isPlanning)answer=enforcePlanningFacts(answer,context);return json({success:true,answer});}
   catch(error){console.error("SmartGoal AI error:",{name:error?.name||"Error",message:String(error?.message||error||"Unknown AI error").slice(0,500),cause:error?.cause?String(error.cause).slice(0,300):undefined});return json({success:false,message:error?.message||"AI bilan bog‘lanib bo‘lmadi."},503);}
 }
 function extractFirstJsonObject(value){
