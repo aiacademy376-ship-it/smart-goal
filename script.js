@@ -3639,7 +3639,7 @@ remove planner task block      <section class="card" style="margin-top:20px">
       // HTML line wrapping can insert indentation/newlines inside a text node.
       // Normalize whitespace before dictionary lookup so the same phrase is
       // translated consistently regardless of its markup formatting.
-      const normalized = trimmed.replace(/\\s+/g, " ");
+      const normalized = trimmed.replace(/\s+/g, " ");
       node.nodeValue = original.replace(trimmed, dictionary[trimmed] || dictionary[normalized] || trimmed);
     }
     root.querySelectorAll("input[placeholder],textarea[placeholder],button[aria-label],button[title],[data-ai-prompt]").forEach(element => {
