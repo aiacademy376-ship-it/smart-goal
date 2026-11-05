@@ -6887,3 +6887,53 @@ select option:checked, .field-select option:checked { background:#eeeaff; color:
   .cosmetic-showcase-icon { width:48px; height:48px; flex-basis:48px; }
   .cosmetic-showcase-status { font-size:8px; }
 }
+
+
+/* Planner AI recommendations: readable, high-contrast output in light and dark themes. */
+.ai-plan-output {
+  margin: 14px 0 18px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 14px;
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.8;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.ai-plan-output:empty { display: none; }
+.ai-plan-output p { margin: 0 0 12px; color: var(--text); }
+.ai-plan-output p:last-child { margin-bottom: 0; }
+.ai-plan-output h3 {
+  margin: 18px 0 9px;
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 800;
+}
+.ai-plan-output h3:first-child { margin-top: 0; }
+.ai-plan-output ol, .ai-plan-output ul {
+  margin: 8px 0 16px;
+  padding-left: 26px;
+  color: var(--text);
+}
+.ai-plan-output li {
+  margin: 7px 0;
+  padding-left: 4px;
+  color: var(--text);
+}
+.ai-plan-output strong { color: var(--text); font-weight: 800; }
+.ai-plan-output em { color: var(--text-secondary); }
+.ai-plan-output code {
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: var(--surface-3);
+  color: var(--text);
+}
+@media (max-width: 640px) {
+  .ai-plan-output { padding: 14px; font-size: 14px; line-height: 1.75; }
+  .ai-plan-output h3 { font-size: 15px; }
+}
