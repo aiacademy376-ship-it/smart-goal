@@ -335,6 +335,8 @@ async function handleData(request, env, user) {
       if(!previous){completedAt=completed?now:null;}
       else if(changed && Number(previous.xpEarned||0)===0){completed=false;completedAt=null;}
       else if(completed){completedAt=previous.completed===true&&previous.completedAt?previous.completedAt:now;}
+      // A routine entry cannot be completed before its scheduled start time.
+      if(routineStart && Date.parse(routineStart)>Date.now()){completed=false;completedAt=null;}
       return {...task,title,description,date,createdAt,completed,completedAt};
     });
     const safeData = { ...body.data, profile, preferences, tasks, inventory, spentXP, xp: Number(balance?.xp_balance || 0) };
@@ -416,7 +418,7 @@ function enforcePlanningFacts(answer,contextText){
   try{context=JSON.parse(contextText||"{}");}catch{}
   const summary=context.todayRoutineSummary||{};
   const routine=Array.isArray(context.todayRoutineItems)?context.todayRoutineItems:[];
-  const pendingRoutine=routine.filter(item=>item.status==="upcoming");
+  const pendingRoutine=routine.filter(item=>item.status==="upcoming" || (item.time && item.time > String(context.currentTime||"99:99")));
   const pendingTasks=Array.isArray(context.todayPendingTasks)?context.todayPendingTasks:[];
   const pendingCount=Number(summary.pending||pendingRoutine.length)+pendingTasks.length;
   let result=String(answer||"").trim();
@@ -424,6 +426,7 @@ function enforcePlanningFacts(answer,contextText){
     // Remove direct claims that the whole day is complete or that the user should stop working.
     result=result.replace(/[^.!?\n]*(?:bugun|bugungi kun|barcha|hamma|все|все задачи|all tasks|everything)[^.!?\n]*(?:bajarildi|yakunlandi|tugadi|tamom|завершен[аоы]?|выполнен[ыо]?|completed|finished|done)[^.!?\n]*[.!?]?/giu,"");
     result=result.replace(/[^.!?\n]*(?:endi|hozir|можете|можно|now)[^.!?\n]*(?:dam ol|dam olish|отдых|rest|relax)[^.!?\n]*[.!?]?/giu,"");
+    result=result.replace(/[^\n]*(?:dam olish va dam olish|отдыхать и отдыхать)[^\n]*/giu,"");
     result=result.replace(/\n{3,}/g,"\n\n").trim();
     const lines=[];
     if(pendingRoutine.length){
@@ -494,10 +497,10 @@ async function handleAI(request,env,user){
     tasks:tasks.map(t=>({title:String(t.title||"").slice(0,100),description:String(t.description||"").slice(0,300),goalTitle:goalTitles.get(String(t.goalId||""))||"",date:String(t.date||""),completed:Boolean(t.completed),priority:String(t.priority||"medium"),estimatedMinutes:Number(t.estimatedMinutes||0),createdAt:String(t.createdAt||""),completedAt:String(t.completedAt||"")})),
     dailyRoutine:dailyRoutine.map(item=>({id:String(item.id||""),time:String(item.time||""),title:String(item.title||"").slice(0,90),description:String(item.description||"").slice(0,180),estimatedMinutes:Math.max(5,Math.min(480,Number(item.estimatedMinutes||30)||30))})),
     routineProgress:userData.routineLogs&&userData.routineLogs[todayLocal]&&typeof userData.routineLogs[todayLocal]==="object"?userData.routineLogs[todayLocal]:{},
-    todayRoutineItems:dailyRoutine.map(item=>{const saved=userData.routineLogs?.[todayLocal]?.[item.id];const time=String(item.time||"99:99");const status=saved?.status|| (time<=currentLocalTime?"missed":"upcoming");return {time,title:String(item.title||"").slice(0,90),description:String(item.description||"").slice(0,180),estimatedMinutes:Math.max(5,Math.min(480,Number(item.estimatedMinutes||30)||30)),status,xpEarned:Number(saved?.xpEarned||0)};}),
-    todayRoutineSummary:(()=>{const items=dailyRoutine.map(item=>{const saved=userData.routineLogs?.[todayLocal]?.[item.id];const time=String(item.time||"99:99");return saved?.status||(time<=currentLocalTime?"missed":"upcoming");});return {total:items.length,completed:items.filter(status=>status==="done").length,missed:items.filter(status=>"missed"===status).length,noTime:items.filter(status=>status==="no-time").length,pending:items.filter(status=>status==="upcoming").length};})(),
-    todayCompletedTasks:tasks.filter(t=>t.completed&&String(t.completedAt||"").slice(0,10)===todayLocal).map(t=>({title:String(t.title||"").slice(0,100),completedAt:String(t.completedAt||"")})),
-    todayPendingTasks:tasks.filter(t=>!t.completed&&(!t.date||t.date===todayLocal)).map(t=>({title:String(t.title||"").slice(0,100),priority:String(t.priority||"medium"),estimatedMinutes:Number(t.estimatedMinutes||0)}))
+    todayRoutineItems:dailyRoutine.map(item=>{const saved=userData.routineLogs?.[todayLocal]?.[item.id];const time=String(item.time||"99:99");const future=time>currentLocalTime;const status=future?"upcoming":(saved?.status||"missed");return {time,title:String(item.title||"").slice(0,90),description:String(item.description||"").slice(0,180),estimatedMinutes:Math.max(5,Math.min(480,Number(item.estimatedMinutes||30)||30)),status,xpEarned:Number(saved?.xpEarned||0)};}),
+    todayRoutineSummary:(()=>{const items=dailyRoutine.map(item=>{const saved=userData.routineLogs?.[todayLocal]?.[item.id];const time=String(item.time||"99:99");return time>currentLocalTime?"upcoming":(saved?.status||"missed");});return {total:items.length,completed:items.filter(status=>status==="done").length,missed:items.filter(status=>"missed"===status).length,noTime:items.filter(status=>status==="no-time").length,pending:items.filter(status=>status==="upcoming").length};})(),
+    todayCompletedTasks:tasks.filter(t=>t.completed&&String(t.completedAt||"").slice(0,10)===todayLocal&&Date.parse(String(t.completedAt||""))<=Date.now()).map(t=>({title:String(t.title||"").slice(0,100),completedAt:String(t.completedAt||"")})),
+    todayPendingTasks:tasks.filter(t=>(!t.completed||Date.parse(String(t.completedAt||""))>Date.now())&&(!t.date||t.date===todayLocal)).map(t=>({title:String(t.title||"").slice(0,100),priority:String(t.priority||"medium"),estimatedMinutes:Number(t.estimatedMinutes||0)}))
   });
   let messages;
   if(action==="routine"){
