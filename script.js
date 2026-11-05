@@ -11,7 +11,7 @@
   const DATA_KEY = "smartgoal_v3_data";
   const SETTINGS_KEY = "smartgoal_v3_settings";
   const SESSION_KEY = "smartgoal_v3_session";
-  const API_BASE="https://smartgoal-api.hyuhyu3268-4d9.workers.dev"; const API_TOKEN_KEY="smartgoal_api_token";
+  const API_BASE=""; const API_TOKEN_KEY="smartgoal_api_token";
   function apiFetch(path,options={}){const headers=new Headers(options.headers||{}),token=localStorage.getItem(API_TOKEN_KEY);if(token)headers.set("Authorization","Bearer "+token);if(options.body&&!headers.has("Content-Type"))headers.set("Content-Type","application/json");return fetch(API_BASE+path,{...options,headers,credentials:"include"});}
 
   const DEFAULT_SETTINGS = {
