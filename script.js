@@ -3886,6 +3886,69 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Ovoz sozlamasi": "Sound setting"
   });
 
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "SmartGoal — Maqsadlaringiz sari": "SmartGoal — к вашим целям",
+    "O'ZINGIZNING YANGI BOSQICHINGIZ": "ВАША НОВАЯ СТУПЕНЬ РАЗВИТИЯ",
+    "Bugungi kichik qadam — ertangi katta natija.": "Маленький шаг сегодня — большой результат завтра.",
+    "Maqsadlaringizni tartibga soling, odatlaringizni rivojlantiring va har kuni kechagidan yaxshiroq bo'ling.": "Упорядочивайте цели, развивайте привычки и становитесь лучше с каждым днём.",
+    "Har bir qadamingizni ko'rib boring": "Отслеживайте каждый свой шаг",
+    "O'zgarishni bugundan boshla.": "Начните меняться уже сегодня.",
+    "XUSH KELIBSIZ": "ДОБРО ПОЖАЛОВАТЬ",
+    "Davom etish uchun ma'lumotlaringizni kiriting.": "Введите свои данные, чтобы продолжить.",
+    "Ro'yxatdan o'tish": "Регистрация",
+    "Bu qurilmada eslab qolish": "Запомнить на этом устройстве",
+    "Hali hisobingiz yo'qmi?": "Ещё нет аккаунта?",
+    "Hisob yarating": "Создать аккаунт",
+    "SmartGoal — rivojlanishingiz uchun yaratilgan platforma.": "SmartGoal — платформа для вашего развития.",
+    "Foydalanuvchi": "Пользователь",
+    "Yig'ilgan ochkolar": "Накопленные очки",
+    "Har kuni bir qadam oldinga.": "Каждый день на шаг вперёд.",
+    "Oyna": "Окно",
+    "Kirishingiz va ro'yxatdan o'tishingiz": "Вход и регистрация",
+    "SmartGoal bosh sahifa": "Главная страница SmartGoal",
+    "Username yoki email": "Имя пользователя или электронная почта",
+    "Parolingizni kiriting": "Введите пароль",
+    "Parolni ko'rsatish": "Показать пароль",
+    "example@email.com": "example@email.com",
+    "Menyuni yopish": "Закрыть меню",
+    "Asosiy navigatsiya": "Основная навигация",
+    "Menyuni ochish": "Открыть меню",
+    "Qidirish": "Поиск",
+    "Maqsad, vazifa yoki foydalanuvchini qidiring...": "Поиск целей, задач или пользователей...",
+    "Qidiruvni yopish": "Закрыть поиск"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "SmartGoal — Maqsadlaringiz sari": "SmartGoal — Toward your goals",
+    "O'ZINGIZNING YANGI BOSQICHINGIZ": "YOUR NEXT LEVEL STARTS HERE",
+    "Bugungi kichik qadam — ertangi katta natija.": "A small step today leads to a big result tomorrow.",
+    "Maqsadlaringizni tartibga soling, odatlaringizni rivojlantiring va har kuni kechagidan yaxshiroq bo'ling.": "Organize your goals, build better habits, and become better every day.",
+    "Har bir qadamingizni ko'rib boring": "Track every step of your journey",
+    "O'zgarishni bugundan boshla.": "Start making a change today.",
+    "XUSH KELIBSIZ": "WELCOME",
+    "Davom etish uchun ma'lumotlaringizni kiriting.": "Enter your details to continue.",
+    "Ro'yxatdan o'tish": "Sign up",
+    "Bu qurilmada eslab qolish": "Remember on this device",
+    "Hali hisobingiz yo'qmi?": "Don't have an account yet?",
+    "Hisob yarating": "Create an account",
+    "SmartGoal — rivojlanishingiz uchun yaratilgan platforma.": "SmartGoal — a platform built to support your growth.",
+    "Foydalanuvchi": "User",
+    "Yig'ilgan ochkolar": "Earned points",
+    "Har kuni bir qadam oldinga.": "One step forward every day.",
+    "Oyna": "Window",
+    "Kirishingiz va ro'yxatdan o'tishingiz": "Sign in and sign up",
+    "SmartGoal bosh sahifa": "SmartGoal home page",
+    "Username yoki email": "Username or email",
+    "Parolingizni kiriting": "Enter your password",
+    "Parolni ko'rsatish": "Show password",
+    "example@email.com": "example@email.com",
+    "Menyuni yopish": "Close menu",
+    "Asosiy navigatsiya": "Main navigation",
+    "Menyuni ochish": "Open menu",
+    "Qidirish": "Search",
+    "Maqsad, vazifa yoki foydalanuvchini qidiring...": "Search goals, tasks, or users...",
+    "Qidiruvni yopish": "Close search"
+  });
+
   const translationOriginalText = new WeakMap();
   const translationOriginalAttributes = new WeakMap();
 
