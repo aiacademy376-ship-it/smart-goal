@@ -3598,6 +3598,19 @@ remove planner task block      <section class="card" style="margin-top:20px">
     "Yashil va binafsha rangli yorqin ramka.":"A bright frame in green and violet."
   });
 
+  Object.assign(UI_TRANSLATIONS.ru, {
+    "Har bir qadamingizni ko'rib boring":"Отслеживайте каждый свой шаг",
+    "yoki":"или",
+    "Mukofotlar do'koni":"Магазин наград",
+    "Oyna":"Окно"
+  });
+  Object.assign(UI_TRANSLATIONS.en, {
+    "Har bir qadamingizni ko'rib boring":"See every step of your journey",
+    "yoki":"or",
+    "Mukofotlar do'koni":"Rewards shop",
+    "Oyna":"Window"
+  });
+
   function translateVisibleUI(root = document.body) {
     if (!root) return;
     const dictionary = UI_TRANSLATIONS[settings.language] || {};
@@ -3609,7 +3622,11 @@ remove planner task block      <section class="card" style="margin-top:20px">
       if (!translationOriginalText.has(node)) translationOriginalText.set(node, node.nodeValue || "");
       const original = translationOriginalText.get(node), trimmed = original.trim();
       if (!trimmed) continue;
-      node.nodeValue = original.replace(trimmed, dictionary[trimmed] || trimmed);
+      // HTML line wrapping can insert indentation/newlines inside a text node.
+      // Normalize whitespace before dictionary lookup so the same phrase is
+      // translated consistently regardless of its markup formatting.
+      const normalized = trimmed.replace(/\\s+/g, " ");
+      node.nodeValue = original.replace(trimmed, dictionary[trimmed] || dictionary[normalized] || trimmed);
     }
     root.querySelectorAll("input[placeholder],textarea[placeholder],button[aria-label],button[title],[data-ai-prompt]").forEach(element => {
       let originals = translationOriginalAttributes.get(element);
