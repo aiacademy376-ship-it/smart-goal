@@ -299,7 +299,16 @@
       description: "1000 ochko to‘plang.",
       icon: "gem",
       condition: data => Number(data.xp || 0) + Number(data.spentXP || 0) >= 1000
-    }
+    },
+    { id: "twenty-five-tasks", name: "Barqaror intizom", description: "25 ta vazifani bajaring.", icon: "calendar-check", condition: data => data.tasks.filter(task => task.completed).length >= 25 },
+    { id: "fifty-tasks", name: "Mehnat chempioni", description: "50 ta vazifani bajaring.", icon: "medal", condition: data => data.tasks.filter(task => task.completed).length >= 50 },
+    { id: "hundred-tasks", name: "Yuz qadam", description: "100 ta vazifani bajaring.", icon: "trophy", condition: data => data.tasks.filter(task => task.completed).length >= 100 },
+    { id: "five-goals-created", name: "Katta orzular", description: "5 ta maqsad yarating.", icon: "goal", condition: data => data.goals.length >= 5 },
+    { id: "ten-goals-created", name: "Rejalar me’mori", description: "10 ta maqsad yarating.", icon: "drafting-compass", condition: data => data.goals.length >= 10 },
+    { id: "xp-250", name: "Birinchi marralar", description: "250 XP to‘plang.", icon: "coins", condition: data => Number(data.xp || 0) + Number(data.spentXP || 0) >= 250 },
+    { id: "xp-2500", name: "Kuchli salohiyat", description: "2500 XP to‘plang.", icon: "sparkles", condition: data => Number(data.xp || 0) + Number(data.spentXP || 0) >= 2500 },
+    { id: "xp-5000", name: "Afsonaviy natija", description: "5000 XP to‘plang.", icon: "crown", condition: data => Number(data.xp || 0) + Number(data.spentXP || 0) >= 5000 },
+    { id: "routine-builder", name: "Kun tartibi ustasi", description: "Kun tartibiga 10 ta band kiriting.", icon: "list-todo", condition: data => (data.dailyRoutine || []).length >= 10 }
   ];
 
   /* -------------------- HELPERS -------------------- */
