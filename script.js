@@ -247,7 +247,19 @@
     { id: "badge-streak", name: "Streak belgisi", description: "Muntazamlik va davomiy harakat ramzi.", type: "badge", value: "Streak", price: 360, icon: "calendar-check" },
     { id: "badge-creator", name: "Creator belgisi", description: "Yangi g‘oyalarni amaliy natijaga aylantiruvchilar uchun.", type: "badge", value: "Creator", price: 480, icon: "lightbulb" },
     { id: "avatar-frame-crystal", name: "Crystal avatar ramkasi", description: "Profil rasmingiz uchun billurdek yorqin ramka.", type: "avatar", value: "crystal", price: 620, icon: "diamond" },
-    { id: "avatar-frame-flame", name: "Flame avatar ramkasi", description: "Profilingizga jo‘shqin va yorqin uslub.", type: "avatar", value: "flame", price: 760, icon: "flame" }
+    { id: "avatar-frame-flame", name: "Flame avatar ramkasi", description: "Profilingizga jo‘shqin va yorqin uslub.", type: "avatar", value: "flame", price: 760, icon: "flame" },
+    { id: "theme-graphite", name: "Graphite mavzusi", description: "Minimal va jiddiy grafit ranglar.", type: "theme", value: "graphite", price: 220, icon: "layers" },
+    { id: "theme-ice", name: "Ice mavzusi", description: "Sovuq moviy va oq ranglar uyg‘unligi.", type: "theme", value: "ice", price: 240, icon: "snowflake" },
+    { id: "theme-amber", name: "Amber mavzusi", description: "Iliq oltin ranglar bilan yorqin interfeys.", type: "theme", value: "amber", price: 260, icon: "sun-medium" },
+    { id: "background-ocean", name: "Ocean profil foni", description: "Chuqur dengiz ranglaridagi profil foni.", type: "background", value: "ocean", price: 560, icon: "waves" },
+    { id: "background-mountain", name: "Mountain profil foni", description: "Tog‘ manzarasidan ilhomlangan fon.", type: "background", value: "mountain", price: 590, icon: "mountain" },
+    { id: "background-aurora-night", name: "Aurora Night fon", description: "Tungi osmon va shimol yog‘dusi ranglari.", type: "background", value: "aurora-night", price: 780, icon: "moon-star" },
+    { id: "badge-focus-pro", name: "Focus Pro belgisi", description: "Chuqur diqqat va samarali mehnat ramzi.", type: "badge", value: "Focus Pro", price: 650, icon: "focus" },
+    { id: "badge-innovator", name: "Innovator belgisi", description: "Yangi yechimlar yaratuvchilar uchun.", type: "badge", value: "Innovator", price: 700, icon: "lightbulb" },
+    { id: "badge-mentor", name: "Mentor belgisi", description: "Bilimini boshqalar bilan ulashuvchilar uchun.", type: "badge", value: "Mentor", price: 820, icon: "graduation-cap" },
+    { id: "avatar-frame-prism", name: "Prism avatar ramkasi", description: "Ranglar jilosi bilan zamonaviy ramka.", type: "avatar", value: "prism", price: 850, icon: "gem" },
+    { id: "avatar-frame-carbon", name: "Carbon avatar ramkasi", description: "Minimal qoramtir premium ramka.", type: "avatar", value: "carbon", price: 900, icon: "square" },
+    { id: "avatar-frame-aurora", name: "Aurora avatar ramkasi", description: "Yashil va binafsha rangli yorqin ramka.", type: "avatar", value: "aurora", price: 980, icon: "sparkles" },
   ];
 
   const ACHIEVEMENTS = [
