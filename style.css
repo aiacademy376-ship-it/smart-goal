@@ -6684,3 +6684,12 @@ img, video, canvas, iframe { max-width: 100%; }
 .setting-info small { font-size:11px; line-height:1.55; }
 select option { padding:9px; background:var(--surface); color:var(--text); }
 @media(max-width:760px){.auth-feature-list{gap:19px;margin-top:34px}.auth-feature .feature-icon{flex-basis:44px;width:44px;height:44px}.setting-row{align-items:flex-start}.settings-panel{padding:16px}}
+
+.file-picker { position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:12px; border:1px dashed var(--border-strong); border-radius:14px; background:var(--surface-2); cursor:pointer; transition:border-color .2s ease,background .2s ease; }
+.file-picker:hover { border-color:var(--primary); background:var(--primary-soft); }
+.file-picker>span { display:inline-flex; align-items:center; gap:9px; padding:9px 12px; border:1px solid var(--border); border-radius:11px; background:var(--surface); color:var(--primary); font-weight:750; }
+.file-picker>small { flex-basis:100%; color:var(--text-muted); line-height:1.5; }
+.file-picker input[type="file"] { position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; clip:rect(0,0,0,0); }
+.file-picker:focus-within { outline:3px solid color-mix(in srgb,var(--primary) 25%,transparent); outline-offset:2px; }
+.file-picker-icon { min-height:72px; }
+.file-picker-icon>span { border:0; background:transparent; }
