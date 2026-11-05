@@ -40,24 +40,37 @@
   };
 
   // Canonical, shareable URLs for every application section.
+  // O‘zbekcha asosiy manzillar. Inglizcha eski manzillar mos sahifaga
+  // yo‘naltiriladi, shunda avval ulashilgan havolalar ham ishlashda davom etadi.
   const PAGE_ROUTES = {
     dashboard: "/",
-    goals: "/goals",
-    schedule: "/tasks",
-    planner: "/planner",
-    analytics: "/statistics",
-    achievements: "/achievements",
-    rewards: "/rewards",
-    community: "/community",
-    ai: "/ai",
-    notifications: "/notifications",
-    settings: "/settings",
-    profile: "/profile"
+    goals: "/maqsadlar",
+    schedule: "/vazifalar",
+    planner: "/kun-tartibi",
+    analytics: "/statistika",
+    achievements: "/yutuqlar",
+    rewards: "/mukofotlar",
+    community: "/hamjamiyat",
+    ai: "/suniy-intellekt",
+    notifications: "/bildirishnomalar",
+    settings: "/sozlamalar",
+    profile: "/profil"
   };
   const ROUTE_PAGES = Object.fromEntries(
     Object.entries(PAGE_ROUTES).map(([page, path]) => [path, page])
   );
   Object.assign(ROUTE_PAGES, {
+    "/goals": "goals",
+    "/tasks": "schedule",
+    "/planner": "planner",
+    "/statistics": "analytics",
+    "/achievements": "achievements",
+    "/rewards": "rewards",
+    "/community": "community",
+    "/ai": "ai",
+    "/notifications": "notifications",
+    "/settings": "settings",
+    "/profile": "profile",
     "/dashboard": "dashboard",
     "/schedule": "schedule",
     "/analytics": "analytics",
@@ -66,7 +79,9 @@
   });
 
   function resolvePageFromPath(pathname = window.location.pathname) {
-    const normalized = String(pathname || "/").replace(/\/+$/, "") || "/";
+    let normalized = String(pathname || "/");
+    try { normalized = decodeURIComponent(normalized); } catch {}
+    normalized = normalized.replace(/\\/+$/, "") || "/";
     return ROUTE_PAGES[normalized] || "dashboard";
   }
 
@@ -493,6 +508,10 @@
   let data = loadData();
   let settings = loadSettings();
   let currentPage = resolvePageFromPath();
+  const canonicalInitialPath = PAGE_ROUTES[currentPage] || "/";
+  if (window.location.pathname !== canonicalInitialPath) {
+    window.history.replaceState({ smartGoalPage: currentPage }, "", canonicalInitialPath);
+  }
   let currentSettingsTab = "general";
   let storeFilter = "all";
   let taskListLimit = 50;
