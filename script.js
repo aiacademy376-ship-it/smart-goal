@@ -2979,7 +2979,8 @@ remove planner task block      <section class="card" style="margin-top:20px">
                     class="theme-option ${settings.colorTheme === theme ? "active" : ""}"
                     data-color-theme="${theme}"
                     data-action="${available ? "set-theme" : "locked-theme"}"
-                    title="${theme}${available ? "" : " — do‘kondan xarid qiling"}">
+                    title="${theme}${available ? "" : " — do‘kondan xarid qiling"}" aria-label="${theme}${available ? " — ochilgan" : " — qulflangan"}">
+                    ${icon(available ? "check" : "lock",14)}
                   </button>
                 `;
               }).join("")}
