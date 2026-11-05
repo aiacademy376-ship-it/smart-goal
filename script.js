@@ -3057,14 +3057,14 @@ remove planner task block      <section class="card" style="margin-top:20px">
             <button class="secondary-button" type="button" data-action="import-data">${icon("upload")} Import</button>
           </div>
 
-          <div class="setting-row">
+          <div class="setting-row settings-danger-row">
             <div class="setting-info"><strong>Ma’lumotlarni o‘chirish</strong><small>Vazifa, maqsad, kun tartibi va boshqa bo‘limlarni tanlab o‘chirish.</small></div>
-            <button class="secondary-button" type="button" data-action="reset-data">${icon("trash-2")} Tozalash</button>
+            <button class="secondary-button settings-danger-button" type="button" data-action="reset-data">${icon("trash-2")} Tozalash</button>
           </div>
 
-          <div class="setting-row settings-reset-row">
+          <div class="setting-row settings-reset-row settings-danger-row">
             <div class="setting-info"><strong>Sozlamalarni asliga qaytarish</strong><small>Til, kun/tun rejimi, rang mavzusi, matn hajmi, ovoz va animatsiyalar tiklanadi.</small></div>
-            <button class="secondary-button" type="button" data-action="reset-preferences">Asliga qaytarish</button>
+            <button class="secondary-button settings-danger-button" type="button" data-action="reset-preferences">Asliga qaytarish</button>
           </div>
         </div>
       `;
