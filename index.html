@@ -117,7 +117,7 @@
               </button>
             </div>
 
-            <form id="login-form" class="auth-form">
+            <form id="login-form" class="auth-form" novalidate>
               <div class="form-field">
                 <label for="login-identifier">Username yoki elektron pochta</label>
                 <div class="input-wrap">
@@ -167,7 +167,7 @@
               </button>
             </form>
 
-            <form id="register-form" class="auth-form hidden">
+            <form id="register-form" class="auth-form hidden" novalidate>
               <div class="form-field">
                 <label for="register-name">Ism va familiya</label>
                 <div class="input-wrap">
@@ -235,7 +235,7 @@
               <label class="checkbox-label terms-label">
                 <input type="checkbox" name="terms" required />
                 <span>Foydalanish shartlari va maxfiylik siyosatiga roziman.</span>
-              </label>
+              </label><button type="button" class="text-button terms-details" data-action="show-terms">Batafsil</button>
 
               <button class="primary-button auth-submit" type="submit">
                 <span>Hisob yaratish</span>
