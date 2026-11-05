@@ -6937,3 +6937,26 @@ select option:checked, .field-select option:checked { background:#eeeaff; color:
   .ai-plan-output { padding: 14px; font-size: 14px; line-height: 1.75; }
   .ai-plan-output h3 { font-size: 15px; }
 }
+
+
+/* Destructive settings actions: make the consequences visually clear. */
+.settings-panel .setting-row.settings-danger-row .setting-info strong,
+.settings-panel .setting-row.settings-danger-row .setting-info small {
+  color: #dc2626;
+}
+
+.settings-panel .setting-row.settings-danger-row .settings-danger-button {
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.45);
+}
+
+.settings-panel .setting-row.settings-danger-row .settings-danger-button:hover {
+  color: #fff;
+  border-color: #dc2626;
+  background: #dc2626;
+}
+
+.settings-panel .setting-row.settings-danger-row .settings-danger-button:focus-visible {
+  outline: 3px solid rgba(220, 38, 38, 0.28);
+  outline-offset: 2px;
+}
