@@ -6444,3 +6444,10 @@ input[type=file]::file-selector-button { margin-right:10px; padding:10px 14px; b
 .avatar-frame-prism { box-shadow:0 0 0 3px #b48cff,0 0 0 6px #65d8e8,0 0 16px rgba(101,216,232,.5); }
 .avatar-frame-carbon { box-shadow:0 0 0 4px #344054,0 0 0 6px #8a98a9; }
 .avatar-frame-aurora { box-shadow:0 0 0 3px #5fc7a8,0 0 0 6px #8b70d7,0 0 18px rgba(95,199,168,.45); }
+
+.public-memory-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr)); gap:12px; margin-top:12px; }
+.public-memory-card { min-width:0; padding:13px; border:1px solid var(--border); border-radius:14px; background:var(--surface-2); }
+.public-memory-card>div { display:grid; gap:4px; }
+.public-memory-card small { color:var(--text-muted); }
+.public-memory-card img { display:block; width:100%; max-height:220px; margin-top:10px; object-fit:contain; border-radius:10px; background:var(--surface); }
+.public-memory-card p { margin:10px 0 0; overflow-wrap:anywhere; }
