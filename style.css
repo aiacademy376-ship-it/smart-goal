@@ -6937,3 +6937,12 @@ select option:checked, .field-select option:checked { background:#eeeaff; color:
   .ai-plan-output { padding: 14px; font-size: 14px; line-height: 1.75; }
   .ai-plan-output h3 { font-size: 15px; }
 }
+
+/* Russian settings typography: keep field labels at the same regular weight
+   as the other locales instead of inheriting the browser's <strong> bold. */
+html[lang="ru"] .settings-panel .setting-info strong {
+  font-weight: 500 !important;
+}
+html[lang="ru"] .settings-panel > .settings-section > h3 {
+  font-weight: 650;
+}
